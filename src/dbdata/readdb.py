@@ -1,5 +1,7 @@
 from sqlalchemy import create_engine
-engine = create_engine('sqlite:///data.db', echo=False)
+from os import path
+db_path = "sqlite:///" + path.expanduser("~/data.db")
+engine = create_engine(db_path, echo=False)
 
 from common_classes import Animal, Genotype
 
@@ -7,8 +9,6 @@ from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
 from sqlalchemy.orm import sessionmaker
-# Session = sessionmaker(bind=engine)
-# session = Session()
 
 def loadSession():
 	""""""
@@ -18,5 +18,7 @@ def loadSession():
 	return session
 
 session = loadSession()
+a=0
 for row in session.query(Animal).order_by(Animal.id):
-	print row.__repr__
+	a+= 1
+	print a
