@@ -49,3 +49,6 @@ img*/
 
 #specific configs
 profiles/*
+
+#databases
+.db
