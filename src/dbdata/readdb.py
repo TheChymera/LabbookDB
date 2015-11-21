@@ -19,6 +19,6 @@ def loadSession():
 
 session = loadSession()
 a=0
-for row in session.query(Animal).order_by(Animal.id):
-	a+= 1
-	print a
+for row in session.query(Animal).order_by(Animal.id_eth):
+	print row.__repr__
+	print row.treatment
