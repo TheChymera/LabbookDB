@@ -51,6 +51,10 @@ class SubstanceAdministration(Base):
 	animal_weight = Column(Float)
 	animal_weight_unit = Column(String)
 
+	def __repr__(self):
+		return "<Substance Administration(date='%s', animal_weight='%s%s')>"\
+		% (self.date, self.animal_weight, self.animal_weight_unit)
+
 class TwoStepInjectionAnesthesia(Base):
 	__tablename__ = "twostep_injection_anesthesia"
 	id = Column(Integer, primary_key=True)
@@ -84,8 +88,8 @@ class Treatment(Base):
 	substance_administrations = relationship("SubstanceAdministration", secondary=administration_association, backref="treatments")
 
 	def __repr__(self):
-		return "<Treatment(substance='%s', frequency='%s', route='%s')>"\
-		% (self.substance, self.frequency, self.route)
+		return "<Treatment(substance='%s', frequency='%s', route='%s', administrations='%s')>"\
+		% (self.substance, self.frequency, self.route, self.substance_administrations)
 
 class Animal(Base):
 	__tablename__ = "animals"
