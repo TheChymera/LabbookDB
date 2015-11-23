@@ -1,6 +1,6 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, literal
 from os import path
-db_path = "sqlite:///" + path.expanduser("~/data.db")
+db_path = "sqlite:///" + path.expanduser("~/animal_data.db")
 engine = create_engine(db_path, echo=False)
 
 from common_classes import Animal, Genotype
@@ -18,7 +18,9 @@ def loadSession():
 	return session
 
 session = loadSession()
-a=0
 for row in session.query(Animal).order_by(Animal.id_eth):
 	print row.__repr__
-	print row.treatment
+	print row.sex
+
+session.close()
+engine.dispose()
