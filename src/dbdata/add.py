@@ -24,28 +24,27 @@ def add_genotype(name, zygosity):
 	session.add(new_animal)
 	commit_and_close(session, engine)
 
-def add_animal(db_path, id_eth, cage_eth, sex, ear_punches, id_uzh="", cahe_uzh=""):
-	session, engine = loadSession(db_path)
-
-	check_entry("id_eth", id_eth)
+def add_animal(db_path, id_eth, cage_eth, sex, ear_punches, id_uzh="", cage_uzh=""):
 	if id_uzh:
-		check_entry("id_uzh", id_uzh)
+		if double_entry(db_path, "id_uzh", id_uzh): return
 
-	new_genotype = Genotype(name=name, zygosity=zygosity)
-	session.add(new_animal)
-	commit_and_close(session, engine)
+	add_to_db(db_path, Animal(id_eth=id_eth, cage_eth=cage_eth, sex=sex, ear_punches=ear_punches, id_uzh=id_uzh, cage_uzh=cage_uzh))
 
 def commit_and_close(session, engine):
 	session.commit()
 	session.close()
 	engine.dispose()
 
-def check_entry(field, value):
+def double_entry(db_path, field, value):
+	session, engine = loadSession(db_path)
 	q=session.query(Animal).filter(getattr(Animal, field)==value)
 	if session.query(literal(True)).filter(q.exists()).scalar():
-		raise ValueError("Entry conflict for key "+field+" = "+value)
-
+		session.close()
+		engine.dispose()
+		print("Entry conflict for key "+field+" = "+value)
+		return True
+	session.close()
+	engine.dispose()
 
 if __name__ == '__main__':
-	Animal(id_eth=id_eth, cage_eth=cage_eth, sex=sex, ear_punches=ear_punches, id_uzh=id_uzh, cage_uzh=cage_uzh)
-	add_animal("4011", "0004", "m", "2L", id_uzh="M2760", cage_uzh="570971")
+	add_animal("~/animal_db.py", 4011, 0004, "f", "2L", id_uzh="M2760", cage_uzh="570971")
