@@ -1,14 +1,9 @@
 from sqlalchemy import create_engine, Column, Integer, String, Sequence, Table, ForeignKey, Float, DateTime
 from sqlalchemy.orm import backref, relationship, sessionmaker
 from os import path
-db_path = "sqlite:///" + path.expanduser("~/data.db")
-engine = create_engine(db_path, echo=False)
 
 from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
-
-Session = sessionmaker(bind=engine)
-session = Session()
 
 genotype_association = Table('gt_association', Base.metadata,
 	Column('genotypes_id', Integer, ForeignKey('genotypes.id')),
@@ -107,5 +102,3 @@ class Animal(Base):
 	def __repr__(self):
 		return "<Animal(id_eth='%s', cage_eth='%s', id_uzh='%s', cage_uzh='%s', genotype='%s', sex='%s', ear_punches='%s', treatment='%s')>"\
 		% (self.id_eth, self.cage_eth, self.id_uzh, self.cage_uzh, [self.genotype[i].name+" "+self.genotype[i].zygosity for i in range(len(self.genotype))], self.sex, self.ear_punches, [self.treatment[i].substance for i in range(len(self.treatment))])
-
-Base.metadata.create_all(engine)
