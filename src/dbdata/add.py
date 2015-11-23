@@ -47,4 +47,4 @@ def double_entry(db_path, field, value):
 	engine.dispose()
 
 if __name__ == '__main__':
-	add_animal("~/animal_db.py", 4011, 0004, "f", "2L", id_uzh="M2760", cage_uzh="570971")
+	add_animal("~/animal.db", 4011, 0004, "f", "2L", id_uzh="M2760", cage_uzh="570971")
