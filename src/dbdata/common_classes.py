@@ -7,58 +7,72 @@ Base = declarative_base()
 
 genotype_association = Table('gt_association', Base.metadata,
 	Column('genotypes_id', Integer, ForeignKey('genotypes.id')),
-	Column('animals_id', Integer, ForeignKey('animals.id'))
+	Column('animals_id', Integer, ForeignKey('animals.id_eth'))
 )
 treatment_association = Table('tr_association', Base.metadata,
 	Column('treatments_id', Integer, ForeignKey('treatments.id')),
-	Column('animals_id', Integer, ForeignKey('animals.id'))
-)
-administration_association = Table('ad_association', Base.metadata,
-	Column('administrations_id', Integer, ForeignKey('substance_administration.id')),
-	Column('treatments_id', Integer, ForeignKey('treatments.id'))
+	Column('animals_id', Integer, ForeignKey('animals.id_eth'))
 )
 
+class FMRIMeasurementSession(Base):
+	__tablename__ = "fmri_measurement_sessions"
+	id = Column(Integer, primary_key=True)
+	date = Column(DateTime)
+	protocol_id = Column(Integer, ForeignKey('fmri_measurement_protocols.id'))
+	protocol = relationship("FMRIMeasurementProtocol", backref="used_in_sessions")
+
+class FMRIMeasurementProtocol(Base):
+	__tablename__ = "fmri_measurement_protocols"
+	id = Column(Integer, primary_key=True)
+	scanner_setup_id = Column(Integer, ForeignKey('scanner_setups.id'))
+	scanners_setup = relationship("ScannerSetup", backref="used_for_protocols")
+	induction_anesthesia = relationship("InhalationAnesthesia", backref="used_in")
+	maintenance_anesthesia = relationship("InhalationAnesthesia", backref="used_in")
+
+
 class InhalationAnesthesia(Base):
-	__tablename__ = "inhalation_anesthesia"
+	__tablename__ = "inhalation_anesthesias"
 	id = Column(Integer, primary_key=True)
 	anesthetic = Column(String)
 	concentration = Column(Float)
 	concentration_unit = Column(String)
-	duration = Column(String)
+	duration = Column(Float)
+	duration_unit = Column(String)
 
 	def __repr__(self):
 		return "<Inhalation Anesthesia Step(anesthetic='%s', concentration='%s', duration='%s')>"\
 		% (self.anesthetic, self.concentration, self.duration)
 
 class ScannerSetup(Base):
-	__tablename__ = "scanner_setup"
+	__tablename__ = "scanner_setups"
 	id = Column(Integer, primary_key=True)
 	coil = Column(String)
-	respiraion = Column(Float)
-	support = Column(Float)
-	primary_rate = Column(Float)
-	secondary_rate = Column(Float)
+	respiraion = Column(String)
+	support = Column(String)
 
 class SubstanceAdministration(Base):
-	__tablename__ = "substance_administration"
+	__tablename__ = "substance_administrations"
 	id = Column(Integer, primary_key=True)
 	date = Column(DateTime)
 	animal_weight = Column(Float)
 	animal_weight_unit = Column(String)
+	treatment_id = Column(Integer, ForeignKey('treatments.id'))
 
 	def __repr__(self):
 		return "<Substance Administration(date='%s', animal_weight='%s%s')>"\
 		% (self.date, self.animal_weight, self.animal_weight_unit)
 
 class TwoStepInjectionAnesthesia(Base):
-	__tablename__ = "twostep_injection_anesthesia"
+	__tablename__ = "twostep_injection_anesthesias"
 	id = Column(Integer, primary_key=True)
 	anesthetic = Column(String)
-	concentration = Column(Float)
-	concentration_unit = Column(String)
+	solution_concentration = Column(Float)
+	solution_concentration_unit = Column(String)
 	primary_dose = Column(Float)
 	primary_rate = Column(Float)
+	primary_rate_unit = Column(String)
 	secondary_rate = Column(Float)
+	secondary_rate_unit = Column(String)
 
 	# def __repr__(self):
 	# 	return "<Inhalation Anesthesia Step(anesthetic='%s', concentration='%s', duration='%s')>"\
@@ -80,7 +94,7 @@ class Treatment(Base):
 	substance = Column(String)
 	frequency = Column(String)
 	route = Column(String)
-	substance_administrations = relationship("SubstanceAdministration", secondary=administration_association, backref="treatments")
+	substance_administrations = relationship("SubstanceAdministration", backref="treatment")
 
 	def __repr__(self):
 		return "<Treatment(substance='%s', frequency='%s', route='%s', administrations='%s')>"\
@@ -88,9 +102,8 @@ class Treatment(Base):
 
 class Animal(Base):
 	__tablename__ = "animals"
-	id = Column(Integer, Sequence("substance_id_seq"), primary_key=True)
-	id_eth = Column(String)
-	cage_eth = Column(String)
+	id_eth = Column(Integer, primary_key=True)
+	cage_eth = Column(Integer)
 	id_uzh = Column(String)
 	cage_uzh = Column(String)
 	sex = Column(String)
