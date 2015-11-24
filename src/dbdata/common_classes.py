@@ -30,6 +30,18 @@ class FMRIMeasurementProtocol(Base):
 	maintenance_anesthesia = relationship("InhalationAnesthesia", backref="used_in")
 
 
+class LaserStimulationProtocol(Base):
+	__tablename__ = "laser_stimulation_protocols"
+	id = Column(Integer, primary_key=True)
+	stimulus_repetitions = Column(Integer)
+	stimulus_duration = Column(Float)
+	inter_stimulus_duration = Column(Float)
+	stimulation_onset = Column(Float)
+	stimulus_frequency = Column(Float)
+	pulse_width = Column(Float)
+	duration_unit = Column(String)
+	frequency_unit = Column(String)
+
 class InhalationAnesthesia(Base):
 	__tablename__ = "inhalation_anesthesias"
 	id = Column(Integer, primary_key=True)
@@ -87,6 +99,15 @@ class Genotype(Base):
 	def __repr__(self):
 		return "<Genotype(name='%s', zygosity='%s')>"\
 		% (self.name, self.zygosity)
+
+class Substance(Base):
+	__tablename__ = "substances"
+	id = Column(Integer, primary_key=True)
+	name = Column(String)
+	long_name = Column(String)
+	concentration = Column(Float)
+	concentration_unit = Column(String)
+	
 
 class Treatment(Base):
 	__tablename__ = "treatments"
