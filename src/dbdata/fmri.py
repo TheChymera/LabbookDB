@@ -14,7 +14,8 @@ def make_document(my_header, my_content, my_footer):
 	return tex_document
 
 def compose_FMRIMeasurementProtocol(Protocol):
-	tex_content = ""
+	tex_content = "\\begin{itemize}\n"
+	return tex_content
 
 def print_document(tex_document, destination=None):
 	p = Popen(["pdflatex"], stdout=PIPE, stdin=PIPE, stderr=STDOUT)
@@ -27,7 +28,6 @@ def print_document(tex_document, destination=None):
 		os.remove(trace_file)
 
 if __name__ == '__main__':
-	my_content="LALA\
-	LILU"
+	my_content=compose_FMRIMeasurementProtocol()
 	tex_document = make_document(standard_header, my_content, standard_footer)
 	print_document(tex_document)
