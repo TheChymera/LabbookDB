@@ -10,16 +10,20 @@ genotype_association = Table('gt_association', Base.metadata,
 	Column('animals_id', Integer, ForeignKey('animals.id_eth'))
 )
 treatment_association = Table('tr_association', Base.metadata,
-	Column('treatments_id', Integer, ForeignKey('treatments.id')),
+	Column('treatments_id', Integer, ForeignKey('treatments.code')),
 	Column('animals_id', Integer, ForeignKey('animals.id_eth'))
 )
 substance_association = Table('st_association', Base.metadata,
 	Column('substance_administrations_id', Integer, ForeignKey('substance_administrations.id')),
-	Column('solutions_id', Integer, ForeignKey('solutions.id'))
+	Column('solutions_id', Integer, ForeignKey('solutions.code'))
 )
 operator_association = Table('op_association', Base.metadata,
 	Column('operator_id', Integer, ForeignKey('operators.initials')),
 	Column('fmri_measurement_sessions_id', Integer, ForeignKey('fmri_measurement_sessions.id'))
+)
+ingredients_association = Table('ig_association', Base.metadata,
+	Column('solutions_id', Integer, ForeignKey('solutions.code')),
+	Column('ingredients_id', Integer, ForeignKey('ingredients.id'))
 )
 
 class FMRIMeasurementSession(Base):
@@ -90,7 +94,7 @@ class TreatmentAdministration(Base):
 	substance_administration_id = Column(Integer, ForeignKey('substance_administrations.id'))
 	substance_administration = relationship("SubstanceAdministration")
 
-	treatment_id = Column(Integer, ForeignKey("treatments.id"))
+	treatment_id = Column(Integer, ForeignKey("treatments.code"))
 
 class SubstanceAdministration(Base):
 	__tablename__ = "substance_administrations"
@@ -118,18 +122,25 @@ class Genotype(Base):
 		return "<Genotype(name='%s', zygosity='%s')>"\
 		% (self.name, self.zygosity)
 
-class Solution(Base):
-	__tablename__ = "solutions"
+class Ingredient(Base):
+	__tablename__ = "ingredients"
 	id = Column(Integer, primary_key=True)
 	name = Column(String)
-	long_name = Column(String)
 	concentration = Column(Float, default=100)
 	concentration_unit_id = Column(String, ForeignKey('measurement_units.code'))
 	concentration_unit = relationship("MeasurementUnit")
 	supplier = Column(String)
 	supplier_id = Column(String)
-	contained = Column(Integer, ForeignKey("solutions.id"))
-	contains = relationship("Solution")
+	contained = Column(Integer, ForeignKey("ingredients.id"))
+	contains = relationship("Ingredient")
+
+class Solution(Base):
+	__tablename__ = "solutions"
+	code = Column(String, primary_key=True)
+	name = Column(String)
+	supplier = Column(String)
+	supplier_id = Column(String)
+	contains = relationship("Ingredient", secondary=ingredients_association, backref="ingredient_of")
 
 	def __repr__(self):
 		return "<Solution(name='%s' (long_name='%s'), concentration=%s%s contains: %s)>"\
@@ -137,8 +148,8 @@ class Solution(Base):
 
 class Treatment(Base):
 	__tablename__ = "treatments"
-	id = Column(Integer, primary_key=True)
-	substance = Column(String)
+	code = Column(String, primary_key=True)
+	name = Column(String)
 	frequency = Column(String)
 	route = Column(String)
 	administrations = relationship("TreatmentAdministration", backref="treatment")
@@ -152,6 +163,14 @@ class Operator(Base):
 	initials = Column(String, primary_key=True)
 	full_name = Column(String)
 	affiliation = Column(String)
+
+class Biopsy(Base):
+	__tablename__ = "biopsies"
+	code = Column(String, primary_key=True)
+	extracted = Column(DateTime)
+	animal_id = Column(Integer, ForeignKey('animals.id_eth'))
+	animal = relationship("Animal")
+	tissue = Column(String)
 
 class Animal(Base):
 	__tablename__ = "animals"
