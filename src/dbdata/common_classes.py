@@ -31,6 +31,11 @@ class FMRIMeasurementProtocol(Base):
 	maintenance_anesthesia_id = Column(Integer, ForeignKey('twostep_injection_anesthesias.id'))
 	maintenance_anesthesia = relationship("TwoStepInjectionAnesthesia", backref="used_in_protocol")
 
+class MeasurementUnit(Base):
+	__tablename__ = "measurement_units"
+	code = Column(String, primary_key=True)
+	long_name = Column(String)
+	siunitx = Column(String)
 
 class LaserStimulationProtocol(Base):
 	__tablename__ = "laser_stimulation_protocols"
@@ -41,22 +46,10 @@ class LaserStimulationProtocol(Base):
 	stimulation_onset = Column(Float)
 	stimulus_frequency = Column(Float)
 	pulse_width = Column(Float)
-	duration_unit = Column(String)
-	frequency_unit = Column(String)
-
-class InhalationAnesthesia(Base):
-	__tablename__ = "inhalation_anesthesias"
-	id = Column(Integer, primary_key=True)
-	anesthetic_id = Column(Integer, ForeignKey('solutions.id'))
-	anesthetic = relationship("Solution")
-	concentration = Column(Float)
-	concentration_unit = Column(String, default="%")
-	duration = Column(Float)
-	duration_unit = Column(String)
-
-	def __repr__(self):
-		return "<Inhalation Anesthesia Step(anesthetic='%s', concentration='%s', duration='%s')>"\
-		% (self.anesthetic, self.concentration, self.duration)
+	duration_unit_id = Column(Integer, ForeignKey(['measurement_units.code']))
+	duration_unit = relationship("MeasurementUnit")
+	frequency_unit_id = Column(Integer, ForeignKey(['measurement_units.code']))
+	frequency_unit = relationship("MeasurementUnit")
 
 class ScannerSetup(Base):
 	__tablename__ = "scanner_setups"
@@ -70,11 +63,11 @@ class SubstanceAdministration(Base):
 	id = Column(Integer, primary_key=True)
 	date = Column(DateTime)
 	substance_id = Column(Integer, ForeignKey('solutions.id'))
-	substance = relationship("Solution", backref="used_in_inhalation")
+	substance = relationship("Solution")
 	route = Column(String)
 	animal_weight = Column(Float)
-	animal_weight_unit = Column(String)
-	treatment_id = Column(Integer, ForeignKey('treatments.id'))
+	animal_weight_unit_id = Column(Integer, ForeignKey(['measurement_units.code']))
+	animal_weight_unit = relationship("MeasurementUnit")
 
 	def __repr__(self):
 		return "<Substance Administration(date='%s', animal_weight='%s%s')>"\
@@ -86,15 +79,12 @@ class TwoStepInjectionAnesthesia(Base):
 	anesthetic_id = Column(Integer, ForeignKey('solutions.id'))
 	anesthetic = relationship("Solution", backref="used_in_injection")
 	primary_dose = Column(Float)
-	primary_dose_unit = Column(String, default="ml/g_animal")
+	animal_weight_id = Column(Integer, ForeignKey(['measurement_units.code']))
+	animal_weight = relationship("MeasurementUnit")
 	primary_rate = Column(Float, default=20)
 	primary_rate_unit = Column(String, default="mul/s")
 	secondary_rate = Column(Float)
 	secondary_rate_unit = Column(String, default="ml/g_animal/h")
-
-	# def __repr__(self):
-	# 	return "<Inhalation Anesthesia Step(anesthetic='%s', concentration='%s', duration='%s')>"\
-	# 	% (self.anesthetic, self.concentration, self.duration)
 
 class Genotype(Base):
 	__tablename__ = "genotypes"
@@ -112,7 +102,8 @@ class Solution(Base):
 	name = Column(String)
 	long_name = Column(String)
 	concentration = Column(Float, default=100)
-	concentration_unit = Column(String, default="%")
+	concentration_unit_id = Column(Integer, ForeignKey(['measurement_units.code']))
+	concentration_unit = relationship("MeasurementUnit")
 	supplier = Column(String)
 	supplier_id = Column(String)
 	contained = Column(Integer, ForeignKey("solutions.id"))
