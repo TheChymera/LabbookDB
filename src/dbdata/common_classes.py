@@ -92,6 +92,7 @@ class ChronicTreatmentAdministration(Base):
 	__tablename__ = "chronic_treatment_administrations"
 	id = Column(Integer, primary_key=True)
 	date = Column(DateTime)
+	deviating_substance_amount = Column(Integer)
 	operator_id = Column(Integer, ForeignKey('operators.initials'))
 	operator = relationship("Operator", backref="administederd_treatments")
 	treatment_id = Column(Integer, ForeignKey("chronic_treatments.code"))
@@ -155,6 +156,9 @@ class ChronicTreatment(Base):
 	name = Column(String)
 	frequency = Column(String)
 	route = Column(String)
+	rate = Column(Float)
+	rate_unit_id = Column(String, ForeignKey('measurement_units.code'))
+	rate_unit = relationship("MeasurementUnit", foreign_keys=[rate_unit_id])
 	dose = Column(Float)
 	dose_unit_id = Column(String, ForeignKey('measurement_units.code'))
 	dose_unit = relationship("MeasurementUnit", foreign_keys=[dose_unit_id])
