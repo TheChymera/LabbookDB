@@ -10,7 +10,7 @@ genotype_association = Table('gt_association', Base.metadata,
 	Column('animals_id', Integer, ForeignKey('animals.id_eth'))
 )
 treatment_association = Table('tr_association', Base.metadata,
-	Column('treatments_id', Integer, ForeignKey('treatments.code')),
+	Column('chronic_treatments_id', Integer, ForeignKey('chronic_treatments.code')),
 	Column('animals_id', Integer, ForeignKey('animals.id_eth'))
 )
 substance_association = Table('st_association', Base.metadata,
@@ -80,26 +80,29 @@ class ScannerSetup(Base):
 	respiration = Column(String)
 	support = Column(String)
 
-class TreatmentAdministration(Base):
-	__tablename__ = "treatment_administrations"
+class Weight(Base):
+	__tablename__ = "weights"
+	id = Column(Integer, primary_key=True)
+	date = Column(DateTime)
+	weight = Column(Float)
+	weight_unit_id = Column(String, ForeignKey('measurement_units.code'))
+	weight_unit = relationship("MeasurementUnit", foreign_keys=[weight_unit_id])
+
+class ChronicTreatmentAdministration(Base):
+	__tablename__ = "chronic_treatment_administrations"
 	id = Column(Integer, primary_key=True)
 	date = Column(DateTime)
 	operator_id = Column(Integer, ForeignKey('operators.initials'))
-	operator = relationship("Operator", backref="administederd_substances")
-	animal_id = Column(Integer, ForeignKey('animals.id_eth'))
-	animal = relationship("Animal", backref="administrations")
-	animal_weight = Column(Float)
-	animal_weight_unit_id = Column(String, ForeignKey('measurement_units.code'))
-	animal_weight_unit = relationship("MeasurementUnit", foreign_keys=[animal_weight_unit_id])
-	substance_administration_id = Column(Integer, ForeignKey('substance_administrations.id'))
-	substance_administration = relationship("SubstanceAdministration")
-
-	treatment_id = Column(Integer, ForeignKey("treatments.code"))
+	operator = relationship("Operator", backref="administederd_treatments")
+	treatment_id = Column(Integer, ForeignKey("chronic_treatments.code"))
 
 class SubstanceAdministration(Base):
 	__tablename__ = "substance_administrations"
 	id = Column(Integer, primary_key=True)
 	substance = relationship("Solution", secondary=substance_association, backref="administered")
+	operator_id = Column(Integer, ForeignKey('operators.initials'))
+	operator = relationship("Operator", backref="administederd_substances")
+	date = Column(DateTime)
 	route = Column(String)
 	rate = Column(Float)
 	rate_unit_id = Column(String, ForeignKey('measurement_units.code'))
@@ -146,17 +149,16 @@ class Solution(Base):
 		return "<Solution(name='%s' (long_name='%s'), concentration=%s%s contains: %s)>"\
 		% (self.name, self.long_name, self.concentration, self.concentration_unit, self.contains)
 
-class Treatment(Base):
-	__tablename__ = "treatments"
+class ChronicTreatment(Base):
+	__tablename__ = "chronic_treatments"
 	code = Column(String, primary_key=True)
 	name = Column(String)
 	frequency = Column(String)
 	route = Column(String)
-	administrations = relationship("TreatmentAdministration", backref="treatment")
-
-	def __repr__(self):
-		return "<Treatment(substance='%s', frequency='%s', route='%s', administrations='%s')>"\
-		% (self.substance, self.frequency, self.route, self.substance_administrations)
+	dose = Column(Float)
+	dose_unit_id = Column(String, ForeignKey('measurement_units.code'))
+	dose_unit = relationship("MeasurementUnit", foreign_keys=[dose_unit_id])
+	administrations = relationship("ChronicTreatmentAdministration")
 
 class Operator(Base):
 	__tablename__ = "operators"
@@ -181,8 +183,15 @@ class Animal(Base):
 	sex = Column(String)
 	ear_punches = Column(String)
 
+	death_date = Column(DateTime)
+	death_reason = Column(String)
+	weight_id = Column(Integer, ForeignKey('weights.id'))
+	weight = relationship("Weight")
+	substance_administration_id = Column(Integer, ForeignKey('substance_administrations.id'))
+	substance_administration = relationship("SubstanceAdministration", backref=backref("animals"))
+
 	genotype = relationship("Genotype", secondary=genotype_association, backref="animals")
-	treatment = relationship("Treatment", secondary=treatment_association, backref="animals")
+	treatment = relationship("ChronicTreatment", secondary=treatment_association, backref="animals")
 
 	def __repr__(self):
 		return "<Animal(id_eth='%s', cage_eth='%s', id_uzh='%s', cage_uzh='%s', genotype='%s', sex='%s', ear_punches='%s', treatment='%s')>"\
