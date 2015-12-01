@@ -87,6 +87,7 @@ class Weight(Base):
 	weight = Column(Float)
 	weight_unit_id = Column(String, ForeignKey('measurement_units.code'))
 	weight_unit = relationship("MeasurementUnit", foreign_keys=[weight_unit_id])
+	animal_id = Column(Integer, ForeignKey("animals.id_eth"))
 
 class ChronicTreatmentAdministration(Base):
 	__tablename__ = "chronic_treatment_administrations"
@@ -189,7 +190,7 @@ class Animal(Base):
 
 	death_date = Column(DateTime)
 	death_reason = Column(String)
-	weight_id = Column(Integer, ForeignKey('weights.id'))
+	# weight_id = Column(Integer, ForeignKey('weights.id'))
 	weight = relationship("Weight")
 	substance_administration_id = Column(Integer, ForeignKey('substance_administrations.id'))
 	substance_administration = relationship("SubstanceAdministration", backref=backref("animals"))
