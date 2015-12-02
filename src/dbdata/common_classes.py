@@ -7,11 +7,11 @@ Base = declarative_base()
 
 genotype_association = Table('gt_association', Base.metadata,
 	Column('genotypes_id', Integer, ForeignKey('genotypes.id')),
-	Column('animals_id', Integer, ForeignKey('animals.id_eth'))
+	Column('animals_id', Integer, ForeignKey('animals.id'))
 )
 treatment_association = Table('tr_association', Base.metadata,
 	Column('chronic_treatments_id', Integer, ForeignKey('chronic_treatments.code')),
-	Column('animals_id', Integer, ForeignKey('animals.id_eth'))
+	Column('animals_id', Integer, ForeignKey('animals.id'))
 )
 substance_association = Table('st_association', Base.metadata,
 	Column('substance_administrations_id', Integer, ForeignKey('substance_administrations.id')),
@@ -71,7 +71,7 @@ class FMRIMeasurementSession(Base):
 	id = Column(Integer, primary_key=True)
 	operator = relationship("Operator", secondary=operator_association, backref="performed_fmri_mesurements")
 	date = Column(DateTime)
-	animal_id = Column(Integer, ForeignKey('animals.id_eth'))
+	animal_id = Column(Integer, ForeignKey('animals.id'))
 	animal = relationship("Animal", backref="measurements")
 	protocol_id = Column(Integer, ForeignKey('fmri_measurement_protocols.id'))
 	protocol = relationship("FMRIMeasurementProtocol", backref="used_in_sessions")
@@ -162,7 +162,8 @@ class SubstanceAdministration(Base):
 
 class Animal(Base):
 	__tablename__ = "animals"
-	id_eth = Column(Integer, primary_key=True)
+	id = Column(Integer, primary_key=True)
+	id_eth = Column(Integer)
 	cage_eth = Column(Integer)
 	id_uzh = Column(String)
 	cage_uzh = Column(String)
@@ -171,7 +172,6 @@ class Animal(Base):
 
 	death_date = Column(DateTime)
 	death_reason = Column(String)
-	# weight_id = Column(Integer, ForeignKey('weights.id'))
 	weight = relationship("Weight")
 	substance_administration_id = Column(Integer, ForeignKey('substance_administrations.id'))
 	substance_administration = relationship("SubstanceAdministration", backref=backref("animals"))
@@ -180,8 +180,8 @@ class Animal(Base):
 	treatment = relationship("ChronicTreatment", secondary=treatment_association, backref="animals")
 
 	def __repr__(self):
-		return "<Animal(id_eth='%s', cage_eth='%s', id_uzh='%s', cage_uzh='%s', genotype='%s', sex='%s', ear_punches='%s', treatment='%s')>"\
-		% (self.id_eth, self.cage_eth, self.id_uzh, self.cage_uzh, [self.genotype[i].name+" "+self.genotype[i].zygosity for i in range(len(self.genotype))], self.sex, self.ear_punches, [self.treatment[i].substance for i in range(len(self.treatment))])
+		return "<Animal(id='%s', id_eth='%s', cage_eth='%s', id_uzh='%s', cage_uzh='%s', genotype='%s', sex='%s', ear_punches='%s', treatment='%s')>"\
+		% (self.id, self.id_eth, self.cage_eth, self.id_uzh, self.cage_uzh, [self.genotype[i].name+" "+self.genotype[i].zygosity for i in range(len(self.genotype))], self.sex, self.ear_punches, [self.treatment[i].substance for i in range(len(self.treatment))])
 
 class Genotype(Base):
 	__tablename__ = "genotypes"
@@ -200,28 +200,38 @@ class Weight(Base):
 	weight = Column(Float)
 	weight_unit_id = Column(String, ForeignKey('measurement_units.code'))
 	weight_unit = relationship("MeasurementUnit", foreign_keys=[weight_unit_id])
-	animal_id = Column(Integer, ForeignKey("animals.id_eth"))
+	animal_id = Column(Integer, ForeignKey("animals.id"))
 
-class Biopsy(Base):
-	__tablename__ = "biopsies"
+class BioticSample(Base):
+	__tablename__ = "biotic_samples"
 	code = Column(String, primary_key=True)
 	extracted = Column(DateTime)
-	animal_id = Column(Integer, ForeignKey('animals.id_eth'))
+	discriminator = Column('type', String(50))
+	__mapper_args__ = {'polymorphic_on': discriminator}
+
+class AnimalBiopsy(BioticSample):
+	__tablename__ = "animal_biopsies"
+	__mapper_args__ = {'polymorphic_identity': 'animal_biopsy'}
+	code = Column(String, ForeignKey('biotic_samples.code'), primary_key=True)
+	animal_id = Column(Integer, ForeignKey('animals.id'))
 	animal = relationship("Animal")
 	tissue = Column(String)
 
 #DNA classes:
-class DNAExtraction(Base):
-	__tablename__ = "dna_extractions"
-	code = Column(Sring, primary_key)
-	protocol = 
-
-class DNAExtractionProtocol(Base):
-	__tablename__ = 'dna_extraction_protocols'
-	id = Column(Integer, primary_key=True)
-	anesthetic = Column(String)
-	# ...
-	# every common field goes here
-	# ...
-	discriminator = Column('type', String(50))
-	__mapper_args__ = {'polymorphic_on': discriminator}
+# class DNAExtraction(Base):
+# 	__tablename__ = "dna_extractions"
+# 	code = Column(Sring, primary_key)
+# 	protocol_id = Column(Integer, ForeignKey('dna_extraction_protocols.id'))
+# 	protocol = relationship('DNAExtractionProtocol', backref='used_for_extractions')
+# 	source_id = Column(Integer, ForeignKey('biotic_samples.code'))
+# 	source = relationship('BioticSample', backref='dna_extractions')
+#
+# class DNAExtractionProtocol(Base):
+# 	__tablename__ = 'dna_extraction_protocols'
+# 	id = Column(Integer, primary_key=True)
+# 	anesthetic = Column(String)
+# 	# ...
+# 	# every common field goes here
+# 	# ...
+# 	discriminator = Column('type', String(50))
+# 	__mapper_args__ = {'polymorphic_on': discriminator}
