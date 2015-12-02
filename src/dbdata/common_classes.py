@@ -26,6 +26,46 @@ ingredients_association = Table('ig_association', Base.metadata,
 	Column('ingredients_id', Integer, ForeignKey('ingredients.id'))
 )
 
+#general classes:
+
+class Operator(Base):
+	__tablename__ = "operators"
+	initials = Column(String, primary_key=True)
+	full_name = Column(String)
+	affiliation = Column(String)
+
+class MeasurementUnit(Base):
+	__tablename__ = "measurement_units"
+	code = Column(String, primary_key=True)
+	long_name = Column(String)
+	siunitx = Column(String)
+
+class Ingredient(Base):
+	__tablename__ = "ingredients"
+	id = Column(Integer, primary_key=True)
+	name = Column(String)
+	concentration = Column(Float, default=100)
+	concentration_unit_id = Column(String, ForeignKey('measurement_units.code'))
+	concentration_unit = relationship("MeasurementUnit")
+	supplier = Column(String)
+	supplier_id = Column(String)
+	contained = Column(Integer, ForeignKey("ingredients.id"))
+	contains = relationship("Ingredient")
+
+class Solution(Base):
+	__tablename__ = "solutions"
+	code = Column(String, primary_key=True)
+	name = Column(String)
+	supplier = Column(String)
+	supplier_id = Column(String)
+	contains = relationship("Ingredient", secondary=ingredients_association, backref="ingredient_of")
+
+	def __repr__(self):
+		return "<Solution(name='%s' (long_name='%s'), concentration=%s%s contains: %s)>"\
+		% (self.name, self.long_name, self.concentration, self.concentration_unit, self.contains)
+
+#fMRI classes:
+
 class FMRIMeasurementSession(Base):
 	__tablename__ = "fmri_measurement_sessions"
 	id = Column(Integer, primary_key=True)
@@ -53,12 +93,6 @@ class FMRIMeasurementProtocol(Base):
 	maintenance_anesthesia_injection_id = Column(Integer, ForeignKey('substance_administrations.id'))
 	maintenance_anesthesia_injection = relationship("SubstanceAdministration", foreign_keys=[maintenance_anesthesia_injection_id])
 
-class MeasurementUnit(Base):
-	__tablename__ = "measurement_units"
-	code = Column(String, primary_key=True)
-	long_name = Column(String)
-	siunitx = Column(String)
-
 class LaserStimulationProtocol(Base):
 	__tablename__ = "laser_stimulation_protocols"
 	id = Column(Integer, primary_key=True)
@@ -80,14 +114,7 @@ class ScannerSetup(Base):
 	respiration = Column(String)
 	support = Column(String)
 
-class Weight(Base):
-	__tablename__ = "weights"
-	id = Column(Integer, primary_key=True)
-	date = Column(DateTime)
-	weight = Column(Float)
-	weight_unit_id = Column(String, ForeignKey('measurement_units.code'))
-	weight_unit = relationship("MeasurementUnit", foreign_keys=[weight_unit_id])
-	animal_id = Column(Integer, ForeignKey("animals.id_eth"))
+#treatment classes:
 
 class ChronicTreatmentAdministration(Base):
 	__tablename__ = "chronic_treatment_administrations"
@@ -97,6 +124,20 @@ class ChronicTreatmentAdministration(Base):
 	operator_id = Column(Integer, ForeignKey('operators.initials'))
 	operator = relationship("Operator", backref="administederd_treatments")
 	treatment_id = Column(Integer, ForeignKey("chronic_treatments.code"))
+
+class ChronicTreatment(Base):
+	__tablename__ = "chronic_treatments"
+	code = Column(String, primary_key=True)
+	name = Column(String)
+	frequency = Column(String)
+	route = Column(String)
+	rate = Column(Float)
+	rate_unit_id = Column(String, ForeignKey('measurement_units.code'))
+	rate_unit = relationship("MeasurementUnit", foreign_keys=[rate_unit_id])
+	dose = Column(Float)
+	dose_unit_id = Column(String, ForeignKey('measurement_units.code'))
+	dose_unit = relationship("MeasurementUnit", foreign_keys=[dose_unit_id])
+	administrations = relationship("ChronicTreatmentAdministration")
 
 class SubstanceAdministration(Base):
 	__tablename__ = "substance_administrations"
@@ -117,67 +158,7 @@ class SubstanceAdministration(Base):
 		return "<Substance Administration(date='%s', animal_weight='%s%s')>"\
 		% (self.date, self.animal_weight, self.animal_weight_unit)
 
-class Genotype(Base):
-	__tablename__ = "genotypes"
-	id = Column(Integer, primary_key=True)
-	name = Column(String)
-	zygosity = Column(String)
-
-	def __repr__(self):
-		return "<Genotype(name='%s', zygosity='%s')>"\
-		% (self.name, self.zygosity)
-
-class Ingredient(Base):
-	__tablename__ = "ingredients"
-	id = Column(Integer, primary_key=True)
-	name = Column(String)
-	concentration = Column(Float, default=100)
-	concentration_unit_id = Column(String, ForeignKey('measurement_units.code'))
-	concentration_unit = relationship("MeasurementUnit")
-	supplier = Column(String)
-	supplier_id = Column(String)
-	contained = Column(Integer, ForeignKey("ingredients.id"))
-	contains = relationship("Ingredient")
-
-class Solution(Base):
-	__tablename__ = "solutions"
-	code = Column(String, primary_key=True)
-	name = Column(String)
-	supplier = Column(String)
-	supplier_id = Column(String)
-	contains = relationship("Ingredient", secondary=ingredients_association, backref="ingredient_of")
-
-	def __repr__(self):
-		return "<Solution(name='%s' (long_name='%s'), concentration=%s%s contains: %s)>"\
-		% (self.name, self.long_name, self.concentration, self.concentration_unit, self.contains)
-
-class ChronicTreatment(Base):
-	__tablename__ = "chronic_treatments"
-	code = Column(String, primary_key=True)
-	name = Column(String)
-	frequency = Column(String)
-	route = Column(String)
-	rate = Column(Float)
-	rate_unit_id = Column(String, ForeignKey('measurement_units.code'))
-	rate_unit = relationship("MeasurementUnit", foreign_keys=[rate_unit_id])
-	dose = Column(Float)
-	dose_unit_id = Column(String, ForeignKey('measurement_units.code'))
-	dose_unit = relationship("MeasurementUnit", foreign_keys=[dose_unit_id])
-	administrations = relationship("ChronicTreatmentAdministration")
-
-class Operator(Base):
-	__tablename__ = "operators"
-	initials = Column(String, primary_key=True)
-	full_name = Column(String)
-	affiliation = Column(String)
-
-class Biopsy(Base):
-	__tablename__ = "biopsies"
-	code = Column(String, primary_key=True)
-	extracted = Column(DateTime)
-	animal_id = Column(Integer, ForeignKey('animals.id_eth'))
-	animal = relationship("Animal")
-	tissue = Column(String)
+#animal classes:
 
 class Animal(Base):
 	__tablename__ = "animals"
@@ -201,3 +182,46 @@ class Animal(Base):
 	def __repr__(self):
 		return "<Animal(id_eth='%s', cage_eth='%s', id_uzh='%s', cage_uzh='%s', genotype='%s', sex='%s', ear_punches='%s', treatment='%s')>"\
 		% (self.id_eth, self.cage_eth, self.id_uzh, self.cage_uzh, [self.genotype[i].name+" "+self.genotype[i].zygosity for i in range(len(self.genotype))], self.sex, self.ear_punches, [self.treatment[i].substance for i in range(len(self.treatment))])
+
+class Genotype(Base):
+	__tablename__ = "genotypes"
+	id = Column(Integer, primary_key=True)
+	name = Column(String)
+	zygosity = Column(String)
+
+	def __repr__(self):
+		return "<Genotype(name='%s', zygosity='%s')>"\
+		% (self.name, self.zygosity)
+
+class Weight(Base):
+	__tablename__ = "weights"
+	id = Column(Integer, primary_key=True)
+	date = Column(DateTime)
+	weight = Column(Float)
+	weight_unit_id = Column(String, ForeignKey('measurement_units.code'))
+	weight_unit = relationship("MeasurementUnit", foreign_keys=[weight_unit_id])
+	animal_id = Column(Integer, ForeignKey("animals.id_eth"))
+
+class Biopsy(Base):
+	__tablename__ = "biopsies"
+	code = Column(String, primary_key=True)
+	extracted = Column(DateTime)
+	animal_id = Column(Integer, ForeignKey('animals.id_eth'))
+	animal = relationship("Animal")
+	tissue = Column(String)
+
+#DNA classes:
+class DNAExtraction(Base):
+	__tablename__ = "dna_extractions"
+	code = Column(Sring, primary_key)
+	protocol = 
+
+class DNAExtractionProtocol(Base):
+	__tablename__ = 'dna_extraction_protocols'
+	id = Column(Integer, primary_key=True)
+	anesthetic = Column(String)
+	# ...
+	# every common field goes here
+	# ...
+	discriminator = Column('type', String(50))
+	__mapper_args__ = {'polymorphic_on': discriminator}
