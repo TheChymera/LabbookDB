@@ -3,7 +3,7 @@ from os import path
 db_path = "sqlite:///" + path.expanduser("~/solutions.db")
 engine = create_engine(db_path, echo=False)
 
-from common_classes import Animal, Genotype, Solution, ChronicTreatmentAdministration, ChronicTreatment
+from common_classes import Animal, Genotype, Solution, ChronicTreatmentAdministration, ChronicTreatment, Weight
 
 from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
@@ -18,10 +18,12 @@ def loadSession():
 	return session
 
 session = loadSession()
-for row in session.query(ChronicTreatment).order_by(ChronicTreatment.code):
-	print row.name
-	for row1 in row.administrations:
-		print row1.date
+for row in session.query(Animal).order_by(Animal.id):
+	print row.id_uzh, row.id_eth, row.id
+	for row in row.weight:
+		print row.weight
+	# for row1 in row.administrations:
+	# 	print row1.date
 
 session.close()
 engine.dispose()
