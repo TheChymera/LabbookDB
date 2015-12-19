@@ -17,6 +17,10 @@ def compose_instructions(Protocol):
 	tex_content = "\\begin{itemize}\n"
 	return tex_content
 
+def compose_PurificationProtocol(Protocol):
+	tex_content = "\\begin{itemize}\n"
+	return tex_content
+
 def print_document(tex_document, destination=None):
 	p = Popen(["pdflatex"], stdout=PIPE, stdin=PIPE, stderr=STDOUT)
 	grep_stdout = p.communicate(input=tex_document)[0]
