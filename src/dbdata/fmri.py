@@ -13,7 +13,7 @@ def make_document(my_header, my_content, my_footer):
 	tex_document += my_footer
 	return tex_document
 
-def compose_FMRIMeasurementProtocol(Protocol):
+def compose_instructions(Protocol):
 	tex_content = "\\begin{itemize}\n"
 	return tex_content
 
@@ -28,6 +28,6 @@ def print_document(tex_document, destination=None):
 		os.remove(trace_file)
 
 if __name__ == '__main__':
-	my_content=compose_FMRIMeasurementProtocol()
+	my_content=compose_instructions()
 	tex_document = make_document(standard_header, my_content, standard_footer)
 	print_document(tex_document)
