@@ -217,21 +217,65 @@ class AnimalBiopsy(BioticSample):
 	animal = relationship("Animal")
 	tissue = Column(String)
 
-#DNA classes:
-# class DNAExtraction(Base):
-# 	__tablename__ = "dna_extractions"
-# 	code = Column(Sring, primary_key)
-# 	protocol_id = Column(Integer, ForeignKey('dna_extraction_protocols.id'))
-# 	protocol = relationship('DNAExtractionProtocol', backref='used_for_extractions')
-# 	source_id = Column(Integer, ForeignKey('biotic_samples.code'))
-# 	source = relationship('BioticSample', backref='dna_extractions')
-#
-# class DNAExtractionProtocol(Base):
-# 	__tablename__ = 'dna_extraction_protocols'
-# 	id = Column(Integer, primary_key=True)
-# 	anesthetic = Column(String)
-# 	# ...
-# 	# every common field goes here
-# 	# ...
-# 	discriminator = Column('type', String(50))
-# 	__mapper_args__ = {'polymorphic_on': discriminator}
+# DNA classes:
+class Incubation(Base):
+	__tablename__ = "incubations"
+	id = Column(Integer, primary_key=True)
+	speed = Column(Float)
+	duration = Column(Float)
+	temperature = Column(Float)
+	movement = Column(String) # "centrifuge" or "shake"
+
+	speed_unit_id = Column(String, ForeignKey('measurement_units.code'))
+	speed_unit = relationship("MeasurementUnit", foreign_keys=[speed_unit_ids])
+	duration_unit_id = Column(String, ForeignKey('measurement_units.code'))
+	duration_unit = relationship("MeasurementUnit", foreign_keys=[duration_unit_ids])
+	temperature_unit_id = Column(String, ForeignKey('measurement_units.code'))
+	temperature_unit = relationship("MeasurementUnit", foreign_keys=[temperature_unit_ids])
+
+class DNAExtraction(Base):
+	__tablename__ = "dna_extractions"
+	code = Column(Sring, primary_key)
+	protocol_id = Column(Integer, ForeignKey('dna_extraction_protocols.id'))
+	protocol = relationship('DNAExtractionProtocol', backref='used_for_extractions')
+	source_id = Column(Integer, ForeignKey('biotic_samples.code'))
+	source = relationship('BioticSample', backref='dna_extractions')
+
+class DNAExtractionProtocol(Base):
+	__tablename__ = 'dna_extraction_protocols'
+	code = Column(String, primary_key=True)
+	name = Column(String)
+	sample_mass = Column(Float)
+	mass_unit_id = Column(String, ForeignKey('measurement_units.code'))
+	mass_unit = relationship("MeasurementUnit", foreign_keys=[mass_unit_id])
+	pre_lysis_buffer_id = Column(String, ForeignKey("solutions.code"))
+	pre_lysis_buffer = relationship("Solution", foreign_keys=[pre_lysis_buffer_id])
+	pre_lysis_buffer_volume = Column(Float)
+	pre_lysis_id = Column(Integer, ForeignKey("incubations.id"))
+	pre_lysis = relationship("Incubation", foreign_keys=[pre_lysis_id])
+	lysis_buffer_id = Column(String, ForeignKey("solutions.code"))
+	lysis_buffer = relationship("Solution", foreign_keys=[lysis_buffer_id])
+	lysis_buffer_volume = Column(Float)
+	proteinase_id = Column(String, ForeignKey("solutions.code"))
+	proteinase = relationship("Solution", foreign_keys=[proteinase_id])
+	proteinase_volume = Column(Float)
+	inactivation_id = Column(Integer, ForeignKey("incubations.id"))
+	inactivation = relationship("Incubation", foreign_keys=[pre_lysis_id])
+	volume_unit_id = Column(String, ForeignKey('measurement_units.code'))
+	volume_unit = relationship("MeasurementUnit", foreign_keys=[volume_unit_ids])
+	time_unit_id = Column(String, ForeignKey('measurement_units.code'))
+	time_unit = relationship("MeasurementUnit", foreign_keys=[time_unit_id])
+
+	discriminator = Column('type', String(50))
+	__mapper_args__ = {'polymorphic_on': discriminator}
+
+class QuickDNAExtractionProtocol(Anesthesia):
+	__tablename__ = 'quick_dna_extraction_protocols'
+	__mapper_args__ = {'polymorphic_identity': 'quick'}
+	id = Column(String, ForeignKey('dna_extraction_protocols.id'), primary_key=True)
+	lysis_preheat_id = Column(Integer, ForeignKey("incubations.id"))
+	lysis_preheat = relationship("Incubation", foreign_keys=[lysis_preheat_id])
+	cooling_id = Column(Integer, ForeignKey("incubations.id"))
+	cooling = relationship("Incubation", foreign_keys=[cooling_id])
+	centrifugation_id = Column(Integer, ForeignKey("incubations.id"))
+	centrifugation = relationship("Incubation", foreign_keys=[centrifugation_id])
