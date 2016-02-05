@@ -34,18 +34,19 @@ session = loadSession()
 
 
 # sql_query = session.query(Animal.treatment).filter(ChronicTreatment.code == "chrFlu")
-# for item in sql_query:
-# 	pass
 
-subq = session.query(Animal.id).subquery()
-sql_query = session.query(ChronicTreatment).join((subq, subq.c.treatment_id=="chrFlu"))
+sql_query = session.query(Animal).join(Animal.treatments).filter(ChronicTreatment.code == "chrFlu")
+
+# subq = session.query(Animal.id).subquery()
+# sql_query = session.query(ChronicTreatment).join((subq, subq.c.treatment_id=="chrFlu"))
 for item in sql_query:
 	pass
 
-mystring = str(session.query(Animal))
-mydf = pd.read_sql_query(mystring,engine)
+mystring = str(sql_query)
+mydf = pd.read_sql_query(mystring,engine,params=["chrFlu"])
 # print mydf.index[1]
-print mydf[["animals_id_uzh","animals_id_eth"]]
+# print mydf[["animals_id_uzh","animals_id_eth"]]
+print mydf
 # print mydf.columns[["animals_id_uzh","animals_id_eth"]]
 
 
