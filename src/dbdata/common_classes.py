@@ -19,11 +19,15 @@ substance_association = Table('st_association', Base.metadata,
 )
 operator_association = Table('op_association', Base.metadata,
 	Column('operator_id', Integer, ForeignKey('operators.initials')),
-	Column('fmri_measurement_sessions_id', Integer, ForeignKey('fmri_measurement_sessions.id'))
+	Column('fmri_measurements_id', Integer, ForeignKey('fmri_measurements.id'))
 )
 ingredients_association = Table('ig_association', Base.metadata,
 	Column('solutions_id', Integer, ForeignKey('solutions.code')),
 	Column('ingredients_id', Integer, ForeignKey('ingredients.id'))
+)
+laser_association = Table('ls_association', Base.metadata,
+	Column('laser_stimulation_protocols_id', Integer, ForeignKey('laser_stimulation_protocols.code')),
+	Column('fmri_measurements_id', Integer, ForeignKey('fmri_measurements.id'))
 )
 
 #general classes:
@@ -66,24 +70,28 @@ class Solution(Base):
 
 #fMRI classes:
 
-class FMRIMeasurementSession(Base):
-	__tablename__ = "fmri_measurement_sessions"
-	id = Column(Integer, primary_key=True)
-	operator = relationship("Operator", secondary=operator_association, backref="performed_fmri_mesurements")
-	date = Column(DateTime)
-	animal_id = Column(Integer, ForeignKey('animals.id'))
-	animal = relationship("Animal", backref="measurements")
-	protocol_id = Column(Integer, ForeignKey('fmri_measurement_protocols.id'))
-	protocol = relationship("FMRIMeasurementProtocol", backref="used_in_sessions")
-	animal_weight = Column(Float)
-	animal_weight_unit_id = Column(String, ForeignKey('measurement_units.code'))
-	animal_weight_unit = relationship("MeasurementUnit", foreign_keys=[animal_weight_unit_id])
+class FMRIScannerSetup(Base):
+	__tablename__ = "scanner_setups"
+	code = Column(String, primary_key=True)
+	coil = Column(String)
+	support = Column(String)
 
-class FMRIMeasurementProtocol(Base):
-	__tablename__ = "fmri_measurement_protocols"
+class FMRIMeasurement(Base):
+	__tablename__ = "fmri_measurements"
 	id = Column(Integer, primary_key=True)
-	scanner_setup_id = Column(Integer, ForeignKey('scanner_setups.id'))
-	scanner_setup = relationship("ScannerSetup", backref="used_for_protocols")
+	date = Column(DateTime)
+	operator_id = Column(Integer, ForeignKey('operators.initials'))
+	operator = relationship("Operator", backref="fmri_measurements")
+	preparation_id = Column(Integer, ForeignKey('fmri_animal_preparation_protocols.code'))
+	preparation = relationship("FMRIAnimalPreparationProtocol", backref="used_in_sessions")
+	laser_stimulation_list = relationship("LaserStimulationProtocol", secondary=laser_association, backref="used_in")
+	scanner_setup_id = Column(Integer, ForeignKey('scanner_setups.code'))
+	scanner_setup = relationship("FMRIScannerSetup", backref="used_for_protocols")
+	animal_id = Column(Integer, ForeignKey('animals.id'))
+
+class FMRIAnimalPreparationProtocol(Base):
+	__tablename__ = "fmri_animal_preparation_protocols"
+	code = Column(String, primary_key=True)
 	induction_anesthesia_gas_id = Column(Integer, ForeignKey('substance_administrations.id'))
 	induction_anesthesia_gas = relationship("SubstanceAdministration", foreign_keys=[induction_anesthesia_gas_id])
 	induction_anesthesia_injection_id = Column(Integer, ForeignKey('substance_administrations.id'))
@@ -92,27 +100,18 @@ class FMRIMeasurementProtocol(Base):
 	maintenance_anesthesia_gas = relationship("SubstanceAdministration", foreign_keys=[maintenance_anesthesia_gas_id])
 	maintenance_anesthesia_injection_id = Column(Integer, ForeignKey('substance_administrations.id'))
 	maintenance_anesthesia_injection = relationship("SubstanceAdministration", foreign_keys=[maintenance_anesthesia_injection_id])
+	respiration = Column(String)
 
 class LaserStimulationProtocol(Base):
 	__tablename__ = "laser_stimulation_protocols"
-	id = Column(Integer, primary_key=True)
+	code = Column(String, primary_key=True)
+	#tme values specified in seconds, frequencies in hertz
 	stimulus_repetitions = Column(Integer)
 	stimulus_duration = Column(Float)
 	inter_stimulus_duration = Column(Float)
 	stimulation_onset = Column(Float)
 	stimulus_frequency = Column(Float)
 	pulse_width = Column(Float)
-	duration_unit_id = Column(String, ForeignKey('measurement_units.code'))
-	duration_unit = relationship("MeasurementUnit", foreign_keys=[duration_unit_id])
-	frequency_unit_id = Column(String, ForeignKey('measurement_units.code'))
-	frequency_unit = relationship("MeasurementUnit", foreign_keys=[frequency_unit_id])
-
-class ScannerSetup(Base):
-	__tablename__ = "scanner_setups"
-	id = Column(Integer, primary_key=True)
-	coil = Column(String)
-	respiration = Column(String)
-	support = Column(String)
 
 #treatment classes:
 
@@ -176,6 +175,8 @@ class Animal(Base):
 	substance_administration_id = Column(Integer, ForeignKey('substance_administrations.id'))
 	substance_administration = relationship("SubstanceAdministration", backref=backref("animals"))
 
+	fmri_measurements = relationship("FMRIMeasurement", backref="animal")
+
 	genotype = relationship("Genotype", secondary=genotype_association, backref="animals")
 	treatment = relationship("ChronicTreatment", secondary=treatment_association, backref="animals")
 
@@ -197,6 +198,8 @@ class Weight(Base):
 	__tablename__ = "weights"
 	id = Column(Integer, primary_key=True)
 	date = Column(DateTime)
+	operator_id = Column(Integer, ForeignKey('operators.initials'))
+	operator = relationship("Operator", backref="weighing_sessions")
 	weight = Column(Float)
 	weight_unit_id = Column(String, ForeignKey('measurement_units.code'))
 	weight_unit = relationship("MeasurementUnit", foreign_keys=[weight_unit_id])
@@ -226,17 +229,18 @@ class Incubation(Base):
 	temperature = Column(Float)
 	movement = Column(String) # "centrifuge" or "shake"
 
+	#speed - usually in RPM - will refer to either centrifugation or shaking (See above)
 	speed_unit_id = Column(String, ForeignKey('measurement_units.code'))
-	speed_unit = relationship("MeasurementUnit", foreign_keys=[speed_unit_ids])
+	speed_unit = relationship("MeasurementUnit", foreign_keys=[speed_unit_id])
 	duration_unit_id = Column(String, ForeignKey('measurement_units.code'))
-	duration_unit = relationship("MeasurementUnit", foreign_keys=[duration_unit_ids])
+	duration_unit = relationship("MeasurementUnit", foreign_keys=[duration_unit_id])
 	temperature_unit_id = Column(String, ForeignKey('measurement_units.code'))
-	temperature_unit = relationship("MeasurementUnit", foreign_keys=[temperature_unit_ids])
+	temperature_unit = relationship("MeasurementUnit", foreign_keys=[temperature_unit_id])
 
 class DNAExtraction(Base):
 	__tablename__ = "dna_extractions"
-	code = Column(Sring, primary_key)
-	protocol_id = Column(Integer, ForeignKey('dna_extraction_protocols.id'))
+	code = Column(String, primary_key=True)
+	protocol_id = Column(Integer, ForeignKey('dna_extraction_protocols.code'))
 	protocol = relationship('DNAExtractionProtocol', backref='used_for_extractions')
 	source_id = Column(Integer, ForeignKey('biotic_samples.code'))
 	source = relationship('BioticSample', backref='dna_extractions')
@@ -262,17 +266,17 @@ class DNAExtractionProtocol(Base):
 	inactivation_id = Column(Integer, ForeignKey("incubations.id"))
 	inactivation = relationship("Incubation", foreign_keys=[pre_lysis_id])
 	volume_unit_id = Column(String, ForeignKey('measurement_units.code'))
-	volume_unit = relationship("MeasurementUnit", foreign_keys=[volume_unit_ids])
+	volume_unit = relationship("MeasurementUnit", foreign_keys=[volume_unit_id])
 	time_unit_id = Column(String, ForeignKey('measurement_units.code'))
 	time_unit = relationship("MeasurementUnit", foreign_keys=[time_unit_id])
 
 	discriminator = Column('type', String(50))
 	__mapper_args__ = {'polymorphic_on': discriminator}
 
-class QuickDNAExtractionProtocol(Anesthesia):
+class QuickDNAExtractionProtocol(DNAExtractionProtocol):
 	__tablename__ = 'quick_dna_extraction_protocols'
 	__mapper_args__ = {'polymorphic_identity': 'quick'}
-	id = Column(String, ForeignKey('dna_extraction_protocols.id'), primary_key=True)
+	id = Column(String, ForeignKey('dna_extraction_protocols.code'), primary_key=True)
 	lysis_preheat_id = Column(Integer, ForeignKey("incubations.id"))
 	lysis_preheat = relationship("Incubation", foreign_keys=[lysis_preheat_id])
 	cooling_id = Column(Integer, ForeignKey("incubations.id"))
