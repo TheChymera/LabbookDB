@@ -31,23 +31,22 @@ session = loadSession()
 # 		print a.date
 
 # sub_query = session.query(Animal.id, ChronicTreatment)
-
-
 # sql_query = session.query(Animal.treatment).filter(ChronicTreatment.code == "chrFlu")
 
-sql_query = session.query(Animal).join(Animal.treatments).filter(ChronicTreatment.code == "chrFlu")
+# EXAMPLE: select animals with a certain field of a certain field
+# sql_query = session.query(Animal).join(Animal.treatments).filter(ChronicTreatment.code == "chrFlu")
+# for item in sql_query:
+# 	pass
+# mystring = str(sql_query)
+# mydf = pd.read_sql_query(mystring,engine,params=["chrFlu"])
 
-# subq = session.query(Animal.id).subquery()
-# sql_query = session.query(ChronicTreatment).join((subq, subq.c.treatment_id=="chrFlu"))
+
+sql_query = session.query(Animal).order_by(Animal.cage_eth)
 for item in sql_query:
 	pass
-
 mystring = str(sql_query)
-mydf = pd.read_sql_query(mystring,engine,params=["chrFlu"])
-# print mydf.index[1]
-# print mydf[["animals_id_uzh","animals_id_eth"]]
+mydf = pd.read_sql_query(mystring,engine)
 print mydf
-# print mydf.columns[["animals_id_uzh","animals_id_eth"]]
 
 
 session.close()
