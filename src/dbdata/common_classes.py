@@ -51,13 +51,17 @@ class Substance(Base):
 	id = Column(Integer, primary_key=True)
 	code = Column(String, unique=True)
 	name = Column(String)
+	concentration = Column(Float)
+	concentration_unit_id = Column(String, ForeignKey('measurement_units.id'))
+	concentration_unit = relationship("MeasurementUnit")
 	supplier = Column(String)
 	supplier_product_code = Column(String)
+
 
 class Ingredient(Base):
 	__tablename__ = "ingredients"
 	id = Column(Integer, primary_key=True)
-	concentration = Column(Float, default=100)
+	concentration = Column(Float)
 	concentration_unit_id = Column(String, ForeignKey('measurement_units.id'))
 	concentration_unit = relationship("MeasurementUnit")
 	contained = Column(Integer, ForeignKey("ingredients.id"))
@@ -268,34 +272,25 @@ class DNAExtractionProtocol(Base):
 	sample_mass = Column(Float)
 	mass_unit_id = Column(String, ForeignKey('measurement_units.id'))
 	mass_unit = relationship("MeasurementUnit", foreign_keys=[mass_unit_id])
-	pre_lysis_buffer_id = Column(String, ForeignKey("solutions.id"))
-	pre_lysis_buffer = relationship("Solution", foreign_keys=[pre_lysis_buffer_id])
-	pre_lysis_buffer_volume = Column(Float)
-	pre_lysis_id = Column(Integer, ForeignKey("incubations.id"))
-	pre_lysis = relationship("Incubation", foreign_keys=[pre_lysis_id])
+	digestion_buffer_id = Column(String, ForeignKey("solutions.id"))
+	digestion_buffer = relationship("Solution", foreign_keys=[digestion_buffer_id])
+	digestion_buffer_volume = Column(Float)
+	digestion_id = Column(Integer, ForeignKey("incubations.id"))
+	digestion = relationship("Incubation", foreign_keys=[digestion_id])
 	lysis_buffer_id = Column(String, ForeignKey("solutions.id"))
 	lysis_buffer = relationship("Solution", foreign_keys=[lysis_buffer_id])
 	lysis_buffer_volume = Column(Float)
+	lysis_id = Column(Integer, ForeignKey("incubations.id"))
+	lysis = relationship("Incubation", foreign_keys=[lysis_id])
 	proteinase_id = Column(String, ForeignKey("solutions.id"))
 	proteinase = relationship("Solution", foreign_keys=[proteinase_id])
 	proteinase_volume = Column(Float)
 	inactivation_id = Column(Integer, ForeignKey("incubations.id"))
-	inactivation = relationship("Incubation", foreign_keys=[pre_lysis_id])
-	volume_unit_id = Column(String, ForeignKey('measurement_units.id'))
-	volume_unit = relationship("MeasurementUnit", foreign_keys=[volume_unit_id])
-	time_unit_id = Column(String, ForeignKey('measurement_units.id'))
-	time_unit = relationship("MeasurementUnit", foreign_keys=[time_unit_id])
-
-	discriminator = Column('type', String(50))
-	__mapper_args__ = {'polymorphic_on': discriminator}
-
-class QuickDNAExtractionProtocol(DNAExtractionProtocol):
-	__tablename__ = 'quick_dna_extraction_protocols'
-	__mapper_args__ = {'polymorphic_identity': 'quick'}
-	id = Column(Integer, ForeignKey('dna_extraction_protocols.id'), primary_key=True)
-	lysis_preheat_id = Column(Integer, ForeignKey("incubations.id"))
-	lysis_preheat = relationship("Incubation", foreign_keys=[lysis_preheat_id])
+	inactivation = relationship("Incubation", foreign_keys=[inactivation_id])
 	cooling_id = Column(Integer, ForeignKey("incubations.id"))
 	cooling = relationship("Incubation", foreign_keys=[cooling_id])
 	centrifugation_id = Column(Integer, ForeignKey("incubations.id"))
 	centrifugation = relationship("Incubation", foreign_keys=[centrifugation_id])
+
+	volume_unit_id = Column(String, ForeignKey('measurement_units.id'))
+	volume_unit = relationship("MeasurementUnit", foreign_keys=[volume_unit_id])
