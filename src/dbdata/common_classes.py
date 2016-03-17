@@ -5,29 +5,33 @@ from os import path
 from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
-genotype_association = Table('gt_association', Base.metadata,
+genotype_association = Table('genotype_associations', Base.metadata,
 	Column('genotypes_id', Integer, ForeignKey('genotypes.id')),
 	Column('animals_id', Integer, ForeignKey('animals.id'))
 )
-treatment_association = Table('tr_association', Base.metadata,
+treatment_association = Table('treatment_associations', Base.metadata,
 	Column('chronic_treatments_id', Integer, ForeignKey('chronic_treatments.id')),
 	Column('animals_id', Integer, ForeignKey('animals.id'))
 )
-solution_association = Table('st_association', Base.metadata,
+solution_association = Table('solution_associations', Base.metadata,
 	Column('soution_administrations_id', Integer, ForeignKey('solution_administrations.id')),
 	Column('solutions_id', Integer, ForeignKey('solutions.id'))
 )
-operator_association = Table('op_association', Base.metadata,
+operator_association = Table('operator_associations', Base.metadata,
 	Column('operator_id', Integer, ForeignKey('operators.id')),
 	Column('fmri_measurements_id', Integer, ForeignKey('fmri_measurements.id'))
 )
-ingredients_association = Table('ig_association', Base.metadata,
+ingredients_association = Table('ingredients_associations', Base.metadata,
 	Column('solutions_id', Integer, ForeignKey('solutions.id')),
 	Column('ingredients_id', Integer, ForeignKey('ingredients.id'))
 )
-laser_association = Table('ls_association', Base.metadata,
+laser_association = Table('laser_associations', Base.metadata,
 	Column('laser_stimulation_protocols_id', Integer, ForeignKey('laser_stimulation_protocols.id')),
 	Column('fmri_measurements_id', Integer, ForeignKey('fmri_measurements.id'))
+)
+irregularities_association = Table('irregularities_associations', Base.metadata,
+	Column('fmri_measurements_id', Integer, ForeignKey('fmri_measurements.id')),
+	Column('irregularities_id', Integer, ForeignKey('irregularities.id'))
 )
 
 #general classes:
@@ -94,6 +98,7 @@ class FMRIMeasurement(Base):
 	__tablename__ = "fmri_measurements"
 	id = Column(Integer, primary_key=True)
 	date = Column(DateTime)
+	temperature = Column(Float)
 	operator_id = Column(Integer, ForeignKey('operators.id'))
 	operator = relationship("Operator", backref="fmri_measurements")
 	preparation_id = Column(Integer, ForeignKey('fmri_animal_preparation_protocols.id'))
@@ -102,6 +107,7 @@ class FMRIMeasurement(Base):
 	scanner_setup_id = Column(Integer, ForeignKey('scanner_setups.id'))
 	scanner_setup = relationship("FMRIScannerSetup", backref="used_for_protocols")
 	animal_id = Column(Integer, ForeignKey('animals.id'))
+	irregularities = relationship("Irregularity", secondary=irregularities_association)
 
 class FMRIAnimalPreparationProtocol(Base):
 	__tablename__ = "fmri_animal_preparation_protocols"
@@ -109,8 +115,8 @@ class FMRIAnimalPreparationProtocol(Base):
 	code = Column(String, unique=True)
 	induction_anesthesia_gas_id = Column(Integer, ForeignKey('solution_administrations.id'))
 	induction_anesthesia_gas = relationship("SolutionAdministration", foreign_keys=[induction_anesthesia_gas_id])
-	induction_anesthesia_injection_id = Column(Integer, ForeignKey('solution_administrations.id'))
-	induction_anesthesia_injection = relationship("SolutionAdministration", foreign_keys=[induction_anesthesia_injection_id])
+	bolus_anesthesia_injection_id = Column(Integer, ForeignKey('solution_administrations.id'))
+	bolus_anesthesia_injection = relationship("SolutionAdministration", foreign_keys=[induction_anesthesia_injection_id])
 	maintenance_anesthesia_gas_id = Column(Integer, ForeignKey('solution_administrations.id'))
 	maintenance_anesthesia_gas = relationship("SolutionAdministration", foreign_keys=[maintenance_anesthesia_gas_id])
 	maintenance_anesthesia_injection_id = Column(Integer, ForeignKey('solution_administrations.id'))
@@ -130,6 +136,38 @@ class LaserStimulationProtocol(Base):
 	pulse_width = Column(Float)
 
 #treatment classes:
+
+class HandlingHabituation(Base):
+	__tablename__ = "handling_habituations"
+	id = Column(Integer, primary_key=True)
+	date = Column(DateTime)
+	session_duration = Column(Integer) #handling duration, per animal and per cage (assumed to be equal) in MINUTES
+	session_frequency = Column(String, default="daily")
+	session_repetitions = Column(Integer)
+	individual_picking_up = Column(Boolean, default=True)
+	group_picking_up = Column(Boolean, default=True)
+	transparent_tube = Column(Boolean, default=False)
+
+class Irregularity(Base):
+	__tablename__ = "irregularities"
+	id = Column(Integer, primary_key=True)
+	description = Column(String)
+
+class Observation(Base):
+	__tablename__ = "observations"
+	id = Column(Integer, primary_key=True)
+	date = Column(DateTime)
+	behaviour = Column(String)
+	physiology = Column(String)
+	severtity = Column(Integer, default=0)
+	animal_id = Column(Animal, ForeignKey('animals.id'))
+
+class UncategorizedTreatment(Base):
+	__tablename__ = "uncategorized_treatment"
+	id = Column(Integer, primary_key=True)
+	date = Column(DateTime)
+	description = Column(String)
+	animal_id = Column(Animal, ForeignKey('animals.id'))
 
 class ChronicTreatmentAdministration(Base):
 	__tablename__ = "chronic_treatment_administrations"
@@ -185,6 +223,7 @@ class Animal(Base):
 	cage_uzh = Column(String)
 	sex = Column(String)
 	ear_punches = Column(String)
+	maximal_severtity = Column(Integer, default=0)
 
 	death_date = Column(DateTime)
 	death_reason = Column(String)
@@ -194,8 +233,12 @@ class Animal(Base):
 
 	fmri_measurements = relationship("FMRIMeasurement", backref="animal")
 
+	handling_habituation_id = Column(Integer, ForeignKey('handling_habituations.id'))
+	handling_habituation = relationship("HandlingHabituation")
 	genotypes = relationship("Genotype", secondary=genotype_association, backref="animals")
 	treatments = relationship("ChronicTreatment", secondary=treatment_association, backref="animals")
+	observations = relationship("Observation")
+	uncategorized_treatments = relationship("UncategorizedTreatment")
 
 	def __repr__(self):
 		return "<Animal(id='%s', id_eth='%s', cage_eth='%s', id_uzh='%s', cage_uzh='%s', genotype='%s', sex='%s', ear_punches='%s', treatment='%s')>"\
