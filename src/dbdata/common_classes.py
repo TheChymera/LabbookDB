@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, Sequence, Table, ForeignKey, Float, DateTime, ForeignKeyConstraint
+from sqlalchemy import create_engine, Column, Integer, String, Sequence, Table, ForeignKey, Float, DateTime, ForeignKeyConstraint, Boolean
 from sqlalchemy.orm import backref, relationship, sessionmaker
 from os import path
 
@@ -116,7 +116,7 @@ class FMRIAnimalPreparationProtocol(Base):
 	induction_anesthesia_gas_id = Column(Integer, ForeignKey('solution_administrations.id'))
 	induction_anesthesia_gas = relationship("SolutionAdministration", foreign_keys=[induction_anesthesia_gas_id])
 	bolus_anesthesia_injection_id = Column(Integer, ForeignKey('solution_administrations.id'))
-	bolus_anesthesia_injection = relationship("SolutionAdministration", foreign_keys=[induction_anesthesia_injection_id])
+	bolus_anesthesia_injection = relationship("SolutionAdministration", foreign_keys=[bolus_anesthesia_injection_id])
 	maintenance_anesthesia_gas_id = Column(Integer, ForeignKey('solution_administrations.id'))
 	maintenance_anesthesia_gas = relationship("SolutionAdministration", foreign_keys=[maintenance_anesthesia_gas_id])
 	maintenance_anesthesia_injection_id = Column(Integer, ForeignKey('solution_administrations.id'))
@@ -160,14 +160,15 @@ class Observation(Base):
 	behaviour = Column(String)
 	physiology = Column(String)
 	severtity = Column(Integer, default=0)
-	animal_id = Column(Animal, ForeignKey('animals.id'))
+	animal_id = Column(Integer, ForeignKey('animals.id'))
 
 class UncategorizedTreatment(Base):
 	__tablename__ = "uncategorized_treatment"
 	id = Column(Integer, primary_key=True)
 	date = Column(DateTime)
 	description = Column(String)
-	animal_id = Column(Animal, ForeignKey('animals.id'))
+	animal_id = Column(Integer, ForeignKey('animals.id'))
+
 
 class ChronicTreatmentAdministration(Base):
 	__tablename__ = "chronic_treatment_administrations"
