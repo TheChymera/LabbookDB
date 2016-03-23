@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine, Column, Integer, String, Sequence, Table, ForeignKey, Float, DateTime, ForeignKeyConstraint, Boolean
-from sqlalchemy.orm import backref, relationship, sessionmaker
+from sqlalchemy.orm import backref, relationship, sessionmaker, validates
 from os import path
 
 from sqlalchemy.ext.declarative import declarative_base
@@ -33,6 +33,22 @@ irregularities_association = Table('irregularities_associations', Base.metadata,
 	Column('fmri_measurements_id', Integer, ForeignKey('fmri_measurements.id')),
 	Column('irregularities_id', Integer, ForeignKey('irregularities.id'))
 )
+authors_association = Table('authors_associations', Base.metadata,
+	Column('protocols_id', Integer, ForeignKey('protocols.id')),
+	Column('operators_id', Integer, ForeignKey('operators.id'))
+)
+
+#meta classes:
+
+class Protocol(Base):
+	__tablename__ = "protocols"
+	id = Column(Integer, primary_key=True)
+	code = Column(String, unique=True)
+	name = Column(String, unique=True)
+	authors = relationship("Operator", secondary=authors_association)
+
+	discriminator = Column('type', String(50))
+	__mapper_args__ = {'polymorphic_on': discriminator}
 
 #general classes:
 
@@ -42,6 +58,12 @@ class Operator(Base):
 	code = Column(String, unique=True)
 	full_name = Column(String)
 	affiliation = Column(String)
+	email = Column(String)
+
+	@validates('email')
+	def validate_email(self, key, address):
+		assert '@' in address
+		return address
 
 class MeasurementUnit(Base):
 	__tablename__ = "measurement_units"
@@ -109,10 +131,10 @@ class FMRIMeasurement(Base):
 	animal_id = Column(Integer, ForeignKey('animals.id'))
 	irregularities = relationship("Irregularity", secondary=irregularities_association)
 
-class FMRIAnimalPreparationProtocol(Base):
-	__tablename__ = "fmri_animal_preparation_protocols"
-	id = Column(Integer, primary_key=True)
-	code = Column(String, unique=True)
+class FMRIAnimalPreparationProtocol(Protocol):
+	__tablename__ = 'fmri_animal_preparation_protocols'
+	__mapper_args__ = {'polymorphic_identity': 'fmri_animal_preparation'}
+	id = Column(Integer, ForeignKey('protocols.id'), primary_key=True)
 	induction_anesthesia_gas_id = Column(Integer, ForeignKey('solution_administrations.id'))
 	induction_anesthesia_gas = relationship("SolutionAdministration", foreign_keys=[induction_anesthesia_gas_id])
 	bolus_anesthesia_injection_id = Column(Integer, ForeignKey('solution_administrations.id'))
@@ -168,7 +190,6 @@ class UncategorizedTreatment(Base):
 	date = Column(DateTime)
 	description = Column(String)
 	animal_id = Column(Integer, ForeignKey('animals.id'))
-
 
 class ChronicTreatmentAdministration(Base):
 	__tablename__ = "chronic_treatment_administrations"
@@ -308,11 +329,10 @@ class DNAExtraction(Base):
 	source_id = Column(Integer, ForeignKey('biotic_samples.id'))
 	source = relationship('BioticSample', backref='dna_extractions')
 
-class DNAExtractionProtocol(Base):
+class DNAExtractionProtocol(Protocol):
 	__tablename__ = 'dna_extraction_protocols'
-	id = Column(Integer, primary_key=True)
-	code = Column(String, unique=True)
-	name = Column(String)
+	__mapper_args__ = {'polymorphic_identity': 'dna_extraction'}
+	id = Column(Integer, ForeignKey('protocols.id'), primary_key=True)
 	sample_mass = Column(Float)
 	mass_unit_id = Column(String, ForeignKey('measurement_units.id'))
 	mass_unit = relationship("MeasurementUnit", foreign_keys=[mass_unit_id])
