@@ -3,13 +3,13 @@ import tempfile
 import shutil
 from string import Template
 from sqlalchemy import create_engine, literal, inspection
-from sqlalchemy.orm import relation, scoped_session, sessionmaker, eagerload, subqueryload, joinedload, lazyload, Load
+from sqlalchemy.orm import aliased, relation, scoped_session, sessionmaker, eagerload, subqueryload, joinedload, lazyload, Load
 from common_classes import *
 from utils import get_script_dir
 import pandas as pd
 import os
 
-tables = {"animals": Animal, "dna_extraction_protocols": DNAExtractionProtocol, "substances": Solution, "incubations": Incubation}
+tables = {"animals": Animal, "dna_extraction_protocols": DNAExtractionProtocol, "substances": Solution, "incubations": Incubation, "measurement_units": MeasurementUnit}
 
 db_path = "sqlite:///" + os.path.expanduser("~/meta.db")
 engine = create_engine(db_path, echo=False)
@@ -38,14 +38,40 @@ def compose_instructions(table, code):
 	#!!! for a system-wide install the location should likely be redefined!
 	templates_path = os.path.join(get_script_dir(),"text_templates")
 
+	IncubationMeasurementUnit = aliased(MeasurementUnit)
 	sql_query = session.query(DNAExtractionProtocol, MeasurementUnit, Incubation) \
-		.join(MeasurementUnit, MeasurementUnit.id == DNAExtractionProtocol.volume_unit_id) \
-		.join(Incubation, Incubation.id == DNAExtractionProtocol.lysis_id) \
-		.join(MeasurementUnit, MeasurementUnit.id == Incubation.temperature_unit_id) \
-		.filter(tables[table].code == code)
+	.join(MeasurementUnit, MeasurementUnit.id == DNAExtractionProtocol.volume_unit_id) \
+	.join(Incubation, Incubation.id == DNAExtractionProtocol.lysis_id) \
+	.join(IncubationMeasurementUnit, IncubationMeasurementUnit.id == Incubation.temperature_unit_id) \
+	.filter(tables[table].code == code)
 
-		# .join(Incubation, Incubation.id == DNAExtractionProtocol.digestion_id) \
-	print(str(sql_query))
+
+	# cols = []
+	# joins = []
+	# insp = inspection.inspect(tables[table])
+	# for name, col in insp.columns.items():
+	# 	cols.append(col.label(name))
+	# 	print(col.label(name))
+	# print("===========================")
+	# for name, rel in insp.relationships.items():
+	# 	for col_name, col in inspection.inspect(rel.mapper).columns.items():
+	# 		cols.append(col.label("{}_{}".format(name, col_name)))
+	# 		print(col.label("{}_{}".format(name, col_name)))
+	# 	joins.append(rel.class_attribute)
+	#
+	# sql_query = session.query(*cols).select_from(tables[table])
+	# for join in joins:
+	# 	sql_query = sql_query.join(join)
+	# sql_query = sql_query.filter(tables[table].code == code)
+
+	# sql_query = session.query(DNAExtractionProtocol, MeasurementUnit, Incubation) \
+	# 	.join(MeasurementUnit, MeasurementUnit.id == DNAExtractionProtocol.volume_unit_id) \
+	# 	.join(Incubation, Incubation.id == DNAExtractionProtocol.lysis_id) \
+	# 	.join(MeasurementUnit, MeasurementUnit.id == Incubation.temperature_unit_id) \
+	# 	.filter(tables[table].code == code)
+	#
+	# 	# .join(Incubation, Incubation.id == DNAExtractionProtocol.digestion_id) \
+	# print(str(sql_query))
 
 	# cols = []
 	# joins = []
@@ -74,7 +100,7 @@ def compose_instructions(table, code):
 	# 	pass
 	mystring = sql_query.statement
 	mydf = pd.read_sql_query(mystring,engine)
-	print(mydf)
+	print(mydf, mydf.columns)
 	# print(mydf.columns)
 	return
 
