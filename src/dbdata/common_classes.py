@@ -303,19 +303,16 @@ class AnimalBiopsy(BioticSample):
 class Incubation(Base):
 	__tablename__ = "incubations"
 	id = Column(Integer, primary_key=True)
-	speed = Column(Float)
+	revolutions_per_minute = Column(Float)
 	duration = Column(Float)
 	temperature = Column(Float)
 	movement = Column(String) # "centrifuge" or "shake"
 
-	#speed - usually in RPM - will refer to either centrifugation or shaking (See above)
-	# speed_unit_id = Column(String, ForeignKey('measurement_units.id'))
-	# speed_unit = relationship("MeasurementUnit", foreign_keys=[speed_unit_id])
 	duration_unit_id = Column(String, ForeignKey('measurement_units.id'))
 	duration_unit = relationship("MeasurementUnit", foreign_keys=[duration_unit_id])
 	#temperature - usually in degrees Centigrade
-	# temperature_unit_id = Column(String, ForeignKey('measurement_units.id'))
-	# temperature_unit = relationship("MeasurementUnit", foreign_keys=[temperature_unit_id])
+	temperature_unit_id = Column(String, ForeignKey('measurement_units.id'))
+	temperature_unit = relationship("MeasurementUnit", foreign_keys=[temperature_unit_id])
 
 class DNAExtraction(Base):
 	__tablename__ = "dna_extractions"
