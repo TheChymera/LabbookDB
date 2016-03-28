@@ -27,13 +27,7 @@ def loadSession():
 
 session = loadSession()
 
-def make_document(my_header, my_content, my_footer):
-	tex_document = my_header
-	tex_document += my_content
-	tex_document += my_footer
-	return tex_document
-
-def compose_instructions(table, code):
+def compose_tex(table, code):
 
 	#!!! for a system-wide install the location should likely be redefined!
 	templates_path = os.path.join(get_script_dir(),"text_templates")
@@ -101,10 +95,6 @@ def compose_instructions(table, code):
 
 	return tex_document
 
-def compose_PurificationProtocol(Protocol):
-	tex_content = "\\begin{itemize}\n"
-	return tex_content
-
 def print_document(tex, pdfname="protocol"):
 	current = os.getcwd()
 	temp = tempfile.mkdtemp()
@@ -123,5 +113,7 @@ def print_document(tex, pdfname="protocol"):
 	shutil.rmtree(temp)
 
 if __name__ == '__main__':
-	my_content=compose_instructions("dna_extraction_protocols","EPDqEP")
-	print_document(my_content, "lala.pdf")
+	code = "EPDqEP"
+	table = "dna_extraction_protocols"
+	tex=compose_tex(table,code)
+	print_document(tex, table[:-1]+"_"+code+".pdf")
