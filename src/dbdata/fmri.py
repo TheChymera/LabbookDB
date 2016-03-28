@@ -52,33 +52,40 @@ def compose_instructions(table, code):
 	for name, col in insp.columns.items():
 		cols.append(col.label(name))
 		# print(col.label(name))
-	# print("===========================")
+	print("===========================")
 	for name, rel in insp.relationships.items():
+		# if "contains" not in name:
 		# print(name,rel.mapper.class_)
 		alias = aliased(rel.mapper.class_, name=name)
-		for col_name, col in inspection.inspect(rel.mapper).columns.items():
-			aliased_col = getattr(alias, col.key)
-			cols.append(aliased_col.label("{}_{}".format(name, col_name)))
-
-		# sub_insp = inspection.inspect(rel.mapper.class_)
-		# print(sub_insp)
-		# for sub_name, sub_rel in sub_insp.relationships.items():
-		# 	print(sub_name,sub_name)
-		# 	# print(sub_name,sub_rel.mapper.class_)
-		# 	sub_alias = aliased(sub_rel.mapper.class_, name=sub_name)
-		# 	for sub_col_name, sub_col in inspection.inspect(sub_rel.mapper).columns.items():
-		# 		sub_aliased_col = getattr(sub_alias, sub_col.key)
-		# 		cols.append(sub_aliased_col.label("{}_{}_{}".format(name, sub_name, sub_col_name)))
-
-			# print(col.label("{}_{}".format(name, col_name)))
 		joins.append((alias, rel.class_attribute))
+		for col_name, col in inspection.inspect(rel.mapper).columns.items():
+			# print(alias, col.key,"!!!")
+			#the id column causes double entries, as it is mapped once on the parent table (related_table_id) and once on the child table (table_id)
+			if col.key != "id":
+				aliased_col = getattr(alias, col.key)
+				cols.append(aliased_col.label("{}_{}".format(name, col_name)))
+
+		sub_insp = inspection.inspect(rel.mapper.class_)
+		print(sub_insp,"???")
+		for sub_name, sub_rel in sub_insp.relationships.items():
+			# print(sub_name,sub_rel,"§§§")
+			if "contains" not in sub_name:
+				# print(sub_name,sub_rel.mapper.class_)
+				sub_alias = aliased(sub_rel.mapper.class_, name=name+"_"+sub_name)
+				joins.append((sub_alias, sub_rel.class_attribute))
+				for sub_col_name, sub_col in inspection.inspect(sub_rel.mapper).columns.items():
+					print(sub_alias, sub_col.key, '###')
+					#the id column causes double entries, as it is mapped once on the parent table (related_table_id) and once on the child table (table_id)
+					if sub_col.key != "id":
+						sub_aliased_col = getattr(sub_alias, sub_col.key)
+						cols.append(sub_aliased_col.label("{}_{}_{}".format(name, sub_name, sub_col_name)))
 
 	sql_query = session.query(*cols).select_from(tables[table])
 	for join in joins:
 		sql_query = sql_query.outerjoin(*join)
-	# sql_query = sql_query.filter(tables[table].code == code)
-	print(str(sql_query))
-	print(code)
+	sql_query = sql_query.filter(tables[table].code == code)
+	# print(str(sql_query))
+	# print(code)
 
 	# sql_query = session.query(DNAExtractionProtocol, MeasurementUnit, Incubation) \
 	# 	.join(MeasurementUnit, MeasurementUnit.id == DNAExtractionProtocol.volume_unit_id) \
@@ -116,11 +123,14 @@ def compose_instructions(table, code):
 	# 	pass
 	mystring = sql_query.statement
 	mydf = pd.read_sql_query(mystring,engine)
-	print(mydf, mydf.columns)
+	# print(mydf, mydf.columns)
+	for i in mydf.columns:
+		print(mydf[i])
+		print("MMMMM")
 	# print(mydf.columns)
 	return
 
-	template_keys = [i.split(table+"_")[1] for i in mydf.columns.tolist()]
+	template_keys = [i for i in mydf.columns.tolist()]
 	template_values = mydf.ix[0].tolist()
 
 	templating_dictionary = dict(zip(template_keys, template_values))
