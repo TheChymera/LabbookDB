@@ -38,39 +38,23 @@ def compose_instructions(table, code):
 	#!!! for a system-wide install the location should likely be redefined!
 	templates_path = os.path.join(get_script_dir(),"text_templates")
 
-	# IncubationMeasurementUnit = aliased(MeasurementUnit)
-	# sql_query = session.query(tables[table], MeasurementUnit, Incubation, IncubationMeasurementUnit) \
-	# .join(MeasurementUnit, MeasurementUnit.id == tables[table].volume_unit_id) \
-	# .join(Incubation, Incubation.id == tables[table].lysis_id) \
-	# .join(IncubationMeasurementUnit, IncubationMeasurementUnit.id == Incubation.temperature_unit_id) \
-	# .filter(tables[table].code == code)
-
-
 	cols = []
 	joins = []
 	insp = inspection.inspect(tables[table])
 	for name, col in insp.columns.items():
 		cols.append(col.label(name))
-		# print(col.label(name))
-	print("===========================")
 	for name, rel in insp.relationships.items():
-		# if "contains" not in name:
-		# print(name,rel.mapper.class_)
 		alias = aliased(rel.mapper.class_, name=name)
 		joins.append((alias, rel.class_attribute))
 		for col_name, col in inspection.inspect(rel.mapper).columns.items():
-			# print(alias, col.key,"!!!")
 			#the id column causes double entries, as it is mapped once on the parent table (related_table_id) and once on the child table (table_id)
 			if col.key != "id":
 				aliased_col = getattr(alias, col.key)
 				cols.append(aliased_col.label("{}_{}".format(name, col_name)))
 
 		sub_insp = inspection.inspect(rel.mapper.class_)
-		print(sub_insp,"???")
 		for sub_name, sub_rel in sub_insp.relationships.items():
-			# print(sub_name,sub_rel,"§§§")
 			if "contains" not in sub_name:
-				# print(sub_name,sub_rel.mapper.class_)
 				sub_alias = aliased(sub_rel.mapper.class_, name=name+"_"+sub_name)
 				joins.append((sub_alias, sub_rel.class_attribute))
 				for sub_col_name, sub_col in inspection.inspect(sub_rel.mapper).columns.items():
@@ -84,54 +68,18 @@ def compose_instructions(table, code):
 	for join in joins:
 		sql_query = sql_query.outerjoin(*join)
 	sql_query = sql_query.filter(tables[table].code == code)
-	# print(str(sql_query))
-	# print(code)
 
-	# sql_query = session.query(DNAExtractionProtocol, MeasurementUnit, Incubation) \
-	# 	.join(MeasurementUnit, MeasurementUnit.id == DNAExtractionProtocol.volume_unit_id) \
-	# 	.join(Incubation, Incubation.id == DNAExtractionProtocol.lysis_id) \
-	# 	.join(MeasurementUnit, MeasurementUnit.id == Incubation.temperature_unit_id) \
-	# 	.filter(tables[table].code == code)
-	#
-	# 	# .join(Incubation, Incubation.id == DNAExtractionProtocol.digestion_id) \
-	# print(str(sql_query))
-
-	# cols = []
-	# joins = []
-	# insp = inspection.inspect(tables[table])
-	# for name, col in insp.columns.items():
-	# 	cols.append(col.label(name))
-	# 	# print col.label(name)
-	# # print "======"
-	# for name, rel in insp.relationships.items():
-	# 	for col_name, col in inspection.inspect(rel.mapper).columns.items():
-	# 		cols.append(col.label("{}_{}".format(name, col_name)))
-	# 		# print col.label("{}_{}".format(name, col_name))
-	# 	# print(rel.mapper.class_)
-	# 	joins.append(rel.mapper.class_)
-	# sql_query = session.query(*cols)
-	# print str(sql_query)
-	# for join in joins:
-	# 	# print str(join)
-	# 	sql_query = sql_query.join(join)
-	# sql_query = sql_query.filter(tables[table].code == code)
-	#
-
-	# get dataframe with target protocol
-	# sql_query = session.query(tables[table]).options(Load(tables[table]).joinedload("*")).filter(tables[table].code == code)
-	# for item in sql_query:
-	# 	pass
 	mystring = sql_query.statement
 	mydf = pd.read_sql_query(mystring,engine)
-	# print(mydf, mydf.columns)
-	for i in mydf.columns:
-		print(mydf[i])
-		print("MMMMM")
-	# print(mydf.columns)
-	return
 
 	template_keys = [i for i in mydf.columns.tolist()]
 	template_values = mydf.ix[0].tolist()
+	for ix, template_value in enumerate(template_values):
+		try:
+			if template_value.is_integer():
+				template_values[ix] = int(template_value)
+		except AttributeError:
+			pass
 
 	templating_dictionary = dict(zip(template_keys, template_values))
 
@@ -144,18 +92,13 @@ def compose_instructions(table, code):
 		tex_template=Template(template_file)
 		tex_template = tex_template.substitute(templating_dictionary)
 
-
 	tex_document = standard_header
 	tex_document += tex_template
 	tex_document += standard_footer
 
-	# print mydf
-
-
 	session.close()
 	engine.dispose()
 
-	# print(tex_document)
 	return tex_document
 
 def compose_PurificationProtocol(Protocol):
@@ -179,17 +122,6 @@ def print_document(tex, pdfname="protocol"):
 	shutil.copy(pdfname,current)
 	shutil.rmtree(temp)
 
-	# p = Popen(["pdflatex"], stdout=PIPE, stdin=PIPE, stderr=STDOUT)
-	# grep_stdout = p.communicate(input=tex_document)[0]
-	# if destination:
-	# 	move("texput.pdf", destination)
-	# all_files = os.listdir(".")
-	# trace_files = [one_file for one_file in all_files if "texput" in one_file and ".pdf" not in one_file]
-	# for trace_file in trace_files:
-	# 	os.remove(trace_file)
-
 if __name__ == '__main__':
 	my_content=compose_instructions("dna_extraction_protocols","EPDqEP")
-	# print_document(my_content, "lala.pdf")
-	# tex_document = make_document(standard_header, my_content, standard_footer)
-	# print_document(tex_document)
+	print_document(my_content, "lala.pdf")
