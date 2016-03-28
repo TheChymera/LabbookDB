@@ -101,11 +101,7 @@ class Solution(Base):
 	name = Column(String)
 	supplier = Column(String)
 	supplier_id = Column(String)
-	contains = relationship("Ingredient", secondary=ingredients_association, backref="ingredient_of")
-
-	def __repr__(self):
-		return "<Solution(name='%s' (long_name='%s'), concentration=%s%s contains: %s)>"\
-		% (self.name, self.long_name, self.concentration, self.concentration_unit, self.contains)
+	contains = relationship("Ingredient", secondary=ingredients_association)
 
 #fMRI classes:
 
@@ -122,12 +118,12 @@ class FMRIMeasurement(Base):
 	date = Column(DateTime)
 	temperature = Column(Float)
 	operator_id = Column(Integer, ForeignKey('operators.id'))
-	operator = relationship("Operator", backref="fmri_measurements")
+	operator = relationship("Operator")
 	preparation_id = Column(Integer, ForeignKey('fmri_animal_preparation_protocols.id'))
-	preparation = relationship("FMRIAnimalPreparationProtocol", backref="used_in_sessions")
-	laser_stimulations = relationship("LaserStimulationProtocol", secondary=laser_association, backref="used_in")
+	preparation = relationship("FMRIAnimalPreparationProtocol")
+	laser_stimulations = relationship("LaserStimulationProtocol", secondary=laser_association)
 	scanner_setup_id = Column(Integer, ForeignKey('scanner_setups.id'))
-	scanner_setup = relationship("FMRIScannerSetup", backref="used_for_protocols")
+	scanner_setup = relationship("FMRIScannerSetup")
 	animal_id = Column(Integer, ForeignKey('animals.id'))
 	irregularities = relationship("Irregularity", secondary=irregularities_association)
 
@@ -197,7 +193,7 @@ class ChronicTreatmentAdministration(Base):
 	date = Column(DateTime)
 	deviating_solution_amount = Column(Integer)
 	operator_id = Column(Integer, ForeignKey('operators.id'))
-	operator = relationship("Operator", backref="administederd_treatments")
+	operator = relationship("Operator")
 	treatment_id = Column(Integer, ForeignKey("chronic_treatments.id"))
 
 class ChronicTreatment(Base):
@@ -218,7 +214,7 @@ class ChronicTreatment(Base):
 class SolutionAdministration(Base):
 	__tablename__ = "solution_administrations"
 	id = Column(Integer, primary_key=True)
-	solutions = relationship("Solution", secondary=solution_association, backref="administered")
+	solutions = relationship("Solution", secondary=solution_association)
 	operator_id = Column(Integer, ForeignKey('operators.id'))
 	operator = relationship("Operator")
 	date = Column(DateTime)
@@ -281,7 +277,7 @@ class Weight(Base):
 	id = Column(Integer, primary_key=True)
 	date = Column(DateTime)
 	operator_id = Column(Integer, ForeignKey('operators.id'))
-	operator = relationship("Operator", backref="weighing_sessions")
+	operator = relationship("Operator")
 	weight = Column(Float)
 	weight_unit_id = Column(String, ForeignKey('measurement_units.id'))
 	weight_unit = relationship("MeasurementUnit", foreign_keys=[weight_unit_id])
@@ -313,21 +309,22 @@ class Incubation(Base):
 	movement = Column(String) # "centrifuge" or "shake"
 
 	#speed - usually in RPM - will refer to either centrifugation or shaking (See above)
-	speed_unit_id = Column(String, ForeignKey('measurement_units.id'))
-	speed_unit = relationship("MeasurementUnit", foreign_keys=[speed_unit_id])
+	# speed_unit_id = Column(String, ForeignKey('measurement_units.id'))
+	# speed_unit = relationship("MeasurementUnit", foreign_keys=[speed_unit_id])
 	duration_unit_id = Column(String, ForeignKey('measurement_units.id'))
 	duration_unit = relationship("MeasurementUnit", foreign_keys=[duration_unit_id])
-	temperature_unit_id = Column(String, ForeignKey('measurement_units.id'))
-	temperature_unit = relationship("MeasurementUnit", foreign_keys=[temperature_unit_id])
+	#temperature - usually in degrees Centigrade
+	# temperature_unit_id = Column(String, ForeignKey('measurement_units.id'))
+	# temperature_unit = relationship("MeasurementUnit", foreign_keys=[temperature_unit_id])
 
 class DNAExtraction(Base):
 	__tablename__ = "dna_extractions"
 	id = Column(Integer, primary_key=True)
 	code = Column(String, unique=True)
 	protocol_id = Column(Integer, ForeignKey('dna_extraction_protocols.id'))
-	protocol = relationship('DNAExtractionProtocol', backref='used_for_extractions')
+	protocol = relationship('DNAExtractionProtocol')
 	source_id = Column(Integer, ForeignKey('biotic_samples.id'))
-	source = relationship('BioticSample', backref='dna_extractions')
+	source = relationship('BioticSample')
 
 class DNAExtractionProtocol(Protocol):
 	__tablename__ = 'dna_extraction_protocols'
