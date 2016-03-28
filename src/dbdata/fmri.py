@@ -39,9 +39,9 @@ def compose_instructions(table, code):
 	templates_path = os.path.join(get_script_dir(),"text_templates")
 
 	# IncubationMeasurementUnit = aliased(MeasurementUnit)
-	# sql_query = session.query(DNAExtractionProtocol, MeasurementUnit, Incubation, IncubationMeasurementUnit) \
-	# .join(MeasurementUnit, MeasurementUnit.id == DNAExtractionProtocol.volume_unit_id) \
-	# .join(Incubation, Incubation.id == DNAExtractionProtocol.lysis_id) \
+	# sql_query = session.query(tables[table], MeasurementUnit, Incubation, IncubationMeasurementUnit) \
+	# .join(MeasurementUnit, MeasurementUnit.id == tables[table].volume_unit_id) \
+	# .join(Incubation, Incubation.id == tables[table].lysis_id) \
 	# .join(IncubationMeasurementUnit, IncubationMeasurementUnit.id == Incubation.temperature_unit_id) \
 	# .filter(tables[table].code == code)
 
@@ -54,18 +54,31 @@ def compose_instructions(table, code):
 		# print(col.label(name))
 	# print("===========================")
 	for name, rel in insp.relationships.items():
+		# print(name,rel.mapper.class_)
 		alias = aliased(rel.mapper.class_, name=name)
 		for col_name, col in inspection.inspect(rel.mapper).columns.items():
 			aliased_col = getattr(alias, col.key)
 			cols.append(aliased_col.label("{}_{}".format(name, col_name)))
+
+		# sub_insp = inspection.inspect(rel.mapper.class_)
+		# print(sub_insp)
+		# for sub_name, sub_rel in sub_insp.relationships.items():
+		# 	print(sub_name,sub_name)
+		# 	# print(sub_name,sub_rel.mapper.class_)
+		# 	sub_alias = aliased(sub_rel.mapper.class_, name=sub_name)
+		# 	for sub_col_name, sub_col in inspection.inspect(sub_rel.mapper).columns.items():
+		# 		sub_aliased_col = getattr(sub_alias, sub_col.key)
+		# 		cols.append(sub_aliased_col.label("{}_{}_{}".format(name, sub_name, sub_col_name)))
+
 			# print(col.label("{}_{}".format(name, col_name)))
 		joins.append((alias, rel.class_attribute))
 
 	sql_query = session.query(*cols).select_from(tables[table])
 	for join in joins:
-		sql_query = sql_query.join(join)
-	sql_query = sql_query.filter(tables[table].code == code)
+		sql_query = sql_query.outerjoin(*join)
+	# sql_query = sql_query.filter(tables[table].code == code)
 	print(str(sql_query))
+	print(code)
 
 	# sql_query = session.query(DNAExtractionProtocol, MeasurementUnit, Incubation) \
 	# 	.join(MeasurementUnit, MeasurementUnit.id == DNAExtractionProtocol.volume_unit_id) \
