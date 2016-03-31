@@ -1,8 +1,14 @@
 \title{$name}
-\author{Horea Christian et al.}
+\author{$authors_full_name}
 \maketitle
 
 Perform the following steps for each sample:
-\begin{enumerate}
-	\item Add \SI{${digestion_buffer_volume}}{\micro\litre} $digestion_buffer_id and \SI{$proteinase_volume}{\micro\litre} $proteinase_id
-\end{enumerate}
+\begin{itemize}
+	\item Add \SI{$digestion_buffer_volume}{$volume_unit_siunitx} $digestion_buffer_name ($digestion_buffer_code) and \SI{$proteinase_volume}{$volume_unit_siunitx} $proteinase_name.
+	\item \MakeUppercase $digestion_movement at \SI{$digestion_revolutions_per_minute}{\rpm} and \SI{$digestion_temperature}{$digestion_temperature_unit_siunitx} for \SI{$digestion_duration}{$digestion_duration_unit_siunitx}.
+	\item Add \SI{$lysis_buffer_volume}{$volume_unit_siunitx} $lysis_buffer_name.
+	\item \MakeUppercase $lysis_movement at \SI{$lysis_revolutions_per_minute}{\rpm} and \SI{$lysis_temperature}{$lysis_temperature_unit_siunitx} for \SI{$lysis_duration}{$lysis_duration_unit_siunitx}.
+	\item Incubate at \SI{$inactivation_temperature}{$inactivation_temperature_unit_siunitx} for \SI{$inactivation_duration}{$inactivation_duration_unit_siunitx}.
+	\item Incubate at \SI{$cooling_temperature}{$cooling_temperature_unit_siunitx} for \SI{$cooling_duration}{$cooling_duration_unit_siunitx}.
+	\item \MakeUppercase $centrifugation_movement at \SI{$centrifugation_revolutions_per_minute}{\rpm} for \SI{$centrifugation_duration}{$centrifugation_duration_unit_siunitx}.
+\end{itemize}
