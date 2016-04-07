@@ -55,4 +55,4 @@ def initialize_read(db_path):
 
 #for testing purposes:
 if __name__ == '__main__':
-	print next_cages_info("~/meta.db")
+	print(next_cages_info("~/meta.db"))
