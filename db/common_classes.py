@@ -236,9 +236,7 @@ class Animal(Base):
 	__tablename__ = "animals"
 	id = Column(Integer, primary_key=True)
 	id_eth = Column(Integer, unique=True)
-	cage_eth = Column(Integer)
 	id_uzh = Column(String)
-	cage_uzh = Column(String)
 	sex = Column(String)
 	ear_punches = Column(String)
 	maximal_severtity = Column(Integer, default=0)
@@ -251,18 +249,30 @@ class Animal(Base):
 	solution_administration_id = Column(Integer, ForeignKey('solution_administrations.id'))
 	solution_administration = relationship("SolutionAdministration", backref=backref("animals"))
 
+	cage_id = Column(Integer, ForeignKey('cages.id'))
+ 	cage = relationship("Cage", back_populates="animals")
+
 	fmri_measurements = relationship("FMRIMeasurement", backref="animal")
 
 	handling_habituation_id = Column(Integer, ForeignKey('handling_habituations.id'))
 	handling_habituation = relationship("HandlingHabituation")
 	genotypes = relationship("Genotype", secondary=genotype_association, backref="animals")
 	treatments = relationship("ChronicTreatment", secondary=treatment_association, backref="animals")
+
 	observations = relationship("Observation")
 	uncategorized_treatments = relationship("UncategorizedTreatment")
 
 	def __repr__(self):
 		return "<Animal(id='%s', id_eth='%s', cage_eth='%s', id_uzh='%s', cage_uzh='%s', genotype='%s', sex='%s', ear_punches='%s', treatment='%s')>"\
 		% (self.id, self.id_eth, self.cage_eth, self.id_uzh, self.cage_uzh, [self.genotype[i].name+" "+self.genotype[i].zygosity for i in range(len(self.genotype))], self.sex, self.ear_punches,[self.treatment[i].solution for i in range(len(self.treatment))])
+
+class Cage(Base):
+	__tablename__ = "cages"
+	id = Column(Integer, primary_key=True)
+	id_uzh = Column(Integer, unique=True)
+	location = Column(String)
+
+	parents = relationship("Animal", back_populates="cage")
 
 class Genotype(Base):
 	__tablename__ = "genotypes"
