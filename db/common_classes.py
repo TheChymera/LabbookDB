@@ -243,6 +243,8 @@ class Animal(Base):
 	ear_punches = Column(String)
 	maximal_severtity = Column(Integer, default=0)
 
+	birth_date = Column(DateTime)
+
 	death_date = Column(DateTime)
 	death_reason = Column(String)
 	weight = relationship("Weight")
