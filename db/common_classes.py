@@ -159,12 +159,20 @@ class HandlingHabituation(Base):
 	__tablename__ = "handling_habituations"
 	id = Column(Integer, primary_key=True)
 	date = Column(DateTime)
+
+	parent_id = Column(Integer, ForeignKey('parent.id'))
+
+	protocol_id = Column(Integer, ForeignKey('handling_habituation_protocols.id'))
+	protocol = relationship("HandlingHabituationProtocol")
+
+class HandlingHabituationProtocol(Protocol):
+	__tablename__ = 'handling_habituation_protocols'
+	__mapper_args__ = {'polymorphic_identity': 'handling_habituation'}
+	id = Column(Integer, ForeignKey('protocols.id'), primary_key=True)
 	session_duration = Column(Integer) #handling duration, per animal and per cage (assumed to be equal) in MINUTES
-	session_frequency = Column(String, default="daily")
-	session_repetitions = Column(Integer)
-	individual_picking_up = Column(Boolean, default=True)
-	group_picking_up = Column(Boolean, default=True)
-	transparent_tube = Column(Boolean, default=False)
+	individual_picking_up = Column(Boolean)
+	group_picking_up = Column(Boolean)
+	transparent_tube = Column(Boolean)
 
 class Irregularity(Base):
 	__tablename__ = "irregularities"
@@ -250,12 +258,10 @@ class Animal(Base):
 	solution_administration = relationship("SolutionAdministration", backref=backref("animals"))
 
 	cage_id = Column(Integer, ForeignKey('cages.id'))
- 	cage = relationship("Cage", back_populates="animals")
+	cage = relationship("Cage", back_populates="animals")
 
 	fmri_measurements = relationship("FMRIMeasurement", backref="animal")
 
-	handling_habituation_id = Column(Integer, ForeignKey('handling_habituations.id'))
-	handling_habituation = relationship("HandlingHabituation")
 	genotypes = relationship("Genotype", secondary=genotype_association, backref="animals")
 	treatments = relationship("ChronicTreatment", secondary=treatment_association, backref="animals")
 
@@ -272,7 +278,9 @@ class Cage(Base):
 	id_uzh = Column(Integer, unique=True)
 	location = Column(String)
 
-	parents = relationship("Animal", back_populates="cage")
+	handling_habituations = relationship(HandlingHabituation)
+
+	animals = relationship("Animal", back_populates="cage")
 
 class Genotype(Base):
 	__tablename__ = "genotypes"
