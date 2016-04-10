@@ -76,7 +76,7 @@ class Substance(Base):
 	__tablename__ = "substances"
 	id = Column(Integer, primary_key=True)
 	code = Column(String, unique=True)
-	name = Column(String)
+	name = Column(String, unique=True)
 	concentration = Column(Float)
 	concentration_unit_id = Column(String, ForeignKey('measurement_units.id'))
 	concentration_unit = relationship("MeasurementUnit")
@@ -98,7 +98,7 @@ class Solution(Base):
 	__tablename__ = "solutions"
 	id = Column(Integer, primary_key=True)
 	code = Column(String, unique=True)
-	name = Column(String)
+	name = Column(String, unique=True)
 	supplier = Column(String)
 	supplier_id = Column(String)
 	contains = relationship("Ingredient", secondary=ingredients_association)
@@ -160,7 +160,7 @@ class HandlingHabituation(Base):
 	id = Column(Integer, primary_key=True)
 	date = Column(DateTime)
 
-	parent_id = Column(Integer, ForeignKey('parent.id'))
+	cage_id = Column(Integer, ForeignKey('cages.id'))
 
 	protocol_id = Column(Integer, ForeignKey('handling_habituation_protocols.id'))
 	protocol = relationship("HandlingHabituationProtocol")
@@ -275,10 +275,10 @@ class CageStay(Base):
 	__tablename__ = "cagestays"
 	id = Column(Integer, primary_key=True)
 
-	animal_id = relationship("Animal", back_populates="cagestays")
-	animal = relationship("Parent", back_populates="cagestays")
+	animal_id = Column(Integer, ForeignKey('animals.id'))
+	animal = relationship("Animal", back_populates="cagestays")
 
-	cage_id = Column(Integer, ForeignKey('cage.id'))
+	cage_id = Column(Integer, ForeignKey('cages.id'))
 	cage = relationship("Cage", back_populates="stays")
 
 class Cage(Base):
@@ -288,7 +288,7 @@ class Cage(Base):
 	handling_habituations = relationship(HandlingHabituation)
 	id_uzh = Column(Integer, unique=True)
 	location = Column(String)
-	stays = relationship("Parent", back_populates="cage")
+	stays = relationship("CageStay", back_populates="cage")
 
 
 class Genotype(Base):
