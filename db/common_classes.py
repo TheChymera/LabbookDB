@@ -160,7 +160,7 @@ class HandlingHabituation(Base):
 	id = Column(Integer, primary_key=True)
 	date = Column(DateTime)
 
-	parent_id = Column(Integer, ForeignKey('parent.id'))
+	cage_id = Column(Integer, ForeignKey('cages.id'))
 
 	protocol_id = Column(Integer, ForeignKey('handling_habituation_protocols.id'))
 	protocol = relationship("HandlingHabituationProtocol")
