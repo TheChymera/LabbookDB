@@ -38,6 +38,11 @@ authors_association = Table('authors_associations', Base.metadata,
 	Column('operators_id', Integer, ForeignKey('operators.id'))
 )
 
+#context-sensitive default functions
+#(need to be functions taking only one input - http://docs.sqlalchemy.org/en/latest/core/defaults.html#context-sensitive-default-functions)
+def mydefaultname(context):
+	return context.current_parameters.get("name")
+
 #meta classes:
 
 class Protocol(Base):
@@ -72,11 +77,14 @@ class MeasurementUnit(Base):
 	long_name = Column(String)
 	siunitx = Column(String)
 
+
+
 class Substance(Base):
 	__tablename__ = "substances"
 	id = Column(Integer, primary_key=True)
 	code = Column(String, unique=True)
 	name = Column(String, unique=True)
+	long_name = Column(String, unique=True, default=mydefault, onupdate=mydefault)
 	concentration = Column(Float)
 	concentration_unit_id = Column(String, ForeignKey('measurement_units.id'))
 	concentration_unit = relationship("MeasurementUnit")
