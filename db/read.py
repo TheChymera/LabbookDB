@@ -1,9 +1,3 @@
-import pandas as pd
-from sqlalchemy import create_engine, literal
-from os import path
-from common_classes import Animal, Genotype, Solution, ChronicTreatmentAdministration, ChronicTreatment, Weight, FMRIMeasurement, ChronicTreatment
-from sqlalchemy.orm import sessionmaker
-
 def next_cages_info(db_path, cage_code="cage_eth", return_skipped=True):
 	"""
 	Returns cage numbers that should be selected for incoming cages.

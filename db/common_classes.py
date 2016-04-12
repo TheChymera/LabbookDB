@@ -76,7 +76,7 @@ class Substance(Base):
 	__tablename__ = "substances"
 	id = Column(Integer, primary_key=True)
 	code = Column(String, unique=True)
-	name = Column(String)
+	name = Column(String, unique=True)
 	concentration = Column(Float)
 	concentration_unit_id = Column(String, ForeignKey('measurement_units.id'))
 	concentration_unit = relationship("MeasurementUnit")
@@ -98,7 +98,7 @@ class Solution(Base):
 	__tablename__ = "solutions"
 	id = Column(Integer, primary_key=True)
 	code = Column(String, unique=True)
-	name = Column(String)
+	name = Column(String, unique=True)
 	supplier = Column(String)
 	supplier_id = Column(String)
 	contains = relationship("Ingredient", secondary=ingredients_association)
@@ -257,8 +257,7 @@ class Animal(Base):
 	solution_administration_id = Column(Integer, ForeignKey('solution_administrations.id'))
 	solution_administration = relationship("SolutionAdministration", backref=backref("animals"))
 
-	cage_id = Column(Integer, ForeignKey('cages.id'))
-	cage = relationship("Cage", back_populates="animals")
+	cagestays = relationship("CageStay", back_populates="animal")
 
 	fmri_measurements = relationship("FMRIMeasurement", backref="animal")
 
@@ -272,15 +271,25 @@ class Animal(Base):
 		return "<Animal(id='%s', id_eth='%s', cage_eth='%s', id_uzh='%s', cage_uzh='%s', genotype='%s', sex='%s', ear_punches='%s', treatment='%s')>"\
 		% (self.id, self.id_eth, self.cage_eth, self.id_uzh, self.cage_uzh, [self.genotype[i].name+" "+self.genotype[i].zygosity for i in range(len(self.genotype))], self.sex, self.ear_punches,[self.treatment[i].solution for i in range(len(self.treatment))])
 
+class CageStay(Base):
+	__tablename__ = "cagestays"
+	id = Column(Integer, primary_key=True)
+
+	animal_id = Column(Integer, ForeignKey('animals.id'))
+	animal = relationship("Animal", back_populates="cagestays")
+
+	cage_id = Column(Integer, ForeignKey('cages.id'))
+	cage = relationship("Cage", back_populates="stays")
+
 class Cage(Base):
 	__tablename__ = "cages"
 	id = Column(Integer, primary_key=True)
-	id_uzh = Column(Integer, unique=True)
-	location = Column(String)
 
 	handling_habituations = relationship(HandlingHabituation)
+	id_uzh = Column(Integer, unique=True)
+	location = Column(String)
+	stays = relationship("CageStay", back_populates="cage")
 
-	animals = relationship("Animal", back_populates="cage")
 
 class Genotype(Base):
 	__tablename__ = "genotypes"
