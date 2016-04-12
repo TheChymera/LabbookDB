@@ -3,13 +3,21 @@
 import datetime
 import argh
 import json
+import sys
 
 from sqlalchemy import create_engine, literal
 from os import path
 from common_classes import *
 from sqlalchemy.orm import sessionmaker
+import sqlalchemy
 
-allowed_classes = {"animal": Animal, "cage": Cage, "substance": Substance, "solution": Solution}
+allowed_classes = {
+	"animal": Animal,
+	"cage": Cage,
+	"substance": Substance,
+	"solution": Solution,
+	"operator": Operator,
+	}
 
 def loadSession(db_path):
 	db_path = "sqlite:///" + path.expanduser(db_path)
@@ -36,27 +44,43 @@ def add_animal(db_path, id_eth, cage_eth, sex, ear_punches, id_uzh="", cage_uzh=
 
 	add_to_db(db_path, Animal(id_eth=id_eth, cage_eth=cage_eth, sex=sex, ear_punches=ear_punches, id_uzh=id_uzh, cage_uzh=cage_uzh))
 
-def add_generic(db_path, category, parameters=""):
+def add_generic(db_path, category, walkthrough=False, parameters=""):
 
 	category_class = allowed_classes[category]
 
-	if not parameters:
-		attributes = dir(category_class())
-		filtered_attributes = [i for i in attributes if i[0] != "_"]
-		message = "You can list the following keys as part of your parameters: " + ", ".join(filtered_attributes)
-		return message
+	#detrmine class attributes
+	attributes = dir(category_class())
+	filtered_attributes = [i for i in attributes if i[0] != "_"]
 
-	parameters = json.loads(parameters)
+	if not walkthrough:
+		if not parameters:
+			message = "You can list the following keys as part of your parameters: " + ", ".join(filtered_attributes)
+			return message
+		elif isinstance(parameters, dict):
+			pass
+		else:
+			parameters = json.loads(parameters)
 
-	myobject = category_class()
-	for key in parameters:
-		setattr(myobject, key, parameters[key])
+		myobject = category_class()
+		for key in parameters:
+			setattr(myobject, key, parameters[key])
+	else:
+		myobject = category_class()
+		for key in filtered_attributes:
+			if key == "id":
+				continue
+			value = raw_input("Enter your desired \""+key+"\" value:").decode(sys.stdin.encoding)
+			print(value, type(value))
+			setattr(myobject, key, value)
 
 	add_to_db(db_path, myobject)
 
 
 def commit_and_close(session, engine):
-	session.commit()
+	try:
+		session.commit()
+	except sqlalchemy.exc.IntegrityError:
+		print("Please make sure this was not a double entry.")
 	session.close()
 	engine.dispose()
 
@@ -71,8 +95,8 @@ def double_entry(db_path, field, value):
 	session.close()
 	engine.dispose()
 
-argh.dispatch_command(add_generic)
 
 if __name__ == '__main__':
-	add_generic("~/meta.db", "animal")
+	argh.dispatch_command(add_generic)
+	# add_generic("~/meta.db", "animal")
 	# add_animal("~/animal.db", 4011, 4, "f", "2L", id_uzh="M2760", cage_uzh="570971")
