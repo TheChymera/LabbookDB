@@ -14,9 +14,10 @@ import sqlalchemy
 allowed_classes = {
 	"animal": Animal,
 	"cage": Cage,
+	"measurementunit": MeasurementUnit,
+	"operator": Operator,
 	"substance": Substance,
 	"solution": Solution,
-	"operator": Operator,
 	}
 
 def loadSession(db_path):
@@ -63,6 +64,8 @@ def add_generic(db_path, category, walkthrough=False, parameters=""):
 
 		myobject = category_class()
 		for key in parameters:
+			if key[-3:] == "_id":
+				pass
 			setattr(myobject, key, parameters[key])
 	else:
 		myobject = category_class()
