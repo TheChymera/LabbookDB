@@ -84,7 +84,7 @@ class Substance(Base):
 	id = Column(Integer, primary_key=True)
 	code = Column(String, unique=True)
 	name = Column(String, unique=True)
-	long_name = Column(String, unique=True, default=mydefault, onupdate=mydefault)
+	long_name = Column(String, unique=True, default=mydefaultname, onupdate=mydefaultname)
 	concentration = Column(Float)
 	concentration_unit_id = Column(String, ForeignKey('measurement_units.id'))
 	concentration_unit = relationship("MeasurementUnit")

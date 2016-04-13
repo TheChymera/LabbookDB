@@ -46,6 +46,8 @@ def add_animal(db_path, id_eth, cage_eth, sex, ear_punches, id_uzh="", cage_uzh=
 	add_to_db(db_path, Animal(id_eth=id_eth, cage_eth=cage_eth, sex=sex, ear_punches=ear_punches, id_uzh=id_uzh, cage_uzh=cage_uzh))
 
 def add_generic(db_path, category, walkthrough=False, parameters=""):
+	"""Adds new entries based on a parameter dictionary
+	"""
 
 	category_class = allowed_classes[category]
 
@@ -64,8 +66,8 @@ def add_generic(db_path, category, walkthrough=False, parameters=""):
 
 		myobject = category_class()
 		for key in parameters:
-			if key[-3:] == "_id":
-				pass
+			# if key[-3:] == "_id":
+				# sql_query=session.query(allowed_classes[category]).filter(getattr(allowed_classes[category], field)==value)
 			setattr(myobject, key, parameters[key])
 	else:
 		myobject = category_class()
