@@ -17,12 +17,15 @@ allowed_classes = {
 	"animal": Animal,
 	"cage": Cage,
 	"dnaextractionprotocol": DNAExtractionProtocol,
+	"fmriscannersetup": FMRIScannerSetup,
+	"habdlinghabituationprotocol": HandlingHabituationProtocol,
 	"ingredient": Ingredient,
 	"incubation": Incubation,
 	"measurementunit": MeasurementUnit,
 	"operator": Operator,
 	"substance": Substance,
 	"solution": Solution,
+	"solutionadministration": SolutionAdministration,
 	}
 
 def loadSession(db_path):
