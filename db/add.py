@@ -16,6 +16,7 @@ import sqlalchemy
 allowed_classes = {
 	"animal": Animal,
 	"cage": Cage,
+	"ingredient": Ingredient,
 	"measurementunit": MeasurementUnit,
 	"operator": Operator,
 	"substance": Substance,
@@ -47,54 +48,56 @@ def add_animal(db_path, id_eth, cage_eth, sex, ear_punches, id_uzh="", cage_uzh=
 
 	add_to_db(db_path, Animal(id_eth=id_eth, cage_eth=cage_eth, sex=sex, ear_punches=ear_punches, id_uzh=id_uzh, cage_uzh=cage_uzh))
 
-def add_generic(db_path, category, walkthrough=False, parameters=""):
+def instructions(kind):
+	if kind == "table_identifier":
+		print("Make sure you have entered the value for \'"+key+"\' correctly. This value is supposed to refer to the id column of another table and needs to be specified as \'table_identifier\'.\'field_by_which_to_filter\'.\'target_value\'")
+
+def get_related_id(db_path, parameters, key):
+	category, field, value = parameters[key].split(".")
+	session, engine = loadSession(db_path)
+	sql_query=session.query(allowed_classes[category]).filter(getattr(allowed_classes[category], field)==value)
+	mystring = sql_query.statement
+	mydf = pd.read_sql_query(mystring,engine)
+	related_table_ids = mydf["id"]
+	input_values = list(related_table_ids)
+	session.close()
+	engine.dispose()
+	return input_values
+
+def add_generic(db_path, parameters, walkthrough=False):
 	"""Adds new entries based on a parameter dictionary
 	"""
 
-	category_class = allowed_classes[category]
+	if isinstance(parameters, str):
+		parameters = json.loads(parameters)
 
-	#detrmine class attributes
-	attributes = dir(category_class())
-	filtered_attributes = [i for i in attributes if i[0] != "_"]
+	category_class = allowed_classes[parameters["CATEGORY"]]
+	if list(parameters.keys()) == ["CATEGORY"]:
+		attributes = dir(category_class())
+		filtered_attributes = [i for i in attributes if i[0] != "_"]
+		print("You can list the following keys as part of your parameters: " + ", ".join(filtered_attributes))
+	parameters.pop("CATEGORY", None)
 
-	if not walkthrough:
-		if not parameters:
-			message = "You can list the following keys as part of your parameters: " + ", ".join(filtered_attributes)
-			return message
-		elif isinstance(parameters, dict):
-			pass
+	myobject = category_class()
+	for key in parameters:
+		if key[-3:] == "_id":
+			try:
+				input_values = get_related_id(db_path, parameters, key)
+			except ValueError:
+				instructions("table_identifier")
+			for input_value in input_values:
+				input_value = int(input_value)
+				setattr(myobject, key, input_value)
+		# if type(parameters[key]) is dict:
 		else:
-			parameters = json.loads(parameters)
-
-		myobject = category_class()
-		for key in parameters:
-			if key[-3:] == "_id":
-				try:
-					category, field, value = parameters[key].split(".")
-				except ValueError:
-					print("Make sure you have entered the value for \'"+key+"\' correctly. This value is supposed to refer to the id column of another table and needs to be specified as \'table_identifier\'.\'field_by_which_to_filter\'.\'target_value\'")
-					continue
-				session, engine = loadSession(db_path)
-				sql_query=session.query(allowed_classes[category]).filter(getattr(allowed_classes[category], field)==value)
-				mystring = sql_query.statement
-				mydf = pd.read_sql_query(mystring,engine)
-				related_table_ids = mydf["id"]
-				input_values = list(related_table_ids)
-				session.close()
-				engine.dispose()
-				for input_value in input_values:
-					input_value = int(input_value)
-					setattr(myobject, key, input_value)
-			else:
-				setattr(myobject, key, parameters[key])
-	else:
-		myobject = category_class()
-		for key in filtered_attributes:
-			if key == "id":
-				continue
-			value = raw_input("Enter your desired \""+key+"\" value:").decode(sys.stdin.encoding)
-			print(value, type(value))
-			setattr(myobject, key, value)
+			setattr(myobject, key, parameters[key])
+		# Walkthrough Legacy Code:
+		# myobject = category_class()
+		# for key in filtered_attributes:
+		# 	if key == "id":
+		# 		continue
+		# 	value = raw_input("Enter your desired \""+key+"\" value:").decode(sys.stdin.encoding)
+		# 	setattr(myobject, key, value)
 
 	add_to_db(db_path, myobject)
 
