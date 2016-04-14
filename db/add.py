@@ -5,6 +5,8 @@ import argh
 import json
 import sys
 
+import pandas as pd
+
 from sqlalchemy import create_engine, literal
 from os import path
 from common_classes import *
@@ -66,9 +68,25 @@ def add_generic(db_path, category, walkthrough=False, parameters=""):
 
 		myobject = category_class()
 		for key in parameters:
-			# if key[-3:] == "_id":
-				# sql_query=session.query(allowed_classes[category]).filter(getattr(allowed_classes[category], field)==value)
-			setattr(myobject, key, parameters[key])
+			if key[-3:] == "_id":
+				try:
+					category, field, value = parameters[key].split(".")
+				except ValueError:
+					print("Make sure you have entered the value for \'"+key+"\' correctly. This value is supposed to refer to the id column of another table and needs to be specified as \'table_identifier\'.\'field_by_which_to_filter\'.\'target_value\'")
+					continue
+				session, engine = loadSession(db_path)
+				sql_query=session.query(allowed_classes[category]).filter(getattr(allowed_classes[category], field)==value)
+				mystring = sql_query.statement
+				mydf = pd.read_sql_query(mystring,engine)
+				related_table_ids = mydf["id"]
+				input_values = list(related_table_ids)
+				session.close()
+				engine.dispose()
+				for input_value in input_values:
+					input_value = int(input_value)
+					setattr(myobject, key, input_value)
+			else:
+				setattr(myobject, key, parameters[key])
 	else:
 		myobject = category_class()
 		for key in filtered_attributes:
