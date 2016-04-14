@@ -14,18 +14,19 @@ from sqlalchemy.orm import sessionmaker
 import sqlalchemy
 
 allowed_classes = {
-	"animal": Animal,
-	"cage": Cage,
-	"dnaextractionprotocol": DNAExtractionProtocol,
-	"fmriscannersetup": FMRIScannerSetup,
-	"habdlinghabituationprotocol": HandlingHabituationProtocol,
-	"ingredient": Ingredient,
-	"incubation": Incubation,
-	"measurementunit": MeasurementUnit,
-	"operator": Operator,
-	"substance": Substance,
-	"solution": Solution,
-	"solutionadministration": SolutionAdministration,
+	"Animal": Animal,
+	"Cage": Cage,
+	"DNAExtractionProtocol": DNAExtractionProtocol,
+	"FMRIScannerSetup": FMRIScannerSetup,
+	"FMRIAnimalPreparationProtocol": FMRIAnimalPreparationProtocol,
+	"HandlingHabituationProtocol": HandlingHabituationProtocol,
+	"Ingredient": Ingredient,
+	"Incubation": Incubation,
+	"MeasurementUnit": MeasurementUnit,
+	"Operator": Operator,
+	"Substance": Substance,
+	"Solution": Solution,
+	"SolutionAdministration": SolutionAdministration,
 	}
 
 def loadSession(db_path):
@@ -66,10 +67,18 @@ def instructions(kind):
 
 def get_related_id(db_path, parameters, key):
 	session, engine = loadSession(db_path)
-	category = parameters[key].split(":")[0]
+	category = parameters[key].split(":",1)[0]
 	sql_query=session.query(allowed_classes[category])
-	for field_value in parameters[key].split(":")[1].split("&&"):
-		field, value = field_value.split(".")
+	for field_value in parameters[key].split(":",1)[1].split("&&"):
+		field, value = field_value.split(".",1)
+		if ":" in value:
+			sub_category = value.split(":",1)[0]
+			sub_field, sub_value = value.split(":",1)[1].split(".",1)
+			sql_subquery=session.query(allowed_classes[sub_category]).filter(getattr(allowed_classes[sub_category], sub_field)==sub_value)
+			mystring = sql_subquery.statement
+			mydf = pd.read_sql_query(mystring,engine)
+			value = mydf["id"][0]
+			value = int(value) # for some reason the type is wrong on this and needs to be set to int explicitly
 		sql_query = sql_query.filter(getattr(allowed_classes[category], field)==value)
 	mystring = sql_query.statement
 	mydf = pd.read_sql_query(mystring,engine)
