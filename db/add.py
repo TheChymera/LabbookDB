@@ -16,7 +16,9 @@ import sqlalchemy
 allowed_classes = {
 	"animal": Animal,
 	"cage": Cage,
+	"dnaextractionprotocol": DNAExtractionProtocol,
 	"ingredient": Ingredient,
+	"incubation": Incubation,
 	"measurementunit": MeasurementUnit,
 	"operator": Operator,
 	"substance": Substance,
@@ -60,9 +62,12 @@ def instructions(kind):
 		print("Make sure you have entered the value for \'"+key+"\' correctly. This value is supposed to refer to the id column of another table and needs to be specified as \'table_identifier\'.\'field_by_which_to_filter\'.\'target_value\'")
 
 def get_related_id(db_path, parameters, key):
-	category, field, value = parameters[key].split(".")
 	session, engine = loadSession(db_path)
-	sql_query=session.query(allowed_classes[category]).filter(getattr(allowed_classes[category], field)==value)
+	category = parameters[key].split(":")[0]
+	sql_query=session.query(allowed_classes[category])
+	for field_value in parameters[key].split(":")[1].split("&&"):
+		field, value = field_value.split(".")
+		sql_query = sql_query.filter(getattr(allowed_classes[category], field)==value)
 	mystring = sql_query.statement
 	mydf = pd.read_sql_query(mystring,engine)
 	related_table_ids = mydf["id"]
