@@ -77,8 +77,6 @@ class MeasurementUnit(Base):
 	long_name = Column(String)
 	siunitx = Column(String)
 
-
-
 class Substance(Base):
 	__tablename__ = "substances"
 	id = Column(Integer, primary_key=True)
@@ -98,7 +96,6 @@ class Ingredient(Base):
 	concentration = Column(Float)
 	concentration_unit_id = Column(String, ForeignKey('measurement_units.id'))
 	concentration_unit = relationship("MeasurementUnit")
-	contained = Column(Integer, ForeignKey("ingredients.id"))
 	substance_id = Column(Integer, ForeignKey('substances.id'))
 	substance = relationship("Substance")
 
@@ -108,7 +105,7 @@ class Solution(Base):
 	code = Column(String, unique=True)
 	name = Column(String, unique=True)
 	supplier = Column(String)
-	supplier_id = Column(String)
+	supplier_product_code = Column(String)
 	contains = relationship("Ingredient", secondary=ingredients_association)
 
 #fMRI classes:
