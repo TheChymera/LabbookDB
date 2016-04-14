@@ -34,7 +34,14 @@ def loadSession(db_path):
 def add_to_db(db_path, myobject):
 	session, engine = loadSession(db_path)
 	session.add(myobject)
-	commit_and_close(session, engine)
+	try:
+		session.commit()
+	except sqlalchemy.exc.IntegrityError:
+		print("Please make sure this was not a double entry.")
+	theid=myobject.id
+	session.close()
+	engine.dispose()
+	return(theid)
 
 def add_genotype(name, zygosity):
 	session, engine = loadSession()
@@ -88,7 +95,10 @@ def add_generic(db_path, parameters, walkthrough=False):
 			for input_value in input_values:
 				input_value = int(input_value)
 				setattr(myobject, key, input_value)
-		# if type(parameters[key]) is dict:
+		#this triggers on-the-fly related entry creation:
+		if isinstance(parameters[key], list) and isinstance(parameters[key][0], dict):
+			for related_entry in parameters[key]:
+				add_generic()
 		else:
 			setattr(myobject, key, parameters[key])
 		# Walkthrough Legacy Code:
