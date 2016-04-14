@@ -14,12 +14,19 @@ from sqlalchemy.orm import sessionmaker
 import sqlalchemy
 
 allowed_classes = {
-	"animal": Animal,
-	"cage": Cage,
-	"measurementunit": MeasurementUnit,
-	"operator": Operator,
-	"substance": Substance,
-	"solution": Solution,
+	"Animal": Animal,
+	"Cage": Cage,
+	"DNAExtractionProtocol": DNAExtractionProtocol,
+	"FMRIScannerSetup": FMRIScannerSetup,
+	"FMRIAnimalPreparationProtocol": FMRIAnimalPreparationProtocol,
+	"HandlingHabituationProtocol": HandlingHabituationProtocol,
+	"Ingredient": Ingredient,
+	"Incubation": Incubation,
+	"MeasurementUnit": MeasurementUnit,
+	"Operator": Operator,
+	"Substance": Substance,
+	"Solution": Solution,
+	"SolutionAdministration": SolutionAdministration,
 	}
 
 def simple_query(db_path, category, field, value, mask="", first=True):
