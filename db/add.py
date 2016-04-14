@@ -67,6 +67,8 @@ def get_related_id(db_path, parameters, key):
 	mydf = pd.read_sql_query(mystring,engine)
 	related_table_ids = mydf["id"]
 	input_values = list(related_table_ids)
+	if input_values == []:
+		print("No entry was found with a value of \""+value+"\" on the \""+field+"\" column of the \""+category+"\" CATEGORY, in the database located under "+db_path+".")
 	session.close()
 	engine.dispose()
 	return input_values
@@ -96,9 +98,12 @@ def add_generic(db_path, parameters, walkthrough=False):
 				input_value = int(input_value)
 				setattr(myobject, key, input_value)
 		#this triggers on-the-fly related entry creation:
-		if isinstance(parameters[key], list) and isinstance(parameters[key][0], dict):
+		elif isinstance(parameters[key], list) and isinstance(parameters[key][0], dict):
+			related_entries=[]
 			for related_entry in parameters[key]:
-				add_generic()
+				related_entry, _ = add_generic(db_path, related_entry)
+				related_entries.append(related_entry)
+			setattr(myobject, key, related_entries)
 		else:
 			setattr(myobject, key, parameters[key])
 		# Walkthrough Legacy Code:
@@ -109,7 +114,7 @@ def add_generic(db_path, parameters, walkthrough=False):
 		# 	value = raw_input("Enter your desired \""+key+"\" value:").decode(sys.stdin.encoding)
 		# 	setattr(myobject, key, value)
 
-	add_to_db(db_path, myobject)
+	return myobject, add_to_db(db_path, myobject)
 
 
 def commit_and_close(session, engine):
