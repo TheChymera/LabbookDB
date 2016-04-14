@@ -13,10 +13,6 @@ treatment_association = Table('treatment_associations', Base.metadata,
 	Column('chronic_treatments_id', Integer, ForeignKey('chronic_treatments.id')),
 	Column('animals_id', Integer, ForeignKey('animals.id'))
 )
-solution_association = Table('solution_associations', Base.metadata,
-	Column('soution_administrations_id', Integer, ForeignKey('solution_administrations.id')),
-	Column('solutions_id', Integer, ForeignKey('solutions.id'))
-)
 operator_association = Table('operator_associations', Base.metadata,
 	Column('operator_id', Integer, ForeignKey('operators.id')),
 	Column('fmri_measurements_id', Integer, ForeignKey('fmri_measurements.id'))
@@ -111,7 +107,7 @@ class Solution(Base):
 #fMRI classes:
 
 class FMRIScannerSetup(Base):
-	__tablename__ = "scanner_setups"
+	__tablename__ = "fmri_scanner_setups"
 	id = Column(Integer, primary_key=True)
 	code = Column(String, unique=True)
 	coil = Column(String)
@@ -127,7 +123,7 @@ class FMRIMeasurement(Base):
 	preparation_id = Column(Integer, ForeignKey('fmri_animal_preparation_protocols.id'))
 	preparation = relationship("FMRIAnimalPreparationProtocol")
 	laser_stimulations = relationship("LaserStimulationProtocol", secondary=laser_association)
-	scanner_setup_id = Column(Integer, ForeignKey('scanner_setups.id'))
+	scanner_setup_id = Column(Integer, ForeignKey('fmri_scanner_setups.id'))
 	scanner_setup = relationship("FMRIScannerSetup")
 	animal_id = Column(Integer, ForeignKey('animals.id'))
 	irregularities = relationship("Irregularity", secondary=irregularities_association)
@@ -227,7 +223,8 @@ class ChronicTreatment(Base):
 class SolutionAdministration(Base):
 	__tablename__ = "solution_administrations"
 	id = Column(Integer, primary_key=True)
-	solutions = relationship("Solution", secondary=solution_association)
+	solution_id = Column(Integer, ForeignKey('solutions.id'))
+	solution = relationship("Solution")
 	operator_id = Column(Integer, ForeignKey('operators.id'))
 	operator = relationship("Operator")
 	date = Column(DateTime)
