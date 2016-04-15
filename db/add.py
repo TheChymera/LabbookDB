@@ -63,23 +63,22 @@ def add_animal(db_path, id_eth, cage_eth, sex, ear_punches, id_uzh="", cage_uzh=
 
 def instructions(kind):
 	if kind == "table_identifier":
-		print("Make sure you have entered the value for \'"+key+"\' correctly. This value is supposed to refer to the id column of another table and needs to be specified as \'table_identifier\'.\'field_by_which_to_filter\'.\'target_value\'")
+		print("Make sure you have entered the filter value correctly. This value is supposed to refer to the id column of another table and needs to be specified as \'table_identifier\'.\'field_by_which_to_filter\'.\'target_value\'")
 
-def get_related_id(db_path, parameters, key):
+def get_related_id(db_path, parameters):
 	session, engine = loadSession(db_path)
-	category = parameters[key].split(":",1)[0]
+	category = parameters.split(":",1)[0]
 	sql_query=session.query(allowed_classes[category])
-	for field_value in parameters[key].split(":",1)[1].split("&&"):
+	for field_value in parameters.split(":",1)[1].split("&&"):
 		field, value = field_value.split(".",1)
+		values=None
 		if ":" in value:
-			sub_category = value.split(":",1)[0]
-			sub_field, sub_value = value.split(":",1)[1].split(".",1)
-			sql_subquery=session.query(allowed_classes[sub_category]).filter(getattr(allowed_classes[sub_category], sub_field)==sub_value)
-			mystring = sql_subquery.statement
-			mydf = pd.read_sql_query(mystring,engine)
-			value = mydf["id"][0]
-			value = int(value) # for some reason the type is wrong on this and needs to be set to int explicitly
-		sql_query = sql_query.filter(getattr(allowed_classes[category], field)==value)
+			values = get_related_id(db_path, value)
+		if values:
+			for value in values:
+				sql_query = sql_query.filter(getattr(allowed_classes[category], field)==value)
+		else:
+			sql_query = sql_query.filter(getattr(allowed_classes[category], field)==value)
 	mystring = sql_query.statement
 	mydf = pd.read_sql_query(mystring,engine)
 	related_table_ids = mydf["id"]
@@ -108,7 +107,7 @@ def add_generic(db_path, parameters, walkthrough=False):
 	for key in parameters:
 		if key[-3:] == "_id":
 			try:
-				input_values = get_related_id(db_path, parameters, key)
+				input_values = get_related_id(db_path, parameters[key])
 			except ValueError:
 				instructions("table_identifier")
 			for input_value in input_values:
