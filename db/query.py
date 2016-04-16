@@ -62,5 +62,5 @@ def commit_and_close(session, engine):
 
 if __name__ == '__main__':
 	# argh.dispatch_command(add_generic)
-	simple_query("~/meta.db", "substance", "code", "flu", mask="id")
+	simple_query("~/meta.db", "Operator", "code", "JGr", first=False)
 	# add_animal("~/animal.db", 4011, 4, "f", "2L", id_uzh="M2760", cage_uzh="570971")
