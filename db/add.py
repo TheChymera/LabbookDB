@@ -74,27 +74,17 @@ def get_related_id(db_path, parameters):
 	sql_query=session.query(allowed_classes[category])
 	for field_value in parameters.split(":",1)[1].split("&&"):
 		field, value = field_value.split(".",1)
-		values=None
 		if ":" in value:
 			values = get_related_id(db_path, value)
-		if values:
 			for value in values:
+				value=int(value) # the value is returned as a numpy object
 				sql_query = sql_query.filter(getattr(allowed_classes[category], field)==value)
-				print("AAAA", field, value)
 		else:
 			sql_query = sql_query.filter(getattr(allowed_classes[category], field)==value)
-			print("BBBB", field, value)
 	mystring = sql_query.statement
-	print("STRING:",mystring)
 	mydf = pd.read_sql_query(mystring,engine)
-	#Dirty hack:
-	if mydf.groupby(mydf.columns, axis=1).agg(numpy.max) != mydf.groupby(mydf.columns, axis=1).agg(numpy.max):
-		raise
-	else:
-		mydf = related_table_ids.groupby(mydf.columns, axis=1).agg(numpy.max)
-	print(parameters, mydf)
+	mydf = mydf.T.groupby(level=0).first().T #awkward hack to deal with polymorphic tables returning multiple IDs
 	related_table_ids = mydf["id"]
-	print(related_table_ids)
 	input_values = list(related_table_ids)
 	if input_values == []:
 		print("No entry was found with a value of \""+value+"\" on the \""+field+"\" column of the \""+category+"\" CATEGORY, in the database located under "+db_path+".")
@@ -124,7 +114,6 @@ def add_generic(db_path, parameters, walkthrough=False):
 			except ValueError:
 				instructions("table_identifier")
 			for input_value in input_values:
-				print(myobject, key, input_value)
 				input_value = int(input_value)
 				setattr(myobject, key, input_value)
 		#this triggers on-the-fly related entry creation:
