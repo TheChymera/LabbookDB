@@ -165,6 +165,7 @@ class HandlingHabituation(Base):
 	date = Column(DateTime)
 
 	cage_id = Column(Integer, ForeignKey('cages.id'))
+	cage = relationship("Cage", back_populates="handling_habituations")
 
 	protocol_id = Column(Integer, ForeignKey('handling_habituation_protocols.id'))
 	protocol = relationship("HandlingHabituationProtocol")
@@ -267,7 +268,7 @@ class Cage(Base):
 	__tablename__ = "cages"
 	id = Column(Integer, primary_key=True)
 
-	handling_habituations = relationship("HandlingHabituation")
+	handling_habituations = relationship("HandlingHabituation", back_populates="cage")
 	id_local = Column(String, unique=True)
 	location = Column(String)
 	stays = relationship("CageStay", back_populates="cage")
@@ -276,12 +277,13 @@ class Cage(Base):
 class Genotype(Base):
 	__tablename__ = "genotypes"
 	id = Column(Integer, primary_key=True)
-	name = Column(String)
+	code = Column(String, unique=True)
+	construct = Column(String)
 	zygosity = Column(String)
 
 	def __repr__(self):
-		return "<Genotype(name='%s', zygosity='%s')>"\
-		% (self.name, self.zygosity)
+		return "<Genotype(code='%s', construct='%s' zygosity='%s')>"\
+		% (self.code, self.construct, self.zygosity)
 
 class Weight(Base):
 	__tablename__ = "weights"
