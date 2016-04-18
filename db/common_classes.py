@@ -203,6 +203,8 @@ class TreatmentProtocol(Protocol):
 	__tablename__ = 'treatment_protocols'
 	__mapper_args__ = {'polymorphic_identity': 'treatment'}
 	id = Column(Integer, ForeignKey('protocols.id'), primary_key=True)
+	code = Column(String, unique=True)
+	name = Column(String, unique=True)
 	frequency = Column(String)
 	route = Column(String)
 	rate = Column(Float)
@@ -267,8 +269,8 @@ class Cage(Base):
 	__tablename__ = "cages"
 	id = Column(Integer, primary_key=True)
 
-	handling_habituations = relationship(HandlingHabituation)
-	id_uzh = Column(Integer, unique=True)
+	handling_habituations = relationship("HandlingHabituation")
+	id_local = Column(String, unique=True)
 	location = Column(String)
 	stays = relationship("CageStay", back_populates="cage")
 
