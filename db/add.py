@@ -8,7 +8,7 @@ import numpy
 
 import pandas as pd
 
-from sqlalchemy import create_engine, literal
+from sqlalchemy import create_engine, literal, update
 from os import path
 from common_classes import *
 from sqlalchemy.orm import sessionmaker
@@ -21,6 +21,7 @@ allowed_classes = {
 	"DNAExtractionProtocol": DNAExtractionProtocol,
 	"FMRIScannerSetup": FMRIScannerSetup,
 	"FMRIAnimalPreparationProtocol": FMRIAnimalPreparationProtocol,
+	"Genotype": Genotype,
 	"HandlingHabituationProtocol": HandlingHabituationProtocol,
 	"Ingredient": Ingredient,
 	"Incubation": Incubation,
@@ -92,6 +93,24 @@ def get_related_id(db_path, parameters):
 	engine.dispose()
 	return input_values
 
+def update_parameter(db_path, entry_identification, parameters):
+	"""Assigns a value to a givn parameter of a given entry
+	"""
+
+	if isinstance(parameters, str):
+		parameters = json.loads(parameters)
+
+	session, engine = loadSession(db_path)
+
+	entry_class = allowed_classes[entry_identification.split(":")[0]]
+	my_id = get_related_id(db_path, entry_identification)[0]
+
+	for key in parameters:
+		session.query(entry_class).\
+			filter(entry_class.id == my_id).\
+			update({key: parameters[key]})
+	commit_and_close(session, engine)
+
 def add_generic(db_path, parameters, walkthrough=False):
 	"""Adds new entries based on a parameter dictionary
 	"""
@@ -157,6 +176,5 @@ def double_entry(db_path, field, value):
 
 
 if __name__ == '__main__':
+	# update_parameter("~/meta.db", entry_identification="Cage:id_local.570974", parameters={"location":"AFS7pula"})
 	argh.dispatch_command(add_generic)
-	# add_generic("~/meta.db", "animal")
-	# add_animal("~/animal.db", 4011, 4, "f", "2L", id_uzh="M2760", cage_uzh="570971")
