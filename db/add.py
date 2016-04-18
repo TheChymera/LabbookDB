@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import datetime
+from datetime import datetime
 import argh
 import json
 import sys
@@ -8,7 +8,7 @@ import numpy
 
 import pandas as pd
 
-from sqlalchemy import create_engine, literal, update
+from sqlalchemy import create_engine, literal, update, insert
 from os import path
 from common_classes import *
 from sqlalchemy.orm import sessionmaker
@@ -23,6 +23,7 @@ allowed_classes = {
 	"FMRIAnimalPreparationProtocol": FMRIAnimalPreparationProtocol,
 	"Genotype": Genotype,
 	"HandlingHabituationProtocol": HandlingHabituationProtocol,
+	"HandlingHabituation": HandlingHabituation,
 	"Ingredient": Ingredient,
 	"Incubation": Incubation,
 	"LaserStimulationProtocol": LaserStimulationProtocol,
@@ -127,6 +128,8 @@ def add_generic(db_path, parameters, walkthrough=False):
 
 	myobject = category_class()
 	for key in parameters:
+		if key == "date":
+			parameters[key] = datetime(*[int(i) for i in parameters[key].split(",")])
 		if key[-3:] == "_id":
 			try:
 				input_values = get_related_id(db_path, parameters[key])
@@ -142,6 +145,17 @@ def add_generic(db_path, parameters, walkthrough=False):
 				related_entry, _ = add_generic(db_path, related_entry)
 				related_entries.append(related_entry)
 			setattr(myobject, key, related_entries)
+		elif isinstance(parameters[key], list) and not isinstance(parameters[key][0], dict):
+			related_entries=[]
+			session, engine = loadSession(db_path)
+			for related_entry in parameters[key]:
+				my_id = get_related_id(db_path, related_entry)[0]
+				entry_class = allowed_classes[related_entry.split(":")[0]]
+				related_entry = session.query(entry_class).\
+					filter(entry_class.id == my_id).all()[0]
+				related_entries.append(related_entry)
+			setattr(myobject, key, related_entries)
+			commit_and_close(session, engine)
 		else:
 			setattr(myobject, key, parameters[key])
 		# Walkthrough Legacy Code:
@@ -176,5 +190,8 @@ def double_entry(db_path, field, value):
 
 
 if __name__ == '__main__':
-	# update_parameter("~/meta.db", entry_identification="Cage:id_local.570974", parameters={"location":"AFS7pula"})
+	add_generic("~/meta.db", parameters={"CATEGORY":"Animal", "id_eth":4001, "id_uzh":"M2763", "sex":"f", "ear_punches":"LR",
+		"genotypes":["Genotype:code.eptg"]
+		})
+	# update_parameter("~/meta.db", entry_identification="Cage:id_local.570974", parameters={"location":"AFS7pua"})
 	argh.dispatch_command(add_generic)
