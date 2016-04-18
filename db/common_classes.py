@@ -203,8 +203,6 @@ class TreatmentProtocol(Protocol):
 	__tablename__ = 'treatment_protocols'
 	__mapper_args__ = {'polymorphic_identity': 'treatment'}
 	id = Column(Integer, ForeignKey('protocols.id'), primary_key=True)
-	code = Column(String, unique=True)
-	name = Column(String, unique=True)
 	frequency = Column(String)
 	route = Column(String)
 	rate = Column(Float)
