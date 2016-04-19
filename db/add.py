@@ -128,7 +128,7 @@ def add_generic(db_path, parameters, walkthrough=False):
 
 	myobject = category_class()
 	for key in parameters:
-		if key == "date":
+		if key[-5:] == "_date":
 			parameters[key] = datetime(*[int(i) for i in parameters[key].split(",")])
 		if key[-3:] == "_id":
 			try:
