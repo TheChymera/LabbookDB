@@ -182,7 +182,7 @@ class HandlingHabituationProtocol(Protocol):
 class Irregularity(Base):
 	__tablename__ = "irregularities"
 	id = Column(Integer, primary_key=True)
-	description = Column(String)
+	description = Column(String, unique=True)
 
 class Observation(Base):
 	__tablename__ = "observations"
