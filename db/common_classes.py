@@ -33,6 +33,10 @@ authors_association = Table('authors_associations', Base.metadata,
 	Column('protocols_id', Integer, ForeignKey('protocols.id')),
 	Column('operators_id', Integer, ForeignKey('operators.id'))
 )
+cage_stay_association = Table('cage_stay_associations', Base.metadata,
+	Column('cage_stays_id', Integer, ForeignKey('cage_stays.id')),
+	Column('animals_id', Integer, ForeignKey('animals.id'))
+)
 
 #context-sensitive default functions
 #(need to be functions taking only one input - http://docs.sqlalchemy.org/en/latest/core/defaults.html#context-sensitive-default-functions)
@@ -240,7 +244,7 @@ class Animal(Base):
 	death_reason = Column(String)
 	weight = relationship("Weight")
 
-	cage_stays = relationship("CageStay", back_populates="animal")
+	cage_stays = relationship("CageStay", secondary=cage_stay_association)
 
 	fmri_measurements = relationship("FMRIMeasurement", backref="animal")
 
@@ -258,8 +262,8 @@ class CageStay(Base):
 	__tablename__ = "cage_stays"
 	id = Column(Integer, primary_key=True)
 
-	animal_id = Column(Integer, ForeignKey('animals.id'))
-	animal = relationship("Animal", back_populates="cage_stays")
+	start_date = Column(DateTime) #date of first occurence
+	end_date = Column(DateTime) #date of last occurence
 
 	cage_id = Column(Integer, ForeignKey('cages.id'))
 	cage = relationship("Cage", back_populates="stays")
