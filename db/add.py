@@ -139,9 +139,7 @@ def add_generic(db_path, parameters, walkthrough=False, session=None, engine=Non
 			related_entries=[]
 			for related_entry in parameters[key]:
 				related_entry, _ = add_generic(db_path, related_entry, session=session, engine=engine)
-				# if related_entry not in session:
-				# 	print(type(related_entry), related_entry.id)
-				# 	new_related_entry = session.query(type(related_entry)).get(related_entry.id)
+				session.add(myobject) # voodoo (imho) fix for the weird errors about myobject not being attached to a Session
 				related_entries.append(related_entry)
 			setattr(myobject, key, related_entries)
 		elif isinstance(parameters[key], list) and not isinstance(parameters[key][0], dict):
@@ -155,7 +153,7 @@ def add_generic(db_path, parameters, walkthrough=False, session=None, engine=Non
 			setattr(myobject, key, related_entries)
 		else:
 			setattr(myobject, key, parameters[key])
-		# Walkthrough Legacy Code:
+			# Walkthrough Legacy Code:
 		# myobject = category_class()
 		# for key in filtered_attributes:
 		# 	if key == "id":
@@ -165,7 +163,8 @@ def add_generic(db_path, parameters, walkthrough=False, session=None, engine=Non
 
 	object_id = add_to_db(session, engine, myobject)
 	if close:
-		commit_and_close(session, engine)
+		session.close()
+		engine.dispose()
 	return myobject, object_id
 
 
