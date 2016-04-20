@@ -240,7 +240,7 @@ class Animal(Base):
 	death_reason = Column(String)
 	weight = relationship("Weight")
 
-	cagestays = relationship("CageStay", back_populates="animal")
+	cage_stays = relationship("CageStay", back_populates="animal")
 
 	fmri_measurements = relationship("FMRIMeasurement", backref="animal")
 
@@ -255,11 +255,11 @@ class Animal(Base):
 		% (self.id, self.id_eth, self.cage_eth, self.id_uzh, self.cage_uzh, [self.genotype[i].name+" "+self.genotype[i].zygosity for i in range(len(self.genotype))], self.sex, self.ear_punches,[self.treatment[i].solution for i in range(len(self.treatment))])
 
 class CageStay(Base):
-	__tablename__ = "cagestays"
+	__tablename__ = "cage_stays"
 	id = Column(Integer, primary_key=True)
 
 	animal_id = Column(Integer, ForeignKey('animals.id'))
-	animal = relationship("Animal", back_populates="cagestays")
+	animal = relationship("Animal", back_populates="cage_stays")
 
 	cage_id = Column(Integer, ForeignKey('cages.id'))
 	cage = relationship("Cage", back_populates="stays")
