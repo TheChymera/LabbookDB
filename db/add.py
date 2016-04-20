@@ -17,6 +17,7 @@ import sqlalchemy
 allowed_classes = {
 	"Animal": Animal,
 	"Cage": Cage,
+	"CageStay": CageStay,
 	"Treatment": Treatment,
 	"DNAExtractionProtocol": DNAExtractionProtocol,
 	"FMRIMeasurement": FMRIMeasurement,
