@@ -19,6 +19,7 @@ allowed_classes = {
 	"Cage": Cage,
 	"Treatment": Treatment,
 	"DNAExtractionProtocol": DNAExtractionProtocol,
+	"FMRIMeasurement": FMRIMeasurement,
 	"FMRIScannerSetup": FMRIScannerSetup,
 	"FMRIAnimalPreparationProtocol": FMRIAnimalPreparationProtocol,
 	"Genotype": Genotype,
@@ -43,16 +44,21 @@ def loadSession(db_path):
 	Base.metadata.create_all(engine)
 	return session, engine
 
-def add_to_db(db_path, myobject):
-	session, engine = loadSession(db_path)
+def add_to_db(db_path, myobject, session=None, engine=None):
+	if not (session and engine) :
+		session, engine = loadSession(db_path)
+		close = True
+	else:
+		close = False
 	session.add(myobject)
 	try:
 		session.commit()
 	except sqlalchemy.exc.IntegrityError:
 		print("Please make sure this was not a double entry.")
 	theid=myobject.id
-	session.close()
-	engine.dispose()
+	if close:
+		session.close()
+		engine.dispose()
 	return(theid)
 
 def add_genotype(name, zygosity):
@@ -71,14 +77,13 @@ def instructions(kind):
 	if kind == "table_identifier":
 		print("Make sure you have entered the filter value correctly. This value is supposed to refer to the id column of another table and needs to be specified as \'table_identifier\'.\'field_by_which_to_filter\'.\'target_value\'")
 
-def get_related_id(db_path, parameters):
-	session, engine = loadSession(db_path)
+def get_related_id(session, engine, parameters):
 	category = parameters.split(":",1)[0]
 	sql_query=session.query(allowed_classes[category])
 	for field_value in parameters.split(":",1)[1].split("&&"):
 		field, value = field_value.split(".",1)
 		if ":" in value:
-			values = get_related_id(db_path, value)
+			values = get_related_id(session, engine, value)
 			for value in values:
 				value=int(value) # the value is returned as a numpy object
 				sql_query = sql_query.filter(getattr(allowed_classes[category], field)==value)
@@ -90,7 +95,7 @@ def get_related_id(db_path, parameters):
 	related_table_ids = mydf["id"]
 	input_values = list(related_table_ids)
 	if input_values == []:
-		print("No entry was found with a value of \""+value+"\" on the \""+field+"\" column of the \""+category+"\" CATEGORY, in the database located under "+db_path+".")
+		print("No entry was found with a value of \""+value+"\" on the \""+field+"\" column of the \""+category+"\" CATEGORY, in the database.")
 	session.close()
 	engine.dispose()
 	return input_values
@@ -113,10 +118,14 @@ def update_parameter(db_path, entry_identification, parameters):
 			update({key: parameters[key]})
 	commit_and_close(session, engine)
 
-def add_generic(db_path, parameters, walkthrough=False):
+def add_generic(db_path, parameters, walkthrough=False, session=None, engine=None):
 	"""Adds new entries based on a parameter dictionary
 	"""
-
+	if not (session and engine) :
+		session, engine = loadSession(db_path)
+		close = True
+	else:
+		close = False
 	if isinstance(parameters, str):
 		parameters = json.loads(parameters)
 
@@ -133,7 +142,7 @@ def add_generic(db_path, parameters, walkthrough=False):
 			parameters[key] = datetime(*[int(i) for i in parameters[key].split(",")])
 		if key[-3:] == "_id":
 			try:
-				input_values = get_related_id(db_path, parameters[key])
+				input_values = get_related_id(session, engine, parameters[key])
 			except ValueError:
 				instructions("table_identifier")
 			for input_value in input_values:
@@ -143,20 +152,21 @@ def add_generic(db_path, parameters, walkthrough=False):
 		elif isinstance(parameters[key], list) and isinstance(parameters[key][0], dict):
 			related_entries=[]
 			for related_entry in parameters[key]:
-				related_entry, _ = add_generic(db_path, related_entry)
+				related_entry, _ = add_generic(db_path, related_entry, session=session, engine=engine)
+				# if related_entry not in session:
+				# 	print(type(related_entry), related_entry.id)
+				# 	new_related_entry = session.query(type(related_entry)).get(related_entry.id)
 				related_entries.append(related_entry)
 			setattr(myobject, key, related_entries)
 		elif isinstance(parameters[key], list) and not isinstance(parameters[key][0], dict):
 			related_entries=[]
-			session, engine = loadSession(db_path)
 			for related_entry in parameters[key]:
-				my_id = get_related_id(db_path, related_entry)[0]
+				my_id = get_related_id(session, engine, related_entry)[0]
 				entry_class = allowed_classes[related_entry.split(":")[0]]
 				related_entry = session.query(entry_class).\
 					filter(entry_class.id == my_id).all()[0]
 				related_entries.append(related_entry)
 			setattr(myobject, key, related_entries)
-			commit_and_close(session, engine)
 		else:
 			setattr(myobject, key, parameters[key])
 		# Walkthrough Legacy Code:
@@ -167,7 +177,10 @@ def add_generic(db_path, parameters, walkthrough=False):
 		# 	value = raw_input("Enter your desired \""+key+"\" value:").decode(sys.stdin.encoding)
 		# 	setattr(myobject, key, value)
 
-	return myobject, add_to_db(db_path, myobject)
+	object_id = add_to_db(db_path, myobject, session, engine)
+	if close:
+		commit_and_close(session, engine)
+	return myobject, object_id
 
 
 def commit_and_close(session, engine):
