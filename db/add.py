@@ -53,12 +53,6 @@ def add_to_db(session, engine, myobject):
 	theid=myobject.id
 	return(theid)
 
-def add_genotype(name, zygosity):
-	session, engine = loadSession()
-	new_genotype = Genotype(name=name, zygosity=zygosity)
-	session.add(new_animal)
-	commit_and_close(session, engine)
-
 def instructions(kind):
 	if kind == "table_identifier":
 		print("Make sure you have entered the filter value correctly. This value is supposed to refer to the id column of another table and needs to be specified as \'table_identifier\'.\'field_by_which_to_filter\'.\'target_value\'")
