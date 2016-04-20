@@ -67,12 +67,6 @@ def add_genotype(name, zygosity):
 	session.add(new_animal)
 	commit_and_close(session, engine)
 
-def add_animal(db_path, id_eth, cage_eth, sex, ear_punches, id_uzh="", cage_uzh=""):
-	if id_uzh:
-		if double_entry(db_path, "id_uzh", id_uzh): return
-
-	add_to_db(db_path, Animal(id_eth=id_eth, cage_eth=cage_eth, sex=sex, ear_punches=ear_punches, id_uzh=id_uzh, cage_uzh=cage_uzh))
-
 def instructions(kind):
 	if kind == "table_identifier":
 		print("Make sure you have entered the filter value correctly. This value is supposed to refer to the id column of another table and needs to be specified as \'table_identifier\'.\'field_by_which_to_filter\'.\'target_value\'")
