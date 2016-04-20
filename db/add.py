@@ -67,8 +67,12 @@ def get_related_id(session, engine, parameters):
 			values = get_related_id(session, engine, value)
 			for value in values:
 				value=int(value) # the value is returned as a numpy object
+				if field[-4:] == "date": # support for date entry matching (the values have to be passes as string but matched as datetime)
+					value = datetime(*[int(i) for i in value.split(",")])
 				sql_query = sql_query.filter(getattr(allowed_classes[category], field)==value)
 		else:
+			if field[-4:] == "date": # support for date entry matching (the values have to be passes as string but matched as datetime)
+				value = datetime(*[int(i) for i in value.split(",")])
 			sql_query = sql_query.filter(getattr(allowed_classes[category], field)==value)
 	mystring = sql_query.statement
 	mydf = pd.read_sql_query(mystring,engine)
@@ -76,7 +80,7 @@ def get_related_id(session, engine, parameters):
 	related_table_ids = mydf["id"]
 	input_values = list(related_table_ids)
 	if input_values == []:
-		print("No entry was found with a value of \""+value+"\" on the \""+field+"\" column of the \""+category+"\" CATEGORY, in the database.")
+		raise BaseException("No entry was found with a value of \""+str(value)+"\" on the \""+field+"\" column of the \""+category+"\" CATEGORY, in the database.")
 	session.close()
 	engine.dispose()
 	return input_values
@@ -184,8 +188,8 @@ def double_entry(db_path, field, value):
 
 
 if __name__ == '__main__':
-	add_generic("~/meta.db", parameters={"CATEGORY":"Animal", "id_eth":4001, "id_uzh":"M2763", "sex":"f", "ear_punches":"LR",
-		"genotypes":["Genotype:code.eptg"]
-		})
+	# add_generic("~/meta.db", parameters={"CATEGORY":"Animal", "id_eth":4001, "id_uzh":"M2763", "sex":"f", "ear_punches":"LR",
+		# "genotypes":["Genotype:code.eptg"]
+		# })
 	# update_parameter("~/meta.db", entry_identification="Cage:id_local.570974", parameters={"location":"AFS7pua"})
 	argh.dispatch_command(add_generic)
