@@ -44,21 +44,13 @@ def loadSession(db_path):
 	Base.metadata.create_all(engine)
 	return session, engine
 
-def add_to_db(db_path, myobject, session=None, engine=None):
-	if not (session and engine) :
-		session, engine = loadSession(db_path)
-		close = True
-	else:
-		close = False
+def add_to_db(session, engine, myobject):
 	session.add(myobject)
 	try:
 		session.commit()
 	except sqlalchemy.exc.IntegrityError:
 		print("Please make sure this was not a double entry.")
 	theid=myobject.id
-	if close:
-		session.close()
-		engine.dispose()
 	return(theid)
 
 def add_genotype(name, zygosity):
@@ -171,7 +163,7 @@ def add_generic(db_path, parameters, walkthrough=False, session=None, engine=Non
 		# 	value = raw_input("Enter your desired \""+key+"\" value:").decode(sys.stdin.encoding)
 		# 	setattr(myobject, key, value)
 
-	object_id = add_to_db(db_path, myobject, session, engine)
+	object_id = add_to_db(session, engine, myobject)
 	if close:
 		commit_and_close(session, engine)
 	return myobject, object_id
