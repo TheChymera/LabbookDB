@@ -134,21 +134,19 @@ def add_generic(db_path, parameters, walkthrough=False, session=None, engine=Non
 				input_value = int(input_value)
 				setattr(myobject, key, input_value)
 		#this triggers on-the-fly related entry creation:
-		elif isinstance(parameters[key], list) and isinstance(parameters[key][0], dict):
+		elif isinstance(parameters[key], list):
 			related_entries=[]
 			for related_entry in parameters[key]:
-				related_entry, _ = add_generic(db_path, related_entry, session=session, engine=engine)
-				session.add(myobject) # voodoo (imho) fix for the weird errors about myobject not being attached to a Session
-				related_entries.append(related_entry)
-			setattr(myobject, key, related_entries)
-		elif isinstance(parameters[key], list) and not isinstance(parameters[key][0], dict):
-			related_entries=[]
-			for related_entry in parameters[key]:
-				my_id = get_related_id(session, engine, related_entry)[0]
-				entry_class = allowed_classes[related_entry.split(":")[0]]
-				related_entry = session.query(entry_class).\
-					filter(entry_class.id == my_id).all()[0]
-				related_entries.append(related_entry)
+				if isinstance(related_entry, dict):
+					related_entry, _ = add_generic(db_path, related_entry, session=session, engine=engine)
+					session.add(myobject) # voodoo (imho) fix for the weird errors about myobject not being attached to a Session
+					related_entries.append(related_entry)
+				elif isinstance(related_entry, str):
+					my_id = get_related_id(session, engine, related_entry)[0]
+					entry_class = allowed_classes[related_entry.split(":")[0]]
+					related_entry = session.query(entry_class).\
+						filter(entry_class.id == my_id).all()[0]
+					related_entries.append(related_entry)
 			setattr(myobject, key, related_entries)
 		else:
 			setattr(myobject, key, parameters[key])
