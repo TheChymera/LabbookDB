@@ -26,12 +26,12 @@ allowed_classes = {
 	"Operator": Operator,
 	"Substance": Substance,
 	"Solution": Solution,
-	"SolutionAdministration": SolutionAdministration,
 	}
 
 def simple_query(db_path, category, field, value, mask="", first=True):
 	session, engine = loadSession(db_path)
 	sql_query=session.query(allowed_classes[category]).filter(getattr(allowed_classes[category], field)==value)
+	print(sql_query.all()[0].__repr__)
 	mystring = sql_query.statement
 	mydf = pd.read_sql_query(mystring,engine)
 	if mask:
@@ -62,5 +62,5 @@ def commit_and_close(session, engine):
 
 if __name__ == '__main__':
 	# argh.dispatch_command(add_generic)
-	simple_query("~/meta.db", "Operator", "code", "JGr", first=False)
+	simple_query("~/meta.db", "Solution", "code", "med-sal", first=False)
 	# add_animal("~/animal.db", 4011, 4, "f", "2L", id_uzh="M2760", cage_uzh="570971")
