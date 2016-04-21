@@ -111,6 +111,11 @@ class Solution(Base):
 	supplier_product_code = Column(String)
 	contains = relationship("Ingredient", secondary=ingredients_association)
 
+
+	def __repr__(self):
+		return "<Solution(id='%s', code='%s', name='%s', contains='%s')>"\
+		% (self.id, self.code, self.name, [str(self.contains[i].concentration)+" "+str(self.contains[i].concentration_unit.code)+" "+str(self.contains[i].substance.name) for i in range(len(self.contains))])
+
 #fMRI classes:
 
 class FMRIScannerSetup(Base):
@@ -267,6 +272,8 @@ class CageStay(Base):
 
 	cage_id = Column(Integer, ForeignKey('cages.id'))
 	cage = relationship("Cage", back_populates="stays")
+
+	reason = Column(String)
 
 class Cage(Base):
 	__tablename__ = "cages"
