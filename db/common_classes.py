@@ -260,8 +260,8 @@ class Animal(Base):
 	uncategorized_treatments = relationship("UncategorizedTreatment")
 
 	def __repr__(self):
-		return "<Animal(id='%s', id_eth='%s', cage_eth='%s', id_uzh='%s', cage_uzh='%s', genotype='%s', sex='%s', ear_punches='%s', treatment='%s')>"\
-		% (self.id, self.id_eth, self.cage_eth, self.id_uzh, self.cage_uzh, [self.genotype[i].name+" "+self.genotype[i].zygosity for i in range(len(self.genotype))], self.sex, self.ear_punches,[self.treatment[i].solution for i in range(len(self.treatment))])
+		return "<Animal(id='%s', id_eth='%s', id_uzh='%s', genotypes='%s', sex='%s', ear_punches='%s', treatment='%s')>"\
+		% (self.id, self.id_eth, self.id_uzh, [self.genotypes[i].construct+" "+self.genotypes[i].zygosity for i in range(len(self.genotypes))], self.sex, self.ear_punches,[self.treatments[i].solution for i in range(len(self.treatments))])
 
 class CageStay(Base):
 	__tablename__ = "cage_stays"
@@ -273,7 +273,7 @@ class CageStay(Base):
 	cage_id = Column(Integer, ForeignKey('cages.id'))
 	cage = relationship("Cage", back_populates="stays")
 
-	reason = Column(String)
+	single_cged = Column(String) #if singel caged, state reason
 
 class Cage(Base):
 	__tablename__ = "cages"
