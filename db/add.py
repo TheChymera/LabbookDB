@@ -50,7 +50,7 @@ def add_to_db(session, engine, myobject):
 	try:
 		session.commit()
 	except sqlalchemy.exc.IntegrityError:
-		print("Please make sure this was not a double entry.")
+		print("Please make sure this was not a double entry:", myobject)
 	theid=myobject.id
 	return(theid)
 
