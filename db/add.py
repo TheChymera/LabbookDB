@@ -125,7 +125,7 @@ def add_generic(db_path, parameters, walkthrough=False, session=None, engine=Non
 	for key in parameters:
 		if key[-4:] == "date":
 			parameters[key] = datetime(*[int(i) for i in parameters[key].split(",")])
-		if key[-3:] == "_id":
+		if key[-3:] == "_id" and not isinstance(parameters[key], int):
 			try:
 				input_values = get_related_id(session, engine, parameters[key])
 			except ValueError:
