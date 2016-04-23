@@ -27,6 +27,7 @@ allowed_classes = {
 	"HandlingHabituationProtocol": HandlingHabituationProtocol,
 	"HandlingHabituation": HandlingHabituation,
 	"Ingredient": Ingredient,
+	"Irregularity": Irregularity,
 	"Incubation": Incubation,
 	"LaserStimulationProtocol": LaserStimulationProtocol,
 	"MeasurementUnit": MeasurementUnit,
