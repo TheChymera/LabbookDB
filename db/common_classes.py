@@ -9,9 +9,13 @@ genotype_association = Table('genotype_associations', Base.metadata,
 	Column('genotypes_id', Integer, ForeignKey('genotypes.id')),
 	Column('animals_id', Integer, ForeignKey('animals.id'))
 )
-treatment_association = Table('treatment_associations', Base.metadata,
+treatment_animal_association = Table('treatment_animal_associations', Base.metadata,
 	Column('treatments_id', Integer, ForeignKey('treatments.id')),
 	Column('animals_id', Integer, ForeignKey('animals.id'))
+)
+treatment_cage_association = Table('treatment_cage_associations', Base.metadata,
+	Column('treatments_id', Integer, ForeignKey('treatments.id')),
+	Column('cages_id', Integer, ForeignKey('cages.id'))
 )
 operator_association = Table('operator_associations', Base.metadata,
 	Column('operator_id', Integer, ForeignKey('operators.id')),
@@ -55,6 +59,20 @@ class Protocol(Base):
 	type = Column(String(50))
 	__mapper_args__ = {
 		'polymorphic_identity': 'protocol',
+		'polymorphic_on': type
+		}
+
+class Measurement(Base):
+	__tablename__ = "measurements"
+	id = Column(Integer, primary_key=True)
+	date = Column(DateTime)
+
+	animal_id = Column(Integer, ForeignKey('animals.id')) # only set in per-animal measurements
+	cage_id = Column(Integer, ForeignKey('cages.id')) # only set in per-cage measurements
+
+	type = Column(String(50))
+	__mapper_args__ = {
+		'polymorphic_identity': 'measurement',
 		'polymorphic_on': type
 		}
 
@@ -126,10 +144,10 @@ class FMRIScannerSetup(Base):
 	scanner = Column(String)
 	support = Column(String)
 
-class FMRIMeasurement(Base):
-	__tablename__ = "fmri_measurements"
-	id = Column(Integer, primary_key=True)
-	date = Column(DateTime)
+class FMRIMeasurement(Measurement):
+	__tablename__ = 'fmri_measurements'
+	__mapper_args__ = {'polymorphic_identity': 'fmri'}
+	id = Column(Integer, ForeignKey('measurements.id'), primary_key=True)
 	temperature = Column(Float)
 	operator_id = Column(Integer, ForeignKey('operators.id'))
 	operator = relationship("Operator")
@@ -138,7 +156,6 @@ class FMRIMeasurement(Base):
 	laser_stimulations = relationship("LaserStimulationProtocol", secondary=laser_association)
 	scanner_setup_id = Column(Integer, ForeignKey('fmri_scanner_setups.id'))
 	scanner_setup = relationship("FMRIScannerSetup")
-	animal_id = Column(Integer, ForeignKey('animals.id'))
 	irregularities = relationship("Irregularity", secondary=irregularities_association)
 
 class FMRIAnimalPreparationProtocol(Protocol):
@@ -225,6 +242,17 @@ class TreatmentProtocol(Protocol):
 	solution_id = Column(Integer, ForeignKey('solutions.id'))
 	solution = relationship("Solution")
 
+class DrinkingMeasurement(Measurement):
+	__tablename__ = 'drinking_measurements'
+	__mapper_args__ = {'polymorphic_identity': 'drinking'}
+	id = Column(Integer, ForeignKey('measurements.id'), primary_key=True)
+	reference_date = Column(DateTime)
+	#water consumption, in ml:
+	consumption = Column(Float)
+	#volumes in water source, in ml:
+	start_amount = Column(Float)
+	end_amount = Column(Float)
+
 class Treatment(Base):
 	__tablename__ = "treatments"
 	id = Column(Integer, primary_key=True)
@@ -252,10 +280,10 @@ class Animal(Base):
 
 	cage_stays = relationship("CageStay", secondary=cage_stay_association)
 
-	fmri_measurements = relationship("FMRIMeasurement", backref="animal")
+	measurements = relationship("Measurement")
 
 	genotypes = relationship("Genotype", secondary=genotype_association, backref="animals")
-	treatments = relationship("Treatment", secondary=treatment_association, backref="animals")
+	treatments = relationship("Treatment", secondary=treatment_animal_association, backref="animals")
 
 	observations = relationship("Observation")
 	uncategorized_treatments = relationship("UncategorizedTreatment")
@@ -281,6 +309,8 @@ class Cage(Base):
 	id = Column(Integer, primary_key=True)
 
 	handling_habituations = relationship("HandlingHabituation", back_populates="cage")
+	treatments = relationship("Treatment", secondary=treatment_cage_association, backref="cages")
+	measurements = relationship("Measurement")
 	id_local = Column(String, unique=True)
 	location = Column(String)
 	stays = relationship("CageStay", back_populates="cage")
