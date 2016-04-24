@@ -18,7 +18,7 @@ allowed_classes = {
 	"Animal": Animal,
 	"Cage": Cage,
 	"CageStay": CageStay,
-	"Treatment": Treatment,
+	"DrinkingMeasurement": DrinkingMeasurement,
 	"DNAExtractionProtocol": DNAExtractionProtocol,
 	"FMRIMeasurement": FMRIMeasurement,
 	"FMRIScannerSetup": FMRIScannerSetup,
@@ -34,6 +34,7 @@ allowed_classes = {
 	"Operator": Operator,
 	"Substance": Substance,
 	"Solution": Solution,
+	"Treatment": Treatment,
 	"TreatmentProtocol": TreatmentProtocol,
 	"Weight": Weight,
 	}
