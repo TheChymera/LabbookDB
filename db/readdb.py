@@ -1,17 +1,12 @@
 from sqlalchemy import create_engine, literal
 from os import path
 from query import loadSession
+import pandas as pd
+from common_classes import *
 
 db_path = "~/meta.db"
 
-import pandas as pd
 
-from common_classes import *
-
-from sqlalchemy.ext.declarative import declarative_base
-Base = declarative_base()
-
-from sqlalchemy.orm import sessionmaker
 
 session, engine = loadSession(db_path)
 # for row in session.query(Animal).order_by(Animal.id):
@@ -50,7 +45,6 @@ print(mydf)
 # mystring = str(sql_query)
 # mydf = pd.read_sql_query(mystring,engine)
 # print(mydf)
-
 
 session.close()
 engine.dispose()
