@@ -1,7 +1,8 @@
 from sqlalchemy import create_engine, literal
 from os import path
-db_path = "sqlite:///" + path.expanduser("~/meta.db")
-engine = create_engine(db_path, echo=False)
+from query import loadSession
+
+db_path = "~/meta.db"
 
 import pandas as pd
 
@@ -12,13 +13,7 @@ Base = declarative_base()
 
 from sqlalchemy.orm import sessionmaker
 
-def loadSession():
-	""""""
-	Session = sessionmaker(bind=engine)
-	session = Session()
-	return session
-
-session = loadSession()
+session, engine = loadSession(db_path)
 # for row in session.query(Animal).order_by(Animal.id):
 # 	print row.id_uzh, row.id_eth, row.id
 # 	for row in row.weight:
