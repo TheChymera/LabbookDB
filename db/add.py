@@ -33,6 +33,7 @@ allowed_classes = {
 	"MeasurementUnit": MeasurementUnit,
 	"Operator": Operator,
 	"Substance": Substance,
+	"SucrosePreferenceMeasurement": SucrosePreferenceMeasurement,
 	"Solution": Solution,
 	"Treatment": Treatment,
 	"TreatmentProtocol": TreatmentProtocol,

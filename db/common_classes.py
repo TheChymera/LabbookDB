@@ -253,6 +253,21 @@ class DrinkingMeasurement(Measurement):
 	start_amount = Column(Float)
 	end_amount = Column(Float)
 
+class SucrosePreferenceMeasurement(Measurement):
+	__tablename__ = 'sucrosepreference_measurements'
+	__mapper_args__ = {'polymorphic_identity': 'drinking'}
+	id = Column(Integer, ForeignKey('measurements.id'), primary_key=True)
+	reference_date = Column(DateTime)
+	#volumes in water source, in ml:
+	water_start_amount = Column(Float)
+	water_end_amount = Column(Float)
+	sucrose_start_amount = Column(Float)
+	sucrose_end_amount = Column(Float)
+	sucrose_bottle_position = Column(String)
+	sucrose_concentration = Column(Float)
+	concentration_unit_id = Column(Integer, ForeignKey('measurement_units.id'))
+	concentration_unit = relationship("MeasurementUnit")
+
 class Treatment(Base):
 	__tablename__ = "treatments"
 	id = Column(Integer, primary_key=True)
