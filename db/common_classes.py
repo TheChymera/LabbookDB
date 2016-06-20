@@ -290,7 +290,7 @@ class Animal(Base):
 
 	def __repr__(self):
 		return "<Animal(id='%s', id_eth='%s', id_uzh='%s', genotypes='%s', sex='%s', ear_punches='%s', treatment='%s')>"\
-		% (self.id, self.id_eth, self.id_uzh, [self.genotypes[i].construct+" "+self.genotypes[i].zygosity for i in range(len(self.genotypes))], self.sex, self.ear_punches,[self.treatments[i].solution for i in range(len(self.treatments))])
+		% (self.id, self.id_eth, self.id_uzh, [self.genotypes[i].construct+" "+self.genotypes[i].zygosity for i in range(len(self.genotypes))], self.sex, self.ear_punches,[self.treatments[i].protocol.solution for i in range(len(self.treatments))])
 
 class CageStay(Base):
 	__tablename__ = "cage_stays"

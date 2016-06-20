@@ -28,6 +28,37 @@ allowed_classes = {
 	"Solution": Solution,
 	}
 
+def instructions(kind):
+	if kind == "table_identifier":
+		print("Make sure you have entered the filter value correctly. This value is supposed to refer to the id column of another table and needs to be specified as \'table_identifier\'.\'field_by_which_to_filter\'.\'target_value\'")
+
+def get_related_id(session, engine, parameters):
+	category = parameters.split(":",1)[0]
+	sql_query=session.query(allowed_classes[category])
+	for field_value in parameters.split(":",1)[1].split("&&"):
+		field, value = field_value.split(".",1)
+		if ":" in value:
+			values = get_related_id(session, engine, value)
+			for value in values:
+				value=int(value) # the value is returned as a numpy object
+				if field[-4:] == "date": # support for date entry matching (the values have to be passes as string but matched as datetime)
+					value = datetime(*[int(i) for i in value.split(",")])
+				sql_query = sql_query.filter(getattr(allowed_classes[category], field)==value)
+		else:
+			if field[-4:] == "date": # support for date entry matching (the values have to be passes as string but matched as datetime)
+				value = datetime(*[int(i) for i in value.split(",")])
+			sql_query = sql_query.filter(getattr(allowed_classes[category], field)==value)
+	mystring = sql_query.statement
+	mydf = pd.read_sql_query(mystring,engine)
+	mydf = mydf.T.groupby(level=0).first().T #awkward hack to deal with polymorphic tables returning multiple IDs
+	related_table_ids = mydf["id"]
+	input_values = list(related_table_ids)
+	if input_values == []:
+		raise BaseException("No entry was found with a value of \""+str(value)+"\" on the \""+field+"\" column of the \""+category+"\" CATEGORY, in the database.")
+	session.close()
+	engine.dispose()
+	return input_values
+
 def simple_query(db_path, category, field, value, mask="", first=True):
 	session, engine = loadSession(db_path)
 	sql_query=session.query(allowed_classes[category]).filter(getattr(allowed_classes[category], field)==value)
