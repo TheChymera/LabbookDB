@@ -52,7 +52,6 @@ def compose_tex(table, code):
 				sub_alias = aliased(sub_rel.mapper.class_, name=name+"_"+sub_name)
 				joins.append((sub_alias, sub_rel.class_attribute))
 				for sub_col_name, sub_col in inspection.inspect(sub_rel.mapper).columns.items():
-					print(sub_alias, sub_col.key, '###')
 					#the id column causes double entries, as it is mapped once on the parent table (related_table_id) and once on the child table (table_id)
 					if sub_col.key != "id":
 						sub_aliased_col = getattr(sub_alias, sub_col.key)
