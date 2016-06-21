@@ -255,7 +255,7 @@ class DrinkingMeasurement(Measurement):
 
 class SucrosePreferenceMeasurement(Measurement):
 	__tablename__ = 'sucrosepreference_measurements'
-	__mapper_args__ = {'polymorphic_identity': 'drinking'}
+	__mapper_args__ = {'polymorphic_identity': 'sucrosepreference'}
 	id = Column(Integer, ForeignKey('measurements.id'), primary_key=True)
 	reference_date = Column(DateTime)
 	#volumes in water source, in ml:
