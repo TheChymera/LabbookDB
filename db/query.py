@@ -17,6 +17,7 @@ allowed_classes = {
 	"Animal": Animal,
 	"Cage": Cage,
 	"DNAExtractionProtocol": DNAExtractionProtocol,
+	"FMRIMeasurement": FMRIMeasurement,
 	"FMRIScannerSetup": FMRIScannerSetup,
 	"FMRIAnimalPreparationProtocol": FMRIAnimalPreparationProtocol,
 	"HandlingHabituationProtocol": HandlingHabituationProtocol,
@@ -26,6 +27,8 @@ allowed_classes = {
 	"Operator": Operator,
 	"Substance": Substance,
 	"Solution": Solution,
+	"Treatment":Treatment,
+	"TreatmentProtocol":TreatmentProtocol,
 	}
 
 def instructions(kind):
