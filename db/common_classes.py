@@ -170,6 +170,11 @@ class FMRIAnimalPreparationProtocol(Protocol):
 	maintenance_anesthesia_gas = relationship("TreatmentProtocol", foreign_keys=[maintenance_anesthesia_gas_id])
 	maintenance_anesthesia_injection_id = Column(Integer, ForeignKey('treatment_protocols.id'))
 	maintenance_anesthesia_injection = relationship("TreatmentProtocol", foreign_keys=[maintenance_anesthesia_injection_id])
+	bolus_muscle_relaxant_injection_id = Column(Integer, ForeignKey('treatment_protocols.id'))
+	bolus_muscle_relaxant_injection = relationship("TreatmentProtocol", foreign_keys=[bolus_muscle_relaxant_injection_id])
+	maintenance_muscle_relaxant_injection_id = Column(Integer, ForeignKey('treatment_protocols.id'))
+	maintenance_muscle_relaxant_injection = relationship("TreatmentProtocol", foreign_keys=[maintenance_muscle_relaxant_injection_id])
+
 	respiration = Column(String)
 
 class LaserStimulationProtocol(Base):
