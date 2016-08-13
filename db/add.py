@@ -36,13 +36,13 @@ def instructions(kind):
 	if kind == "table_identifier":
 		print("Make sure you have entered the filter value correctly. This value is supposed to refer to the id column of another table and needs to be specified as \'table_identifier\'.\'field_by_which_to_filter\'.\'target_value\'")
 
-def get_related_id(session, engine, parameters):
+def get_related_ids(session, engine, parameters):
 	category = parameters.split(":",1)[0]
 	sql_query=session.query(allowed_classes[category])
 	for field_value in parameters.split(":",1)[1].split("&&"):
 		field, value = field_value.split(".",1)
 		if ":" in value:
-			values = get_related_id(session, engine, value)
+			values = get_related_ids(session, engine, value)
 			for value in values:
 				value=int(value) # the value is returned as a numpy object
 				if field[-4:] == "date": # support for date entry matching (the values have to be passes as string but matched as datetime)
@@ -73,12 +73,18 @@ def update_parameter(db_path, entry_identification, parameters):
 	session, engine = loadSession(db_path)
 
 	entry_class = allowed_classes[entry_identification.split(":")[0]]
-	my_id = get_related_id(db_path, entry_identification)[0]
+	my_id = get_related_ids(session, engine, entry_identification)[0]
 
-	for key in parameters:
-		session.query(entry_class).\
-			filter(entry_class.id == my_id).\
-			update({key: parameters[key]})
+	myobject = session.query(entry_class).filter(entry_class.id == my_id)[0]
+
+	for parameter_key in parameters:
+		related_entries = getattr(myobject, parameter_key)
+		for parameter_expression in parameters[parameter_key]:
+			related_entry_ids = get_related_ids(session, engine, parameter_expression)
+			related_entry_class = allowed_classes[parameter_expression.split(":")[0]]
+			for related_entry_id in related_entry_ids:
+				related_entry = session.query(related_entry_class).filter(related_entry_class.id == related_entry_id)[0]
+				related_entries.append(related_entry)
 	commit_and_close(session, engine)
 
 def add_generic(db_path, parameters, walkthrough=False, session=None, engine=None):
@@ -105,7 +111,7 @@ def add_generic(db_path, parameters, walkthrough=False, session=None, engine=Non
 			parameters[key] = datetime(*[int(i) for i in parameters[key].split(",")])
 		if key[-3:] == "_id" and not isinstance(parameters[key], int):
 			try:
-				input_values = get_related_id(session, engine, parameters[key])
+				input_values = get_related_ids(session, engine, parameters[key])
 			except ValueError:
 				instructions("table_identifier")
 			for input_value in input_values:
@@ -119,7 +125,7 @@ def add_generic(db_path, parameters, walkthrough=False, session=None, engine=Non
 					related_entry, _ = add_generic(db_path, related_entry, session=session, engine=engine)
 					related_entries.append(related_entry)
 				elif isinstance(related_entry, str):
-					my_id = get_related_id(session, engine, related_entry)[0]
+					my_id = get_related_ids(session, engine, related_entry)[0]
 					entry_class = allowed_classes[related_entry.split(":")[0]]
 					related_entry = session.query(entry_class).\
 						filter(entry_class.id == my_id).all()[0]
