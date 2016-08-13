@@ -11,34 +11,9 @@ import pandas as pd
 from sqlalchemy import create_engine, literal, update, insert
 from os import path
 from common_classes import *
+from query import allowed_classes
 from sqlalchemy.orm import sessionmaker
 import sqlalchemy
-
-allowed_classes = {
-	"Animal": Animal,
-	"Cage": Cage,
-	"CageStay": CageStay,
-	"DrinkingMeasurement": DrinkingMeasurement,
-	"DNAExtractionProtocol": DNAExtractionProtocol,
-	"FMRIMeasurement": FMRIMeasurement,
-	"FMRIScannerSetup": FMRIScannerSetup,
-	"FMRIAnimalPreparationProtocol": FMRIAnimalPreparationProtocol,
-	"Genotype": Genotype,
-	"HandlingHabituationProtocol": HandlingHabituationProtocol,
-	"HandlingHabituation": HandlingHabituation,
-	"Ingredient": Ingredient,
-	"Irregularity": Irregularity,
-	"Incubation": Incubation,
-	"LaserStimulationProtocol": LaserStimulationProtocol,
-	"MeasurementUnit": MeasurementUnit,
-	"Operator": Operator,
-	"Substance": Substance,
-	"SucrosePreferenceMeasurement": SucrosePreferenceMeasurement,
-	"Solution": Solution,
-	"Treatment": Treatment,
-	"TreatmentProtocol": TreatmentProtocol,
-	"Weight": Weight,
-	}
 
 def loadSession(db_path):
 	db_path = "sqlite:///" + path.expanduser(db_path)
