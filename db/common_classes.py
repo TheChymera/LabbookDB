@@ -322,7 +322,7 @@ class CageStay(Base):
 	cage_id = Column(Integer, ForeignKey('cages.id'))
 	cage = relationship("Cage", back_populates="stays")
 
-	single_cged = Column(String) #if singel caged, state reason
+	single_caged = Column(String) #if singel caged, state reason
 
 class Cage(Base):
 	__tablename__ = "cages"
