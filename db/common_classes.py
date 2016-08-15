@@ -298,7 +298,7 @@ class Animal(Base):
 	death_reason = Column(String)
 	weights = relationship("Weight")
 
-	cage_stays = relationship("CageStay", secondary=cage_stay_association)
+	cage_stays = relationship("CageStay", secondary=cage_stay_association, backref="animals")
 
 	measurements = relationship("Measurement")
 
