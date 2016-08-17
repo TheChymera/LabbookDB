@@ -70,7 +70,7 @@ def sucrosepreference_plot(reference_df, is_preformatted=False, plot_columns=[],
 		df.loc[df["treatment"] == key, "treatment"] = rename_treatments[key]
 
 	plt.style.use('ggplot')
-	sns.stripplot(x=periodcolumn_name,y=datacolumn_name, hue="treatment", data=df, palette=sns.color_palette(qualitative_colorset),jitter=False, split=True)
+	sns.swarmplot(x=periodcolumn_name,y=datacolumn_name, hue="treatment", data=df, palette=sns.color_palette(qualitative_colorset), split=True)
 	plt.legend(loc=legend_loc, frameon=True)
 
 	add_significance(-0.2,0.2,df,datacolumn_name,[{periodcolumn_name:"0 to 2","treatment":"Control"},{periodcolumn_name:"0 to 2","treatment":"Fluoxetine"}])
