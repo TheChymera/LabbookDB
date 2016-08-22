@@ -154,7 +154,7 @@ class ForcedSwimTestMeasurement(Measurement):
 	__tablename__ = 'forcedswimtest_measurements'
 	__mapper_args__ = {'polymorphic_identity': 'forcedswimtest'}
 	id = Column(Integer, ForeignKey('measurements.id'), primary_key=True)
-	temperature = Column(Float)
+	temperature = Column(Float) #in degrees Centigrade
 	recording = Column(String) #path to the recording file
 	evaluations = relationship("Evaluation")
 
