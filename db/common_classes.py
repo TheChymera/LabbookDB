@@ -70,13 +70,27 @@ class Measurement(Base):
 	animal_id = Column(Integer, ForeignKey('animals.id')) # only set in per-animal measurements
 	cage_id = Column(Integer, ForeignKey('cages.id')) # only set in per-cage measurements
 
+	author_id = Column(Integer, ForeignKey('authors.id'))
+	author = relationship("Author")
+
 	type = Column(String(50))
 	__mapper_args__ = {
 		'polymorphic_identity': 'measurement',
 		'polymorphic_on': type
 		}
 
+
 #general classes:
+
+class Evaluation(Base):
+	__tablename__ = "evaluations"
+	id = Column(Integer, primary_key=True)
+
+	evaluation = Column(String) #path to file contining the data from evaluation
+	author_id = Column(Integer, ForeignKey('authors.id'))
+	author = relationship("Author")
+
+	measurement_id = Column(Integer, ForeignKey('measurements.id'))
 
 class Operator(Base):
 	__tablename__ = "operators"
@@ -133,6 +147,22 @@ class Solution(Base):
 	def __repr__(self):
 		return "<Solution(id='%s', code='%s', name='%s', contains='%s')>"\
 		% (self.id, self.code, self.name, [str(self.contains[i].concentration)+" "+str(self.contains[i].concentration_unit.code)+" "+str(self.contains[i].substance.name) for i in range(len(self.contains))])
+
+#behavioural classes:
+
+class ForcedSwimTestMeasurement(Measurement):
+	__tablename__ = 'forcedswimtest_measurements'
+	__mapper_args__ = {'polymorphic_identity': 'forcedswimtest'}
+	id = Column(Integer, ForeignKey('measurements.id'), primary_key=True)
+	temperature = Column(Float)
+	recording = Column(String) #path to the recording file
+	evaluations = relationship("Evaluation")
+
+	# Bracket of recording file representing this measurement:
+	# Format: "x_start-x_end,y_start-y_end"
+	# Values should be formatted as decimal-point floats, and represent fractions of the recording with and height
+	recording_bracket = Column(String)
+
 
 #fMRI classes:
 
