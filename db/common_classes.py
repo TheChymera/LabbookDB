@@ -70,8 +70,8 @@ class Measurement(Base):
 	animal_id = Column(Integer, ForeignKey('animals.id')) # only set in per-animal measurements
 	cage_id = Column(Integer, ForeignKey('cages.id')) # only set in per-cage measurements
 
-	author_id = Column(Integer, ForeignKey('authors.id'))
-	author = relationship("Author")
+	operator_id = Column(Integer, ForeignKey('operators.id'))
+	operator = relationship("Operator")
 
 	type = Column(String(50))
 	__mapper_args__ = {
@@ -87,8 +87,8 @@ class Evaluation(Base):
 	id = Column(Integer, primary_key=True)
 
 	evaluation = Column(String) #path to file contining the data from evaluation
-	author_id = Column(Integer, ForeignKey('authors.id'))
-	author = relationship("Author")
+	author_id = Column(Integer, ForeignKey('operators.id'))
+	author = relationship("Operator")
 
 	measurement_id = Column(Integer, ForeignKey('measurements.id'))
 
@@ -179,8 +179,6 @@ class FMRIMeasurement(Measurement):
 	__mapper_args__ = {'polymorphic_identity': 'fmri'}
 	id = Column(Integer, ForeignKey('measurements.id'), primary_key=True)
 	temperature = Column(Float)
-	operator_id = Column(Integer, ForeignKey('operators.id'))
-	operator = relationship("Operator")
 	preparation_id = Column(Integer, ForeignKey('fmri_animal_preparation_protocols.id'))
 	preparation = relationship("FMRIAnimalPreparationProtocol")
 	laser_stimulations = relationship("LaserStimulationProtocol", secondary=laser_association)
@@ -381,8 +379,6 @@ class Weight(Measurement):
 	__tablename__ = 'Weight_measurements'
 	__mapper_args__ = {'polymorphic_identity': 'Weight'}
 	id = Column(Integer, ForeignKey('measurements.id'), primary_key=True)
-	operator_id = Column(Integer, ForeignKey('operators.id'))
-	operator = relationship("Operator")
 	weight = Column(Float)
 	weight_unit_id = Column(Integer, ForeignKey('measurement_units.id'))
 	weight_unit = relationship("MeasurementUnit", foreign_keys=[weight_unit_id])
