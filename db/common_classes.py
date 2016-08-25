@@ -160,7 +160,7 @@ class ForcedSwimTestMeasurement(Measurement):
 
 	# Bracket of recording file representing this measurement:
 	# Format: "x_start-x_end,y_start-y_end"
-	# Values should be formatted as decimal-point floats, and represent fractions of the recording with and height
+	# Values should be formatted as integers, and represent percent of the recording with and height
 	recording_bracket = Column(String)
 
 
