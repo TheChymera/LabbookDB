@@ -86,7 +86,7 @@ class Evaluation(Base):
 	__tablename__ = "evaluations"
 	id = Column(Integer, primary_key=True)
 
-	evaluation = Column(String) #path to file contining the data from evaluation
+	path = Column(String) #path to file contining the data from evaluation
 	author_id = Column(Integer, ForeignKey('operators.id'))
 	author = relationship("Operator")
 
