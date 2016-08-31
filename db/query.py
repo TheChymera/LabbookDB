@@ -20,6 +20,7 @@ allowed_classes = {
 	"CageStay": CageStay,
 	"DrinkingMeasurement": DrinkingMeasurement,
 	"DNAExtractionProtocol": DNAExtractionProtocol,
+	"Evaluation": Evaluation,
 	"ForcedSwimTestMeasurement": ForcedSwimTestMeasurement,
 	"FMRIMeasurement": FMRIMeasurement,
 	"FMRIScannerSetup": FMRIScannerSetup,
