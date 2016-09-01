@@ -18,7 +18,9 @@ def sucrose_prefernce():
 		("Treatment.protocol",),
 		]
 	filters = [["Treatment","start_date","2016,4,25,19,30","2016,5,19,23,5"]]
-	reference_df = query.get_df("~/syncdata/meta.db",col_entries=col_entries, join_entries=join_entries, filters=filters)
+	df = query.get_df("~/syncdata/meta.db",col_entries=col_entries, join_entries=join_entries, filters=filters)
+
+	return df
 
 if __name__ == '__main__' and __package__ is None:
 	sucrose_prefernce()
