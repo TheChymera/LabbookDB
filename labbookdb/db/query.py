@@ -116,7 +116,7 @@ def add_all_columns(cols, class_name):
 		column = getattr(joinclassobject, col.key)
 		cols.append(column.label("{}_{}".format(class_name, col_name)))
 
-def get_df(db_path, col_entries=[], join_entries=[], filters=[]):
+def get_df(db_path, col_entries=[], join_entries=[], filters=[], outerjoin=False):
 	"""Return a dataframe from a complex query of a LabbookDB-style database
 
 	Arguments
@@ -194,7 +194,10 @@ def get_df(db_path, col_entries=[], join_entries=[], filters=[]):
 
 	sql_query = session.query(*cols)
 	for join in joins:
-		sql_query = sql_query.join(*join)
+		if outerjoin:
+			sql_query = sql_query.outerjoin(*join)
+		else:
+			sql_query = sql_query.join(*join)
 
 	for sub_filter in filters:
 		if sub_filter[1][-4:] == "date" and isinstance(sub_filter[2], str):
