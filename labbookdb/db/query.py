@@ -200,13 +200,14 @@ def get_df(db_path, col_entries=[], join_entries=[], filters=[], outerjoin=False
 			sql_query = sql_query.join(*join)
 
 	for sub_filter in filters:
-		if sub_filter[1][-4:] == "date" and isinstance(sub_filter[2], str):
-			for ix, i in enumerate(sub_filter[2:]):
-				sub_filter[2+ix] = datetime(*[int(a) for a in i.split(",")])
-		if len(sub_filter) == 3:
-			sql_query = sql_query.filter(getattr(allowed_classes[sub_filter[0]], sub_filter[1]) == sub_filter[2])
-		else:
-			sql_query = sql_query.filter(or_(getattr(allowed_classes[sub_filter[0]], sub_filter[1]) == v for v in sub_filter[2:]))
+		if sub_filter:
+			if sub_filter[1][-4:] == "date" and isinstance(sub_filter[2], str):
+				for ix, i in enumerate(sub_filter[2:]):
+					sub_filter[2+ix] = datetime(*[int(a) for a in i.split(",")])
+			if len(sub_filter) == 3:
+				sql_query = sql_query.filter(getattr(allowed_classes[sub_filter[0]], sub_filter[1]) == sub_filter[2])
+			else:
+				sql_query = sql_query.filter(or_(getattr(allowed_classes[sub_filter[0]], sub_filter[1]) == v for v in sub_filter[2:]))
 
 	mystring = sql_query.statement
 	df = pd.read_sql_query(mystring,engine)
