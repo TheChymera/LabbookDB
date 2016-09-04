@@ -1,6 +1,36 @@
 import pandas as pd
 import processing
 
+def plottable_sums(reference_df, behaviour, identifier_column="Animal_id", periods={}, period_label="period", metadata_columns={"TreatmentProtocol_code":"treatment"}):
+	identifiers = list(set(reference_df[identifier_column]))
+	evaluation_df = pd.DataFrame({})
+	for identifier in identifiers:
+		identifier_df = reference_df[reference_df[identifier_column]==identifier]
+		evaluation_path = identifier_df["Evaluation_path"].values[0]
+		identifier_data = {}
+		for metadata_column in metadata_columns:
+			identifier_data[metadata_columns[metadata_column]] = identifier_df[metadata_column].values[0]
+		for period in periods:
+			period_start, period_end = periods[period]
+			sums = processing.timedelta_sums(evaluation_path, index_name=identifier, period_start=period_start, period_end=period_end)
+			#We need to calculate this explicitly since the start/end of th experiment may not align perfecty with the theoretical period
+			real_period_duration = sums.sum(axis=1).values[0]
+			#if the behaviour key is not found, there was none of that behaviour type in the period
+			try:
+				behaviour_ratio = sums[behaviour].values[0]/real_period_duration
+			except KeyError:
+				behaviour_ratio = 0
+			identifier_data[behaviour+" ratio"] = behaviour_ratio
+			identifier_data[period_label] = period
+			identifier_data["identifier"] = identifier
+			period_df_slice = pd.DataFrame(identifier_data, index=[identifier])
+			evaluation_df = pd.concat([evaluation_df, period_df_slice])
+
+	#data is usually ordered as it comes, for nicer plots we sort it here
+	evaluation_df = evaluation_df.sort_values([period_label], ascending=True)
+	evaluation_df = evaluation_df.sort_values(metadata_columns.values(), ascending=False)
+	return evaluation_df
+
 def plottable_sucrosepreference_df(reference_df):
 	cage_ids = list(set(reference_df["Cage_id"]))
 	preferences_df = pd.DataFrame({})
