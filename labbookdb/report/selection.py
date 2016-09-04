@@ -5,7 +5,7 @@ if __package__ is None:
 	__package__ = "labbookdb.report.selection"
 from ...db import query
 
-def sucrose_prefernce():
+def sucrose_prefernce(db_path, treatment_start_dates=[]):
 	col_entries=[
 		("Cage","id"),
 		("Treatment",),
@@ -17,8 +17,12 @@ def sucrose_prefernce():
 		("SucrosePreferenceMeasurement",),
 		("Treatment.protocol",),
 		]
-	filters = [["Treatment","start_date","2016,4,25,19,30","2016,5,19,23,5"]]
-	df = query.get_df("~/syncdata/meta.db",col_entries=col_entries, join_entries=join_entries, filters=filters)
+	if treatment_start_dates:
+		my_filter = ["Treatment","start_date"]
+		my_filter.extend(treatment_start_dates)
+	else:
+		my_filter = None
+	df = query.get_df(db_path,col_entries=col_entries, join_entries=join_entries, filters=[my_filter])
 
 	return df
 
