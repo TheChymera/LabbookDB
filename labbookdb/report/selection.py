@@ -5,18 +5,54 @@ if __package__ is None:
 	__package__ = "labbookdb.report.selection"
 from ...db import query
 
-def sucrose_prefernce(db_path, treatment_start_dates=[]):
-	col_entries=[
-		("Cage","id"),
-		("Treatment",),
-		("SucrosePreferenceMeasurement",),
-		("TreatmentProtocol","code"),
-		]
-	join_entries=[
-		("Cage.treatments",),
-		("SucrosePreferenceMeasurement",),
-		("Treatment.protocol",),
-		]
+def data_selection(db_path, data_type, treatment_start_dates=[]):
+	"""Select dataframe from a LabbookDB style database.
+
+	Parameters
+	----------
+
+	db_path : string
+	Path to a LabbookDB formatted database.
+
+	data_type : string
+	What type of data should be selected values can be:
+		"sucrose preference"
+		"forced swim"
+
+	treatment_start_dates : list, optional
+	A list containing the treatment start date or dates by which to filter the cages for the sucrose preference measurements.
+	Items should be strings in datetime format, e.g. "2016,4,25,19,30".
+	"""
+	if data_type == "sucrose preference":
+		col_entries=[
+			("Cage","id"),
+			("Treatment",),
+			("SucrosePreferenceMeasurement",),
+			("TreatmentProtocol","code"),
+			]
+		join_entries=[
+			("Cage.treatments",),
+			("SucrosePreferenceMeasurement",),
+			("Treatment.protocol",),
+			]
+	elif data_type == "forced swim":
+		col_entries=[
+			("Animal","id"),
+			("Cage","id"),
+			("Treatment",),
+			("TreatmentProtocol","code"),
+			("ForcedSwimTestMeasurement",),
+			("Evaluation",),
+			]
+		join_entries=[
+			("Animal.cage_stays",),
+			("ForcedSwimTestMeasurement",),
+			("Evaluation",),
+			("CageStay.cage",),
+			("Cage.treatments",),
+			("Treatment.protocol",),
+			]
+
 	if treatment_start_dates:
 		my_filter = ["Treatment","start_date"]
 		my_filter.extend(treatment_start_dates)
