@@ -28,7 +28,7 @@ def plottable_sums(reference_df, behaviour, identifier_column="Animal_id", perio
 
 	#data is usually ordered as it comes, for nicer plots we sort it here
 	evaluation_df = evaluation_df.sort_values([period_label], ascending=True)
-	evaluation_df = evaluation_df.sort_values(metadata_columns.values(), ascending=False)
+	evaluation_df = evaluation_df.sort_values(list(metadata_columns.values()), ascending=False)
 	return evaluation_df
 
 def plottable_sucrosepreference_df(reference_df):

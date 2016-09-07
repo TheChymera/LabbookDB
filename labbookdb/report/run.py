@@ -28,7 +28,7 @@ def sucrose_prefernce(db_path, treatment_start_dates, columns=["0 to 2", "2 to 5
 
 	raw_df = selection.data_selection(db_path, "sucrose preference", treatment_start_dates=treatment_start_dates)
 	plottable_df = formatting.plottable_sucrosepreference_df(raw_df)
-	plotting.sucrose_preference(plottable_df, legend_loc=4, plot_columns=columns, rename_treatments=rename_treatments)
+	plotting.sucrose_preference(plottable_df, legend_loc=4, columns=columns, rename_treatments=rename_treatments)
 
 def forced_swim(db_path, plot_style, treatment_start_dates, columns=["2 to 4"], rename_treatments={"cFluDW":"Fluoxetine","cFluDW_":"Control"}, period_label="", plot_behaviour="immobility"):
 	"""Plot sucrose preference scatterplot.

@@ -1,10 +1,10 @@
-if __package__ is None:
-	import sys, os
-	pkg_root = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)),"../.."))+"/"
-	sys.path.append(pkg_root)
-	import labbookdb.report
-	__package__ = "labbookdb.report.selection"
-from ...db import query
+import os
+if not __package__:
+	import sys
+	print(os.path.realpath(__file__))
+	pkg_root = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)),"../.."))
+	sys.path.insert(0,pkg_root)
+from labbookdb.db import query
 
 def data_selection(db_path, data_type, treatment_start_dates=[]):
 	"""Select dataframe from a LabbookDB style database.

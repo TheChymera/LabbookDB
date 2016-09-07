@@ -9,7 +9,7 @@ import pandas as pd
 from datetime import *
 from sqlalchemy import create_engine, literal, or_, inspection
 from os import path
-from common_classes import *
+from .common_classes import *
 from sqlalchemy.orm import sessionmaker, aliased
 import sqlalchemy
 
