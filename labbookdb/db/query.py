@@ -237,9 +237,3 @@ def get_df(db_path, col_entries=[], join_entries=[], filters=[], outerjoin=False
 	# reference_df = pd.read_sql_query(mystring,engine)
 	# print reference_df.columns
 	# print reference_df
-
-
-if __name__ == '__main__':
-	# argh.dispatch_command(add_generic)
-
-	simple_query("~/meta.db", "Solution", "code", "med-sal", first=False)
