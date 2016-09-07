@@ -1,6 +1,5 @@
-import os
 if not __package__:
-	import sys
+	import os, sys
 	print(os.path.realpath(__file__))
 	pkg_root = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)),"../.."))
 	sys.path.insert(0,pkg_root)
