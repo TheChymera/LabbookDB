@@ -13,7 +13,6 @@ from .common_classes import *
 from sqlalchemy.orm import sessionmaker, aliased
 import sqlalchemy
 
-
 allowed_classes = {
 	"Animal": Animal,
 	"Cage": Cage,
