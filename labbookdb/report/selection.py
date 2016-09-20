@@ -1,9 +1,4 @@
-if not __package__:
-	import os, sys
-	print(os.path.realpath(__file__))
-	pkg_root = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)),"../.."))
-	sys.path.insert(0,pkg_root)
-from labbookdb.db import query
+from .db import query
 
 def data_selection(db_path, data_type, treatment_start_dates=[]):
 	"""Select dataframe from a LabbookDB style database.
@@ -61,6 +56,3 @@ def data_selection(db_path, data_type, treatment_start_dates=[]):
 	df = query.get_df(db_path,col_entries=col_entries, join_entries=join_entries, filters=[my_filter])
 
 	return df
-
-if __name__ == '__main__' and __package__ is None:
-	sucrose_prefernce()
