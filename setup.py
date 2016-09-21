@@ -11,5 +11,8 @@ setup(
 	classifiers = [],
 	install_requires = [],
 	provides = ["labbookdb"],
-	packages = ["labbookdb"],
+	packages = ["labbookdb",
+		"labbookdb.db"
+		"labbookdb.report"
+		],
 	)
