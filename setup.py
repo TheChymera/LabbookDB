@@ -12,7 +12,7 @@ setup(
 	install_requires = [],
 	provides = ["labbookdb"],
 	packages = ["labbookdb",
-		"labbookdb.db"
-		"labbookdb.report"
+		"labbookdb.db",
+		"labbookdb.report",
 		],
 	)
