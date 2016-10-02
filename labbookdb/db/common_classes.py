@@ -173,7 +173,6 @@ class FMRIScannerSetup(Base):
 	coil = Column(String)
 	scanner = Column(String)
 	support = Column(String)
-	ventillation = Column(String)
 
 class FMRIMeasurement(Measurement):
 	__tablename__ = 'fmri_measurements'
