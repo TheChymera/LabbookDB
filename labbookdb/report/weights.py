@@ -8,9 +8,9 @@ from os import path
 from sqlalchemy import create_engine, or_, inspection
 from sqlalchemy.orm import sessionmaker, aliased
 
-sys.path.append('/home/chymera/src/LabbookDB/db/')
+sys.path.append('/home/chymera/src/LabbookDB/labbookdb/db/')
 from common_classes import *
-from query import loadSession, allowed_classes
+from query import loadSession
 
 import matplotlib
 matplotlib.style.use('ggplot')
