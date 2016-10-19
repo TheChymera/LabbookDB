@@ -1,4 +1,9 @@
-from .db import query
+try:
+	from .db import query
+except ValueError:
+	import sys
+	sys.path.append('/home/chymera/src/LabbookDB/labbookdb/db/')
+	import query
 
 def data_selection(db_path, data_type, treatment_start_dates=[]):
 	"""Select dataframe from a LabbookDB style database.
@@ -11,8 +16,9 @@ def data_selection(db_path, data_type, treatment_start_dates=[]):
 
 	data_type : string
 	What type of data should be selected values can be:
-		"sucrose preference"
 		"forced swim"
+		"cage list"
+		"sucrose preference"
 
 	treatment_start_dates : list, optional
 	A list containing the treatment start date or dates by which to filter the cages for the sucrose preference measurements.
@@ -46,6 +52,15 @@ def data_selection(db_path, data_type, treatment_start_dates=[]):
 			("CageStay.cage",),
 			("Cage.treatments",),
 			("Treatment.protocol",),
+			]
+	elif data_type == "cage list":
+		col_entries=[
+			("Animal","id"),
+			("Cage","id"),
+			]
+		join_entries=[
+			("Animal.cage_stays",),
+			("CageStay.cage",),
 			]
 
 	if treatment_start_dates:
