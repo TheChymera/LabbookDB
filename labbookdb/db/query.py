@@ -9,9 +9,13 @@ import pandas as pd
 from datetime import *
 from sqlalchemy import create_engine, literal, or_, inspection
 from os import path
-from .common_classes import *
 from sqlalchemy.orm import sessionmaker, aliased
 import sqlalchemy
+
+try:
+	from .common_classes import *
+except ValueError:
+	from common_classes import *
 
 allowed_classes = {
 	"Animal": Animal,
