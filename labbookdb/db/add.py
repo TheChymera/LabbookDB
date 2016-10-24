@@ -3,17 +3,21 @@
 from datetime import datetime
 import argh
 import json
-import sys
 import numpy
 
 import pandas as pd
 
 from sqlalchemy import create_engine, literal, update, insert
 from os import path
-from common_classes import *
-from query import allowed_classes
 from sqlalchemy.orm import sessionmaker
 import sqlalchemy
+
+try:
+	from .common_classes import *
+	from .query import allowed_classes
+except ValueError:
+	from common_classes import *
+	from query import allowed_classes
 
 def loadSession(db_path):
 	db_path = "sqlite:///" + path.expanduser(db_path)
