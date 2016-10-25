@@ -1,5 +1,5 @@
 try:
-	from .db import query
+	from ..db import query
 except (ValueError, SystemError):
 	import sys
 	sys.path.append('/home/chymera/src/LabbookDB/labbookdb/db/')

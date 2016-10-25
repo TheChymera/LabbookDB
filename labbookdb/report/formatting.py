@@ -1,5 +1,8 @@
 import pandas as pd
-import processing
+try:
+	from ..report import processing
+except SystemError:
+	import processing
 
 def plottable_sums(reference_df, behaviour, identifier_column="Animal_id", periods={}, period_label="period", metadata_columns={"TreatmentProtocol_code":"treatment"}):
 	identifiers = list(set(reference_df[identifier_column]))
