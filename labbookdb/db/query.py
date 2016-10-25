@@ -14,7 +14,7 @@ import sqlalchemy
 
 try:
 	from .common_classes import *
-except ValueError:
+except (ValueError, SystemError):
 	from common_classes import *
 
 allowed_classes = {
