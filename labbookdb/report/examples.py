@@ -73,6 +73,6 @@ def forced_swim(db_path, plot_style, treatment_start_dates, columns=["2 to 4"], 
 		plotting.forced_swim_ttest(plottable_df, legend_loc=4, periods=periods, rename_treatments=rename_treatments)
 
 if __name__ == '__main__':
-	# sucrose_prefernce(db_path, treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5"])
+	sucrose_prefernce(db_path, treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5"])
 	# forced_swim(db_path, "ttest", treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5"], columns=["2 to 4", "2 to 6"])
-	forced_swim(db_path, "tsplot", treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5"])
+	# forced_swim(db_path, "tsplot", treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5"])
