@@ -181,7 +181,7 @@ class FMRIMeasurement(Measurement):
 	scanner_setup = relationship("FMRIScannerSetup")
 	irregularities = relationship("Irregularity", secondary=irregularities_association)
 
-	laser_stimulation_id = Column(Integer, ForeignKey('laser_stimulations.id'))
+	laser_stimulation_id = Column(Integer, ForeignKey('laser_stimulation_protocols.id'))
 	laser_stimulation = relationship("LaserStimulationProtocol")
 
 class FMRIAnimalPreparationProtocol(Protocol):
