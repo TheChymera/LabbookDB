@@ -38,6 +38,7 @@ def forced_swim(db_path, plot_style, treatment_start_dates,
 	rename_treatments={"cFluDW":"Fluoxetine","cFluDW_":"Control"},
 	period_label="",
 	plot_behaviour="immobility",
+	matplotlibrc=False,
 	):
 	"""Plot sucrose preference scatterplot.
 
@@ -69,7 +70,7 @@ def forced_swim(db_path, plot_style, treatment_start_dates,
 		elif period_label == "interval [2 min]":
 			periods={1:[0,120],2:[120,240],3:[240,360]}
 			plottable_df = formatting.plottable_sums(raw_df, plot_behaviour, identifier_column="Animal_id", periods=periods, period_label=period_label)
-		plotting.forced_swim_timecourse(plottable_df, legend_loc="best", rename_treatments=rename_treatments, period_label=period_label, plotstyle=plot_style, plot_behaviour=plot_behaviour)
+		plotting.forced_swim_timecourse(plottable_df, legend_loc="best", rename_treatments=rename_treatments, period_label=period_label, plotstyle=plot_style, plot_behaviour=plot_behaviour,matplotlibrc=matplotlibrc)
 	elif plot_style == "ttest":
 		periods = {}
 		for column_name in columns:
@@ -78,7 +79,7 @@ def forced_swim(db_path, plot_style, treatment_start_dates,
 			end = int(end_minute)*60
 			periods[column_name] = [start,end]
 		plottable_df = formatting.plottable_sums(raw_df, plot_behaviour, period_label="interval [minutes]", periods=periods)
-		plotting.forced_swim_ttest(plottable_df, legend_loc=4, periods=periods, rename_treatments=rename_treatments)
+		plotting.forced_swim_ttest(plottable_df, legend_loc=4, periods=periods, rename_treatments=rename_treatments,matplotlibrc=matplotlibrc)
 
 if __name__ == '__main__':
 	# sucrose_prefernce(db_path, treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5"])
