@@ -248,7 +248,10 @@ class Observation(Base):
 	date = Column(DateTime)
 	behaviour = Column(String)
 	physiology = Column(String)
+	value = Column(Float)
 	severtity = Column(Integer, default=0)
+	unit_id = Column(Integer, ForeignKey('measurement_units.id'))
+	unit = relationship("MeasurementUnit")
 	animal_id = Column(Integer, ForeignKey('animals.id'))
 
 class UncategorizedTreatment(Base):

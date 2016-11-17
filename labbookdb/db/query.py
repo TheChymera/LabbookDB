@@ -37,6 +37,7 @@ allowed_classes = {
 	"LaserStimulationProtocol": LaserStimulationProtocol,
 	"MeasurementUnit": MeasurementUnit,
 	"Operator": Operator,
+	"Observation": Observation,
 	"Substance": Substance,
 	"SucrosePreferenceMeasurement": SucrosePreferenceMeasurement,
 	"Solution": Solution,
