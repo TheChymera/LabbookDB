@@ -423,8 +423,8 @@ class DNAExtraction(Base):
 	code = Column(String, unique=True)
 	protocol_id = Column(Integer, ForeignKey('dna_extraction_protocols.id'))
 	protocol = relationship('DNAExtractionProtocol')
-	source_id = Column(Integer, ForeignKey('biotic_samples.id'))
-	source = relationship('BioticSample')
+	source_id = Column(Integer, ForeignKey('biopsies.id'))
+	source = relationship('Biopsy')
 
 class DNAExtractionProtocol(Protocol):
 	__tablename__ = 'dna_extraction_protocols'
