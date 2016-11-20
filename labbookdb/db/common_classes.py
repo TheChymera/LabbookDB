@@ -64,6 +64,7 @@ class Measurement(Base):
 	date = Column(DateTime)
 
 	animal_id = Column(Integer, ForeignKey('animals.id')) # only set in per-animal measurements
+	animal_id = Column(Integer, ForeignKey('animals.id')) # only set in per-animal measurements
 	cage_id = Column(Integer, ForeignKey('cages.id')) # only set in per-cage measurements
 
 	operator_id = Column(Integer, ForeignKey('operators.id'))
@@ -119,6 +120,7 @@ class Substance(Base):
 	concentration_unit = relationship("MeasurementUnit")
 	supplier = Column(String)
 	supplier_product_code = Column(String)
+	pubchem_sid = Column(String)
 
 
 class Ingredient(Base):
@@ -384,21 +386,21 @@ class Weight(Measurement):
 	weight_unit_id = Column(Integer, ForeignKey('measurement_units.id'))
 	weight_unit = relationship("MeasurementUnit", foreign_keys=[weight_unit_id])
 
-class BioticSample(Base):
-	__tablename__ = "biotic_samples"
+class Biopsy(Base):
+	__tablename__ = "biopsies"
 	id = Column(Integer, primary_key=True)
-	code = Column(String, unique=True)
-	extracted = Column(DateTime)
-	discriminator = Column('type', String(50))
-	__mapper_args__ = {'polymorphic_on': discriminator}
-
-class AnimalBiopsy(BioticSample):
-	__tablename__ = "animal_biopsies"
-	__mapper_args__ = {'polymorphic_identity': 'animal_biopsy'}
-	id = Column(Integer, ForeignKey('biotic_samples.id'), primary_key=True)
+	date = Column(DateTime)
 	animal_id = Column(Integer, ForeignKey('animals.id'))
 	animal = relationship("Animal")
-	tissue = Column(String)
+	extraction_protocol_id = Column(Integer, ForeignKey('protocols.id'))
+	extraction_protocol = relationship("Protocol", foreign_keys=[extraction_protocol_id])
+	type = Column(String(50))
+
+class BrainBiopsy(Biopsy):
+	__tablename__ = "brain_biopsies"
+	id = Column(Integer, ForeignKey('biopsies.id'), primary_key=True)
+	sectioning_protocol_id = Column(Integer, ForeignKey('protocols.id'))
+	sectioning_protocol = relationship("Protocol", foreign_keys=[sectioning_protocol_id])
 
 # DNA classes:
 class Incubation(Base):
@@ -453,3 +455,46 @@ class DNAExtractionProtocol(Protocol):
 
 	volume_unit_id = Column(Integer, ForeignKey('measurement_units.id'))
 	volume_unit = relationship("MeasurementUnit", foreign_keys=[volume_unit_id])
+
+class BrainExtractionProtocol(Protocol):
+	__tablename__ = 'brain_extraction_protocols'
+	__mapper_args__ = {'polymorphic_identity': 'brain_extraction'}
+	id = Column(Integer, ForeignKey('protocols.id'), primary_key=True)
+	perfusion_system = Column(String(50)) #e.g. "pump", "peristaltic pump", "syringe"
+	perfusion_flow = Column(Float) #in ml/min
+	peristaltic_frequency = Column(Float) #in Hz
+	perfusion_solution_id = Column(Integer, ForeignKey("solutions.id"))
+	perfusion_solution = relationship("Solution", foreign_keys=[perfusion_solution_id])
+	perfusion_solution_volume = Column(Float) #in ml
+	fixation_solution_id = Column(Integer, ForeignKey("solutions.id"))
+	fixation_solution = relationship("Solution", foreign_keys=[fixation_solution_id])
+	fixation_solution_volume = Column(Float) #in ml
+	storage_solution_id = Column(Integer, ForeignKey("solutions.id"))
+	storage_solution = relationship("Solution", foreign_keys=[storage_solution_id])
+	storage_solution_volume = Column(Float) #in ml
+	post_extraction_fixation_time = Column(Float) #in hours
+
+class SectioningProtocol(Protocol):
+	__tablename__ = 'brain_extraction_protocols'
+	__mapper_args__ = {'polymorphic_identity': 'brain_extraction'}
+	id = Column(Integer, ForeignKey('protocols.id'), primary_key=True)
+	system = Column(String(50)) #e.g. "vibratome", "cryotome", "microtome"
+	slice_thickness = Column(Float) #in micrometres
+	blade_frequency = Column(Float) #in Hz
+	blade_speed = Column(Float) #in mm/s
+
+# Histological Measurements
+class FluorescentMicroscopyMeasurement(Measurement):
+	__tablename__ = 'fluorescent_microscopy_measurements'
+	__mapper_args__ = {'polymorphic_identity': 'fluorescent_microscopy'}
+	id = Column(Integer, ForeignKey('measurements.id'), primary_key=True)
+	light_source = Column(String) # e.g. "LED", "LASER"
+	stimulation_wavelength = Column(Float) #in nm
+	imaged_wavelength = Column(Float) #in nm
+	exposure = Column(Float) #in s
+	start_bregma_distance = Column(Float) #positive towards rostral, in mm
+	start_interaural_distance = Column(Float) #positive towards rostral, in mm
+	start_lambda_distance = Column(Float) #positive towards rostral, in mm
+	start_midline_distance = Column(Float) #positive towards right of animal, in mm
+	start_depth = Column(Float) #in mm
+	recording = Column(String) #path to the recording file
