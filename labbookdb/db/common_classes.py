@@ -475,7 +475,7 @@ class BrainExtractionProtocol(Protocol):
 	post_extraction_fixation_time = Column(Float) #in hours
 
 class SectioningProtocol(Protocol):
-	__tablename__ = 'brain_extraction_protocols'
+	__tablename__ = 'sectioning_protocols'
 	__mapper_args__ = {'polymorphic_identity': 'brain_extraction'}
 	id = Column(Integer, ForeignKey('protocols.id'), primary_key=True)
 	system = Column(String(50)) #e.g. "vibratome", "cryotome", "microtome"
