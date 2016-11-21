@@ -42,6 +42,7 @@ allowed_classes = {
 	"MeasurementUnit": MeasurementUnit,
 	"Operator": Operator,
 	"Observation": Observation,
+	"Protocol": Protocol,
 	"SectioningProtocol": SectioningProtocol,
 	"Substance": Substance,
 	"SucrosePreferenceMeasurement": SucrosePreferenceMeasurement,
