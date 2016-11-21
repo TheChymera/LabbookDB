@@ -339,6 +339,8 @@ class Animal(Base):
 	observations = relationship("Observation")
 	uncategorized_treatments = relationship("UncategorizedTreatment")
 
+	biopsies = relationship("Biopsy", backref="animal")
+
 	def __repr__(self):
 		return "<Animal(id='%s', id_eth='%s', id_uzh='%s', genotypes='%s', sex='%s', ear_punches='%s', treatment='%s')>"\
 		% (self.id, self.id_eth, self.id_uzh, [self.genotypes[i].construct+" "+self.genotypes[i].zygosity for i in range(len(self.genotypes))], self.sex, self.ear_punches,[self.treatments[i].protocol.solution for i in range(len(self.treatments))])
@@ -380,7 +382,7 @@ class Genotype(Base):
 
 class Weight(Measurement):
 	__tablename__ = 'Weight_measurements'
-	__mapper_args__ = {'polymorphic_identity': 'Weight'}
+	__mapper_args__ = {'polymorphic_identity': 'weight'}
 	id = Column(Integer, ForeignKey('measurements.id'), primary_key=True)
 	weight = Column(Float)
 	weight_unit_id = Column(Integer, ForeignKey('measurement_units.id'))
@@ -391,13 +393,17 @@ class Biopsy(Base):
 	id = Column(Integer, primary_key=True)
 	date = Column(DateTime)
 	animal_id = Column(Integer, ForeignKey('animals.id'))
-	animal = relationship("Animal")
 	extraction_protocol_id = Column(Integer, ForeignKey('protocols.id'))
 	extraction_protocol = relationship("Protocol", foreign_keys=[extraction_protocol_id])
 	type = Column(String(50))
+	__mapper_args__ = {
+		'polymorphic_identity': 'biopsy',
+		'polymorphic_on': type
+		}
 
 class BrainBiopsy(Biopsy):
 	__tablename__ = "brain_biopsies"
+	__mapper_args__ = {'polymorphic_identity': 'brain'}
 	id = Column(Integer, ForeignKey('biopsies.id'), primary_key=True)
 	sectioning_protocol_id = Column(Integer, ForeignKey('protocols.id'))
 	sectioning_protocol = relationship("Protocol", foreign_keys=[sectioning_protocol_id])
