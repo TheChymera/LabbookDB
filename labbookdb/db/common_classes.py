@@ -64,7 +64,6 @@ class Measurement(Base):
 	date = Column(DateTime)
 
 	animal_id = Column(Integer, ForeignKey('animals.id')) # only set in per-animal measurements
-	animal_id = Column(Integer, ForeignKey('animals.id')) # only set in per-animal measurements
 	cage_id = Column(Integer, ForeignKey('cages.id')) # only set in per-cage measurements
 
 	operator_id = Column(Integer, ForeignKey('operators.id'))
@@ -391,10 +390,12 @@ class Weight(Measurement):
 class Biopsy(Base):
 	__tablename__ = "biopsies"
 	id = Column(Integer, primary_key=True)
-	date = Column(DateTime)
+	start_date = Column(DateTime)
 	animal_id = Column(Integer, ForeignKey('animals.id'))
 	extraction_protocol_id = Column(Integer, ForeignKey('protocols.id'))
 	extraction_protocol = relationship("Protocol", foreign_keys=[extraction_protocol_id])
+	sample_location = Column(String) #id of the physical sample
+	measurements = relationship("Measurement", backref="biopsy")
 	type = Column(String(50))
 	__mapper_args__ = {
 		'polymorphic_identity': 'biopsy',
@@ -407,6 +408,7 @@ class BrainBiopsy(Biopsy):
 	id = Column(Integer, ForeignKey('biopsies.id'), primary_key=True)
 	sectioning_protocol_id = Column(Integer, ForeignKey('protocols.id'))
 	sectioning_protocol = relationship("Protocol", foreign_keys=[sectioning_protocol_id])
+
 
 # DNA classes:
 class Incubation(Base):
@@ -488,6 +490,11 @@ class SectioningProtocol(Protocol):
 	slice_thickness = Column(Float) #in micrometres
 	blade_frequency = Column(Float) #in Hz
 	blade_speed = Column(Float) #in mm/s
+	start_bregma_distance = Column(Float) #positive towards rostral, in mm
+	start_interaural_distance = Column(Float) #positive towards rostral, in mm
+	start_lambda_distance = Column(Float) #positive towards rostral, in mm
+	start_midline_distance = Column(Float) #positive towards right of animal, in mm
+	start_depth = Column(Float) #in mm
 
 # Histological Measurements
 class FluorescentMicroscopyMeasurement(Measurement):
@@ -498,10 +505,5 @@ class FluorescentMicroscopyMeasurement(Measurement):
 	stimulation_wavelength = Column(Float) #in nm
 	imaged_wavelength = Column(Float) #in nm
 	exposure = Column(Float) #in s
-	start_bregma_distance = Column(Float) #positive towards rostral, in mm
-	start_interaural_distance = Column(Float) #positive towards rostral, in mm
-	start_lambda_distance = Column(Float) #positive towards rostral, in mm
-	start_midline_distance = Column(Float) #positive towards right of animal, in mm
-	start_depth = Column(Float) #in mm
 	data = Column(String) #path data folder
-	sample_location = Column(String) #id of the physical sample
+	biopsy_id = Column(Integer, ForeignKey('animals.id')) # only set in per-animal measurements
