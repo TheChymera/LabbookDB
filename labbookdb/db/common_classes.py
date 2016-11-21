@@ -395,7 +395,7 @@ class Biopsy(Base):
 	extraction_protocol_id = Column(Integer, ForeignKey('protocols.id'))
 	extraction_protocol = relationship("Protocol", foreign_keys=[extraction_protocol_id])
 	sample_location = Column(String) #id of the physical sample
-	measurements = relationship("Measurement", backref="biopsy")
+	fluorescent_microscopy = relationship("FluorescentMicroscopyMeasurement", backref="biopsy")
 	type = Column(String(50))
 	__mapper_args__ = {
 		'polymorphic_identity': 'biopsy',
