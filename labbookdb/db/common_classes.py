@@ -482,7 +482,7 @@ class BrainExtractionProtocol(Protocol):
 
 class SectioningProtocol(Protocol):
 	__tablename__ = 'sectioning_protocols'
-	__mapper_args__ = {'polymorphic_identity': 'brain_extraction'}
+	__mapper_args__ = {'polymorphic_identity': 'sectioning'}
 	id = Column(Integer, ForeignKey('protocols.id'), primary_key=True)
 	system = Column(String(50)) #e.g. "vibratome", "cryotome", "microtome"
 	slice_thickness = Column(Float) #in micrometres
@@ -503,4 +503,5 @@ class FluorescentMicroscopyMeasurement(Measurement):
 	start_lambda_distance = Column(Float) #positive towards rostral, in mm
 	start_midline_distance = Column(Float) #positive towards right of animal, in mm
 	start_depth = Column(Float) #in mm
-	recording = Column(String) #path to the recording file
+	data = Column(String) #path data folder
+	sample_location = Column(String) #id of the physical sample
