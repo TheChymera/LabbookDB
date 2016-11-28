@@ -1,11 +1,12 @@
 try:
 	from ..report import selection, formatting
-except SystemError:
+except (SystemError, ValueError):
 	import selection, formatting
 if not __package__:
 	import sys, os
 	sys.path.append(os.path.expanduser('~/src/behaviopy'))
 from behaviopy import plotting
+import matplotlib.pyplot as plt
 
 db_path="~/syncdata/meta.db"
 
@@ -82,6 +83,7 @@ def forced_swim(db_path, plot_style, treatment_start_dates,
 		plotting.forced_swim_ttest(plottable_df, legend_loc=4, periods=periods, rename_treatments=rename_treatments,matplotlibrc=matplotlibrc)
 
 if __name__ == '__main__':
-	# sucrose_prefernce(db_path, treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5"])
-	forced_swim(db_path, "ttest", treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5"], columns=["2 to 4", "2 to 6"])
+	sucrose_prefernce(db_path, treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5"])
+	# forced_swim(db_path, "ttest", treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5"], columns=["2 to 4", "2 to 6"])
 	# forced_swim(db_path, "tsplot", treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5"])
+	plt.show()
