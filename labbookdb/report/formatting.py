@@ -1,7 +1,7 @@
 import pandas as pd
 try:
 	from ..report import processing
-except SystemError:
+except (SystemError, ValueError):
 	import processing
 
 def plottable_sums(reference_df, behaviour, identifier_column="Animal_id", periods={}, period_label="period", metadata_columns={"TreatmentProtocol_code":"treatment"}):
