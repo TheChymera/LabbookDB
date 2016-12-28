@@ -160,6 +160,17 @@ class ForcedSwimTestMeasurement(Measurement):
 	# Values should be formatted as integers, and represent percent of the recording with and height
 	recording_bracket = Column(String)
 
+class OpenFieldTestMeasurement(Measurement):
+	__tablename__ = 'openfieldtest_measurements'
+	__mapper_args__ = {'polymorphic_identity': 'openfieldtest§'}
+	id = Column(Integer, ForeignKey('measurements.id'), primary_key=True)
+	arena_shape = Column(String) #"square" or "round"
+	arena_dimension = Column(Integer) #square side or radius (contingent on `arena_shape`) in mmm
+	center_luminostiy = Column(Integer) #in lux
+	edge_luminostiy = Column(Integer) #in lux
+	corner_luminostiy = Column(Integer) #in lux (only if `arena_shape == "square"`)
+
+	evaluations = relationship("Evaluation")
 
 #fMRI classes:
 
