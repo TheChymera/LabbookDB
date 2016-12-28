@@ -158,7 +158,7 @@ class Arena(Base):
 	z_dim = Column(Float) # in mm
 	wall_color = Column(String)
 
-	measurements = relationship("Measurement")
+	measurements = relationship("OpenFieldTestMeasurement")
 
 
 class ForcedSwimTestMeasurement(Measurement):
