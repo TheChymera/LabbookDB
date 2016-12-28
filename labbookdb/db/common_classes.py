@@ -176,7 +176,7 @@ class ForcedSwimTestMeasurement(Measurement):
 
 class OpenFieldTestMeasurement(Measurement):
 	__tablename__ = 'openfieldtest_measurements'
-	__mapper_args__ = {'polymorphic_identity': 'openfieldtest§'}
+	__mapper_args__ = {'polymorphic_identity': 'openfieldtest'}
 	id = Column(Integer, ForeignKey('measurements.id'), primary_key=True)
 	center_luminostiy = Column(Integer) #in lux
 	edge_luminostiy = Column(Integer) #in lux
