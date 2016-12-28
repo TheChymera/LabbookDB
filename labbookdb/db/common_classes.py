@@ -147,6 +147,20 @@ class Solution(Base):
 
 #behavioural classes:
 
+class Arena(Base):
+	__tablename__ = "arenas"
+	id = Column(Integer, primary_key=True)
+	code = Column(String, unique=True)
+	name = Column(String, unique=True)
+	shape = Column(String) # e.g. "square" or "round"
+	x_dim = Column(Float) # in mm
+	y_dim = Column(Float) # in mm
+	z_dim = Column(Float) # in mm
+	wall_color = Column(String)
+
+	measurements = relationship("Measurement")
+
+
 class ForcedSwimTestMeasurement(Measurement):
 	__tablename__ = 'forcedswimtest_measurements'
 	__mapper_args__ = {'polymorphic_identity': 'forcedswimtest'}
@@ -164,12 +178,11 @@ class OpenFieldTestMeasurement(Measurement):
 	__tablename__ = 'openfieldtest_measurements'
 	__mapper_args__ = {'polymorphic_identity': 'openfieldtest§'}
 	id = Column(Integer, ForeignKey('measurements.id'), primary_key=True)
-	arena_shape = Column(String) #"square" or "round"
-	arena_dimension = Column(Integer) #square side or radius (contingent on `arena_shape`) in mmm
 	center_luminostiy = Column(Integer) #in lux
 	edge_luminostiy = Column(Integer) #in lux
 	corner_luminostiy = Column(Integer) #in lux (only if `arena_shape == "square"`)
 
+	arena_id = Column(Integer, ForeignKey('arenas.id'))
 	evaluations = relationship("Evaluation")
 
 #fMRI classes:
