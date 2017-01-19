@@ -74,7 +74,7 @@ class AnimalExternalIdentifier(Base):
 	__tablename__ = "animal_external_identifiers"
 	__mapper_args__ = {'polymorphic_identity': 'animal'}
 	id = Column(Integer, ForeignKey('external_identifiers.id'), primary_key=True)
-	animal_id = Column(Integer, ForeignKey('animal.id'))
+	animal_id = Column(Integer, ForeignKey('animals.id'))
 	animal = relationship("Animal", back_populates="external_identifiers")
 
 class Measurement(Base):
