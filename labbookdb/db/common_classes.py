@@ -66,7 +66,7 @@ class ExternalIdentifier(Base):
 
 	type = Column(String(50))
 	__mapper_args__ = {
-		'polymorphic_identity': 'measurement',
+		'polymorphic_identity': 'external_identifier',
 		'polymorphic_on': type
 		}
 
