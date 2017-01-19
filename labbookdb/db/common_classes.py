@@ -62,7 +62,7 @@ class ExternalIdentifier(Base):
 	__tablename__ = "external_identifiers"
 	id = Column(Integer, primary_key=True)
 	database = Column(String)
-	identifiers = Column(String)
+	identifier = Column(String)
 
 	type = Column(String(50))
 	__mapper_args__ = {
