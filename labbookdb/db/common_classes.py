@@ -360,8 +360,6 @@ class Animal(Base):
 	__tablename__ = "animals"
 	id = Column(Integer, primary_key=True)
 	external_identifiers = relationship("AnimalExternalIdentifier", back_populates="animal")
-	# id_eth = Column(Integer, unique=True)
-	# id_uzh = Column(String)
 	sex = Column(String)
 	ear_punches = Column(String)
 	maximal_severtity = Column(Integer, default=0)
