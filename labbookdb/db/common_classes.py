@@ -370,7 +370,6 @@ class Animal(Base):
 
 	death_date = Column(DateTime)
 	death_reason = Column(String)
-	weights = relationship("Weight")
 
 	cage_stays = relationship("CageStay", secondary=cage_stay_association, backref="animals")
 
@@ -423,8 +422,8 @@ class Genotype(Base):
 		return "<Genotype(code='%s', construct='%s' zygosity='%s')>"\
 		% (self.code, self.construct, self.zygosity)
 
-class Weight(Measurement):
-	__tablename__ = 'Weight_measurements'
+class WeightMeasurement(Measurement):
+	__tablename__ = 'weight_measurements'
 	__mapper_args__ = {'polymorphic_identity': 'weight'}
 	id = Column(Integer, ForeignKey('measurements.id'), primary_key=True)
 	weight = Column(Float)
