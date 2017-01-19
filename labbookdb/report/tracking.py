@@ -7,6 +7,11 @@ except ValueError:
 	sys.path.append('/home/chymera/src/LabbookDB/labbookdb/db/')
 	import query
 
+def animal_id_table(db_path, id_list, id_column):
+	"""
+	Return the list of animals and the 
+	"""
+
 def further_cages(db_path):
 	"""
 	Returns cage numbers that should be selected for incoming cages.

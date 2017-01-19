@@ -58,17 +58,17 @@ class Protocol(Base):
 		'polymorphic_on': type
 		}
 
-class ExternalIdentifier(Base):
-	__tablename__ = "external_identifiers"
-	id = Column(Integer, primary_key=True)
-	database = Column(String)
-	identifier = Column(String)
-
-	type = Column(String(50))
-	__mapper_args__ = {
-		'polymorphic_identity': 'external_identifier',
-		'polymorphic_on': type
-		}
+# class ExternalIdentifier(Base):
+# 	__tablename__ = "external_identifiers"
+# 	id = Column(Integer, primary_key=True)
+# 	database = Column(String)
+# 	identifier = Column(String)
+#
+# 	type = Column(String(50))
+# 	__mapper_args__ = {
+# 		'polymorphic_identity': 'external_identifier',
+# 		'polymorphic_on': type
+# 		}
 
 class Measurement(Base):
 	__tablename__ = "measurements"
@@ -92,8 +92,9 @@ class Measurement(Base):
 
 class AnimalExternalIdentifier(Base):
 	__tablename__ = "animal_external_identifiers"
-	__mapper_args__ = {'polymorphic_identity': 'animal'}
-	id = Column(Integer, ForeignKey('external_identifiers.id'), primary_key=True, autoincrement=True)
+	id = Column(Integer, primary_key=True)
+	database = Column(String)
+	identifier = Column(String)
 	animal_id = Column(Integer, ForeignKey('animals.id'))
 	animal = relationship("Animal", back_populates="external_ids")
 
