@@ -96,7 +96,7 @@ class AnimalExternalIdentifier(Base):
 	database = Column(String)
 	identifier = Column(String)
 	animal_id = Column(Integer, ForeignKey('animals.id'))
-	# animal = relationship("Animal", back_populates="external_ids")
+	animal = relationship("Animal", back_populates="external_ids")
 
 class Evaluation(Base):
 	__tablename__ = "evaluations"
@@ -372,7 +372,7 @@ class Animal(Base):
 
 	cage_stays = relationship("CageStay", secondary=cage_stay_association, backref="animals")
 
-	external_ids = relationship("AnimalExternalIdentifier")
+	external_ids = relationship("AnimalExternalIdentifier", back_populates="animal")
 	measurements = relationship("Measurement")
 
 	genotypes = relationship("Genotype", secondary=genotype_association, backref="animals")
