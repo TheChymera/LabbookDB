@@ -52,7 +52,7 @@ allowed_classes = {
 	"Solution": Solution,
 	"Treatment": Treatment,
 	"TreatmentProtocol": TreatmentProtocol,
-	"Weight": Weight,
+	"WeightMeasurement": WeightMeasurement,
 	}
 
 def instructions(kind):
