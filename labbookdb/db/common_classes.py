@@ -58,6 +58,24 @@ class Protocol(Base):
 		'polymorphic_on': type
 		}
 
+class ExternalIdentifier(Base):
+	__tablename__ = "external_identifiers"
+	id = Column(Integer, primary_key=True)
+	database = Column(String)
+	identifiers = Column(String)
+
+	type = Column(String(50))
+	__mapper_args__ = {
+		'polymorphic_identity': 'measurement',
+		'polymorphic_on': type
+		}
+
+class AnimalExternalIdentifier(Base):
+	__tablename__ = "animal_external_identifiers"
+	__mapper_args__ = {'polymorphic_identity': 'animal'}
+	animal_id = Column(Integer, ForeignKey('animal.id'))
+	animal = relationship("Animal", back_populates="external_identifiers")
+
 class Measurement(Base):
 	__tablename__ = "measurements"
 	id = Column(Integer, primary_key=True)
@@ -341,8 +359,9 @@ class Treatment(Base):
 class Animal(Base):
 	__tablename__ = "animals"
 	id = Column(Integer, primary_key=True)
-	id_eth = Column(Integer, unique=True)
-	id_uzh = Column(String)
+	external_identifiers = relationship("AnimalExternalIdentifier", back_populates="animal")
+	# id_eth = Column(Integer, unique=True)
+	# id_uzh = Column(String)
 	sex = Column(String)
 	ear_punches = Column(String)
 	maximal_severtity = Column(Integer, default=0)
