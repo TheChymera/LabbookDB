@@ -19,6 +19,7 @@ except (ValueError, SystemError):
 
 allowed_classes = {
 	"Animal": Animal,
+	"AnimalExternalIdentifier": AnimalExternalIdentifier,
 	"Arena": Arena,
 	"Cage": Cage,
 	"CageStay": CageStay,
