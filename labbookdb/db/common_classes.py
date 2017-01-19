@@ -95,8 +95,7 @@ class AnimalExternalIdentifier(Base):
 	__mapper_args__ = {'polymorphic_identity': 'animal'}
 	id = Column(Integer, ForeignKey('external_identifiers.id'), primary_key=True)
 	animal_id = Column(Integer, ForeignKey('animals.id'))
-	animal = relationship("Animal", back_populates="external_identifiers")
-
+	animal = relationship("Animal", back_populates="external_ids")
 
 class Evaluation(Base):
 	__tablename__ = "evaluations"
@@ -361,7 +360,7 @@ class Treatment(Base):
 class Animal(Base):
 	__tablename__ = "animals"
 	id = Column(Integer, primary_key=True)
-	external_identifiers = relationship("AnimalExternalIdentifier", back_populates="animal")
+	external_ids = relationship("AnimalExternalIdentifier", back_populates="animal")
 	sex = Column(String)
 	ear_punches = Column(String)
 	maximal_severtity = Column(Integer, default=0)
