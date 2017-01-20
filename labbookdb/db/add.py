@@ -45,13 +45,22 @@ def get_related_ids(session, engine, parameters):
 	sql_query=session.query(allowed_classes[category])
 	for field_value in parameters.split(":",1)[1].split("&&"):
 		field, value = field_value.split(".",1)
+		# this unpacks one level of AND separators.
+		# we use this so that "Animal:external_ids.AnimalExternalIdentifier:database.ETH/AIC/cdb&#&identifier.275511" will look for both the database and the identifier attributes in the AnimalExternalIdentifier class.
+		# if we use "Animal:external_ids.AnimalExternalIdentifier:database.ETH/AIC/cdb&#&identifier.275511" that will look for the database attribute on the AnimalExternalIdentifier class, and for the identifier attribute on the Animal class.
+		if "&#&" in value:
+			value=value.replace("&#&", "&&")
 		if ":" in value:
-			values = get_related_ids(session, engine, value)
+			values, objects = get_related_ids(session, engine, value)
 			for value in values:
 				value=int(value) # the value is returned as a numpy object
 				if field[-4:] == "date": # support for date entry matching (the values have to be passes as string but matched as datetime)
 					value = datetime(*[int(i) for i in value.split(",")])
-				sql_query = sql_query.filter(getattr(allowed_classes[category], field)==value)
+				# we are generally looking to match values, but sometimes the parent table does not have an id column, but only a relationship column (e.g. in one to many relationships)
+				try:
+					sql_query = sql_query.filter(getattr(allowed_classes[category], field)==value)
+				except sqlalchemy.exc.InvalidRequestError:
+					sql_query = sql_query.filter(getattr(allowed_classes[category], field).contains(*[i for i in objects]))
 		else:
 			if field[-4:] == "date": # support for date entry matching (the values have to be passes as string but matched as datetime)
 				value = datetime(*[int(i) for i in value.split(",")])
@@ -65,7 +74,7 @@ def get_related_ids(session, engine, parameters):
 		raise BaseException("No entry was found with a value of \""+str(value)+"\" on the \""+field+"\" column of the \""+category+"\" CATEGORY, in the database.")
 	session.close()
 	engine.dispose()
-	return input_values
+	return input_values, sql_query
 
 def update_parameter(db_path, entry_identification, parameters):
 	"""Assigns a value to a givn parameter of a given entry
@@ -77,14 +86,14 @@ def update_parameter(db_path, entry_identification, parameters):
 	session, engine = loadSession(db_path)
 
 	entry_class = allowed_classes[entry_identification.split(":")[0]]
-	my_id = get_related_ids(session, engine, entry_identification)[0]
+	my_id = get_related_ids(session, engine, entry_identification)[0][0]
 
 	myobject = session.query(entry_class).filter(entry_class.id == my_id)[0]
 
 	for parameter_key in parameters:
 		related_entries = getattr(myobject, parameter_key)
 		for parameter_expression in parameters[parameter_key]:
-			related_entry_ids = get_related_ids(session, engine, parameter_expression)
+			related_entry_ids, _ = get_related_ids(session, engine, parameter_expression)
 			related_entry_class = allowed_classes[parameter_expression.split(":")[0]]
 			for related_entry_id in related_entry_ids:
 				related_entry = session.query(related_entry_class).filter(related_entry_class.id == related_entry_id)[0]
@@ -115,7 +124,7 @@ def add_generic(db_path, parameters, walkthrough=False, session=None, engine=Non
 			parameters[key] = datetime(*[int(i) for i in parameters[key].split(",")])
 		if key[-3:] == "_id" and not isinstance(parameters[key], int):
 			try:
-				input_values = get_related_ids(session, engine, parameters[key])
+				input_values, _ = get_related_ids(session, engine, parameters[key])
 			except ValueError:
 				instructions("table_identifier")
 			for input_value in input_values:
@@ -129,7 +138,7 @@ def add_generic(db_path, parameters, walkthrough=False, session=None, engine=Non
 					related_entry, _ = add_generic(db_path, related_entry, session=session, engine=engine)
 					related_entries.append(related_entry)
 				elif isinstance(related_entry, str):
-					my_id = get_related_ids(session, engine, related_entry)[0]
+					my_id = get_related_ids(session, engine, related_entry)[0][0]
 					entry_class = allowed_classes[related_entry.split(":")[0]]
 					related_entry = session.query(entry_class).\
 						filter(entry_class.id == my_id).all()[0]
