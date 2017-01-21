@@ -49,8 +49,9 @@ def get_related_ids(session, engine, parameters):
 		# this unpacks one level of AND separators.
 		# we use this so that "Animal:external_ids.AnimalExternalIdentifier:database.ETH/AIC/cdb&#&identifier.275511" will look for both the database and the identifier attributes in the AnimalExternalIdentifier class.
 		# if we use "Animal:external_ids.AnimalExternalIdentifier:database.ETH/AIC/cdb&#&identifier.275511" that will look for the database attribute on the AnimalExternalIdentifier class, and for the identifier attribute on the Animal class.
-		if "&#&" in value:
+		if "&#&" in value or "&##&" in value:
 			value=value.replace("&#&", "&&")
+			value=value.replace("&##&", "&#&")
 		if ":" in value:
 			values, objects = get_related_ids(session, engine, value)
 			for value in values:
@@ -158,7 +159,6 @@ def add_generic(db_path, parameters, walkthrough=False, session=None, engine=Non
 		session.close()
 		engine.dispose()
 	return myobject, object_id
-
 
 def commit_and_close(session, engine):
 	try:
