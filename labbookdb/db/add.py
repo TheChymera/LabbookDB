@@ -22,7 +22,8 @@ except ValueError:
 def loadSession(db_path):
 	db_path = "sqlite:///" + path.expanduser(db_path)
 	engine = create_engine(db_path, echo=False)
-	Session = sessionmaker(bind=engine)
+	#it is very important that `autoflush == False`, otherwise if "treatments" or "measurements" entried precede "external_ids" the latter will insert a null on the animal_id column
+	Session = sessionmaker(bind=engine, autoflush=False)
 	session = Session()
 	Base.metadata.create_all(engine)
 	return session, engine
@@ -65,11 +66,12 @@ def get_related_ids(session, engine, parameters):
 			if field[-4:] == "date": # support for date entry matching (the values have to be passes as string but matched as datetime)
 				value = datetime(*[int(i) for i in value.split(",")])
 			sql_query = sql_query.filter(getattr(allowed_classes[category], field)==value)
-	mystring = sql_query.statement
+	mystring = sql_query.with_labels().statement
 	mydf = pd.read_sql_query(mystring,engine)
-	mydf = mydf.T.groupby(level=0).first().T #awkward hack to deal with polymorphic tables returning multiple IDs
-	related_table_ids = mydf["id"]
+	category_tablename = allowed_classes[category].__table__.name
+	related_table_ids = mydf[category_tablename+"_id"]
 	input_values = list(related_table_ids)
+	input_values = [int(i) for i in input_values]
 	if input_values == []:
 		raise BaseException("No entry was found with a value of \""+str(value)+"\" on the \""+field+"\" column of the \""+category+"\" CATEGORY, in the database.")
 	session.close()
@@ -119,7 +121,7 @@ def add_generic(db_path, parameters, walkthrough=False, session=None, engine=Non
 	parameters.pop("CATEGORY", None)
 
 	myobject = category_class()
-	for key in parameters:
+	for key, _ in sorted(parameters.items()):
 		if key[-4:] == "date":
 			parameters[key] = datetime(*[int(i) for i in parameters[key].split(",")])
 		if key[-3:] == "_id" and not isinstance(parameters[key], int):
@@ -129,6 +131,7 @@ def add_generic(db_path, parameters, walkthrough=False, session=None, engine=Non
 				instructions("table_identifier")
 			for input_value in input_values:
 				input_value = int(input_value)
+				print("Setting", myobject.__class__.__name__+"'s",key,"attribute to",input_value)
 				setattr(myobject, key, input_value)
 		#this triggers on-the-fly related entry creation:
 		elif isinstance(parameters[key], list):
@@ -144,16 +147,11 @@ def add_generic(db_path, parameters, walkthrough=False, session=None, engine=Non
 						filter(entry_class.id == my_id).all()[0]
 					related_entries.append(related_entry)
 			session.add(myobject) # voodoo (imho) fix for the weird errors about myobject not being attached to a Session
+			print("Setting", myobject.__class__.__name__+"'s",key,"attribute to",related_entries)
 			setattr(myobject, key, related_entries)
 		else:
+			print("Setting", myobject.__class__.__name__+"'s",key,"attribute to",parameters[key])
 			setattr(myobject, key, parameters[key])
-			# Walkthrough Legacy Code:
-		# myobject = category_class()
-		# for key in filtered_attributes:
-		# 	if key == "id":
-		# 		continue
-		# 	value = raw_input("Enter your desired \""+key+"\" value:").decode(sys.stdin.encoding)
-		# 	setattr(myobject, key, value)
 
 	object_id = add_to_db(session, engine, myobject)
 	if close:
