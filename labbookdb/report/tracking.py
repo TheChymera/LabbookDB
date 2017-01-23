@@ -1,3 +1,6 @@
+import os
+import pandas as pd
+
 import selection
 
 try:
@@ -7,10 +10,31 @@ except ValueError:
 	sys.path.append('/home/chymera/src/LabbookDB/labbookdb/db/')
 	import query
 
-def animal_id_table(db_path, id_list, id_column):
+def animal_id_table(db_path,
+	save_as=None,
+	):
 	"""
-	Return the list of animals and the 
+	Return the list of animals and the
 	"""
+	df = selection.data_selection(db_path, "animal ids")
+	df = df.sort_values('Animal_death_date', ascending=False)
+	df.Animal_death_date = df.groupby('AnimalExternalIdentifier_animal_id', sort=False)['Animal_death_date'].ffill()
+	df = df.set_index(['Animal_death_date','AnimalExternalIdentifier_animal_id', 'AnimalExternalIdentifier_database'])['AnimalExternalIdentifier_identifier'].unstack().reset_index()
+	df.set_index('AnimalExternalIdentifier_animal_id', inplace=True)
+	df = df.rename_axis(None, axis=1)
+	df = df.sort_index(ascending=False)
+
+	# piv = df.pivot_table(index=['AnimalExternalIdentifier_animal_id'], columns=['AnimalExternalIdentifier_database'])
+	# print(piv.columns)
+	# piv = piv['AnimalExternalIdentifier_identifier']
+	# piv.join(df.groupby('AnimalExternalIdentifier_animal_id')['Animal_death_date'].first()).reset_index().rename_axis([None], axis=1)
+	# print(piv)
+
+	if save_as:
+		df.to_html(os.path.abspath(os.path.expanduser(save_as)), col_space=300)
+	else:
+		print(df)
+		print(df.columns)
 
 def further_cages(db_path):
 	"""

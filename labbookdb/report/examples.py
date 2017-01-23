@@ -9,23 +9,7 @@ from behaviopy import plotting
 import matplotlib.pyplot as plt
 import behaviour
 import selection
-
-def get_animal_id_table(db_path,
-	save_as=None,
-	):
-	import pandas as pd
-	import os
-	table = selection.data_selection(db_path, "animal ids")
-	# print(table)
-	table = table.pivot(index="AnimalExternalIdentifier_animal_id", columns='AnimalExternalIdentifier_database',)
-	# table = table.pivot(index="AnimalExternalIdentifier_animal_id", columns='AnimalExternalIdentifier_database', values="AnimalExternalIdentifier_identifier","Animal_death_date")
-	if save_as:
-		table.to_html(os.path.abspath(os.path.expanduser(save_as)))
-	else:
-		# print(table.loc[:,[u'Animal_death_date',"ETH/AIC/cdb"]])
-		# print(table[[u'Animal_death_date',u"AnimalExternalIdentifier_identifier"]])
-		print(table)
-		print(table.columns)
+import tracking
 
 if __name__ == '__main__':
 	db_path="~/syncdata/meta.db"
@@ -37,5 +21,5 @@ if __name__ == '__main__':
 	# forced_swim(db_path, "tsplot", treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5"], period_label="interval [2 min]")
 	# plt.show()
 	# print(table)
-	get_animal_id_table(db_path)
-	# get_animal_id_table(db_path,"~/animals.html")
+	# tracking.animal_id_table(db_path)
+	tracking.animal_id_table(db_path,"~/animals.html")
