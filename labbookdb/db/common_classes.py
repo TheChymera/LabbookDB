@@ -401,7 +401,7 @@ class Animal(Base):
 		"cages:\t\t{cages}\n"
 		"treatments:\t{treatments}\n"
 		"measurements:\t{measurements}\n"
-		"\
+		""\
 		.format(id=self.id, sex=self.sex, ep=self.ear_punches,
 		bd=self.birth_date,
 		dd=self.death_date, dr=self.death_reason,
