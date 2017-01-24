@@ -87,6 +87,10 @@ class Measurement(Base):
 		'polymorphic_on': type
 		}
 
+	def __str__(self):
+		return "Measurement(date: {date}, type: {type})"\
+		.format(date=self.date, type=self.type)
+
 #general classes:
 
 class AnimalExternalIdentifier(Base):
@@ -227,6 +231,10 @@ class FMRIMeasurement(Measurement):
 
 	laser_stimulation_id = Column(Integer, ForeignKey('laser_stimulation_protocols.id'))
 	laser_stimulation = relationship("LaserStimulationProtocol")
+
+	def __str__(self):
+		return "FMRIMeasurement(temperature: {tm}, response_diagnostic: {rd})"\
+		.format(tm=self.temperature, rd=self.response_diagnostic)
 
 class FMRIAnimalPreparationProtocol(Protocol):
 	__tablename__ = 'fmri_animal_preparation_protocols'
@@ -386,19 +394,20 @@ class Animal(Base):
 		% (self.id, [self.genotypes[i].construct+" "+self.genotypes[i].zygosity for i in range(len(self.genotypes))], self.sex, self.ear_punches,[self.treatments[i].protocol.solution for i in range(len(self.treatments))])
 	def __str__(self):
 		return "Animal(id: {id}, sex: {sex}, ear_punches: {ep}):\n\
-		birth_date: {bd}\n\
-		death_date: {dd}\t(death_reason: {dr})\n\
+		birth_date:\t{bd}\n\
+		death_date:\t{dd}\t(death_reason: {dr})\n\
 		external_ids:\t{eids}\n\
 		genotypes:\t{genotypes}\n\
-		cages:\t{cages}\n\
+		cages:\t\t{cages}\n\
 		treatments:\t{treatments}\n\
+		measurements:\t{measurements}\n\
 		"\
 		.format(id=self.id, sex=self.sex, ep=self.ear_punches,
 		bd=self.birth_date,
 		dd=self.death_date, dr=self.death_reason,
 		eids=", ".join([self.external_ids[i].identifier+"("+self.external_ids[i].database+")" for i in range(len(self.external_ids))]),
 		genotypes=", ".join([self.genotypes[i].construct+"("+self.genotypes[i].zygosity+")" for i in range(len(self.genotypes))]),
-		treatments=[self.treatments[i].protocol.solution for i in range(len(self.treatments))],
+		treatments=", ".join([self.treatments[i].protocol.solution for i in range(len(self.treatments))]),
 		cages=", ".join([str(self.cage_stays[i].cage_id)+"("+str(self.cage_stays[i].start_date)+" - "+str(self.cage_stays[i].start_date)+")" for i in range(len(self.cage_stays))]),
 		)
 
