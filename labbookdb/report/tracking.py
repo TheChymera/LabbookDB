@@ -4,7 +4,7 @@ import pandas as pd
 import selection
 
 try:
-	from .db import query
+	from ..db import query
 except ValueError:
 	import sys
 	sys.path.append('/home/chymera/src/LabbookDB/labbookdb/db/')
