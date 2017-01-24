@@ -406,7 +406,7 @@ class Animal(Base):
 		dd=self.death_date, dr=self.death_reason,
 		eids=", ".join([self.external_ids[i].identifier+"("+self.external_ids[i].database+")" for i in range(len(self.external_ids))]),
 		genotypes=", ".join([self.genotypes[i].construct+"("+self.genotypes[i].zygosity+")" for i in range(len(self.genotypes))]),
-		treatments=", ".join([self.treatments[i].protocol.solution for i in range(len(self.treatments))]),
+		treatments=", ".join([self.treatments[i].protocol.solution.name for i in range(len(self.treatments))]),
 		cages=", ".join([str(self.cage_stays[i].cage_id)+"("+str(self.cage_stays[i].start_date)+" - "+str(self.cage_stays[i].start_date)+")" for i in range(len(self.cage_stays))]),
 		measurements="\n\t\t\t".join([self.measurements[i].__str__() for i in range(len(self.measurements))]),
 		)
