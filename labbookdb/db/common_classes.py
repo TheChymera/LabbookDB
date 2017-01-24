@@ -393,15 +393,14 @@ class Animal(Base):
 		return "<Animal(id='%s', genotypes='%s', sex='%s', ear_punches='%s', treatment='%s')>"\
 		% (self.id, [self.genotypes[i].construct+" "+self.genotypes[i].zygosity for i in range(len(self.genotypes))], self.sex, self.ear_punches,[self.treatments[i].protocol.solution for i in range(len(self.treatments))])
 	def __str__(self):
-		return "Animal(id: {id}, sex: {sex}, ear_punches: {ep}):\n"
-		"birth_date:\t{bd}\n"
-		"death_date:\t{dd}\t(death_reason: {dr})\n"
-		"external_ids:\t{eids}\n"
-		"genotypes:\t{genotypes}\n"
-		"cages:\t\t{cages}\n"
-		"treatments:\t{treatments}\n"
-		"measurements:\t{measurements}\n"
-		""\
+		return "Animal(id: {id}, sex: {sex}, ear_punches: {ep}):\n"\
+		"\tbirth_date:\t{bd}\n"\
+		"\tdeath_date:\t{dd}\t(death_reason: {dr})\n"\
+		"\texternal_ids:\t{eids}\n"\
+		"\tgenotypes:\t{genotypes}\n"\
+		"\tcages:\t\t{cages}\n"\
+		"\ttreatments:\t{treatments}\n"\
+		"\tmeasurements:\t{measurements}\n"\
 		.format(id=self.id, sex=self.sex, ep=self.ear_punches,
 		bd=self.birth_date,
 		dd=self.death_date, dr=self.death_reason,
