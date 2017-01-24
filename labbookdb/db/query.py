@@ -9,7 +9,7 @@ import pandas as pd
 from datetime import *
 from sqlalchemy import create_engine, literal, or_, inspection
 from os import path
-from sqlalchemy.orm import sessionmaker, aliased
+from sqlalchemy.orm import sessionmaker, aliased, contains_eager
 import sqlalchemy
 
 try:
@@ -86,17 +86,41 @@ def get_related_id(session, engine, parameters):
 	engine.dispose()
 	return input_values
 
-def simple_query(db_path, category, field, value, mask="", first=True):
+def animal_info(db_path, identifier,
+	database=None,
+	):
+	"""Return the __str__ attribute of an Animal object query filterd by the id column OR by arguments of the external_id objects.
+
+	Parameters
+	----------
+
+	db_path : string
+	Path to a LabbookDB formatted database.
+
+	identifier : int or string
+	The identifier of the animal
+
+	database : string or None, optional
+	If specified gives a constraint on the AnimalExternalIdentifier.database colun AND truns the identifier attribute into a constraint on the AnimalExternalIdentifier.identifier column. If unspecified, the identfier argument is used as a constraint on the Animal.id column.
+	"""
+
 	session, engine = loadSession(db_path)
-	sql_query=session.query(allowed_classes[category]).filter(getattr(allowed_classes[category], field)==value)
-	print(sql_query.all()[0].__repr__)
-	mystring = sql_query.statement
-	mydf = pd.read_sql_query(mystring,engine)
-	if mask:
-		mydf = mydf[mask]
-	if first:
-		mydf = mydf[0]
-	print(mydf)
+	sql_query = session.query(Animal)
+	if database and identifier:
+		sql_query = sql_query.join(Animal.external_ids)\
+		.filter(AnimalExternalIdentifier.database == database).filter(AnimalExternalIdentifier.identifier == identifier)\
+		.options(contains_eager('external_ids'))
+	else:
+		sql_query = sql_query.filter(Animal.id == identifier)
+	try:
+		animal = [i.__str__() for i in sql_query][0]
+	except:
+		if database == None:
+			print("No entry was found with {id} in the Animal.id column of the database located at {loc}.".format(id=identifier,loc=db_path))
+		else:
+			print("No entry was found with {id} in the AnimalExternalIdentifier.identifier column and {db} in the AnimalExternalIdentifier.database column of the database located at {loc}.".format(id=identifier,db=database,loc=db_path))
+	else:
+		print(animal)
 	session.close()
 	engine.dispose()
 
