@@ -11,7 +11,10 @@ setup(
 	classifiers = [],
 	install_requires = [],
 	provides = ["labbookdb"],
-	packages = ["labbookdb",],
+	packages = ["labbookdb",
+		"labbookdb.db",
+		"labbookdb.report",
+		],
 	entry_points = {'console_scripts' : \
 			['LDB = labbookdb.cli:main']
 		}
