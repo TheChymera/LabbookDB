@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import behaviour
 import selection
 import tracking
+import query
 
 if __name__ == '__main__':
 	db_path="~/syncdata/meta.db"
@@ -21,5 +22,4 @@ if __name__ == '__main__':
 	# forced_swim(db_path, "tsplot", treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5"], period_label="interval [2 min]")
 	# plt.show()
 	# print(table)
-	# tracking.animal_id_table(db_path)
-	tracking.animal_id_table(db_path,"~/animals.html")
+	# tracking.animal_id_table(db_path,"~/animals.html")
