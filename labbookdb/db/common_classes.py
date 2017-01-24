@@ -388,7 +388,7 @@ class Animal(Base):
 		return "Animal(id={id}, sex={sex}, ear_punches={ep}):\n\
 				\tgenotypes:\t\t{genotypes}\
 				\ttreatments:\t\t{treatments}\
-				"
+				"\
 			.format(id=self.id, sex=self.sex, ep=self.ear_punches,
 			genotypes="genotypes:\t\t"+"\t\t\t\t\t".join([self.genotypes[i].construct+" "+self.genotypes[i].zygosity for i in range(len(self.genotypes))]),
 			treatments=[self.treatments[i].protocol.solution for i in range(len(self.treatments))],
