@@ -409,7 +409,7 @@ class Animal(Base):
 		genotypes=", ".join([self.genotypes[i].construct+"("+self.genotypes[i].zygosity+")" for i in range(len(self.genotypes))]),
 		treatments=", ".join([self.treatments[i].protocol.solution for i in range(len(self.treatments))]),
 		cages=", ".join([str(self.cage_stays[i].cage_id)+"("+str(self.cage_stays[i].start_date)+" - "+str(self.cage_stays[i].start_date)+")" for i in range(len(self.cage_stays))]),
-		treatments=", ".join([self.measurements[i].__str__() for i in range(len(self.measurements))]),
+		measurements=", ".join([self.measurements[i].__str__() for i in range(len(self.measurements))]),
 		)
 
 class CageStay(Base):
