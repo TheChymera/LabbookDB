@@ -233,8 +233,8 @@ class FMRIMeasurement(Measurement):
 	laser_stimulation = relationship("LaserStimulationProtocol")
 
 	def __str__(self):
-		return "FMRIMeasurement(temperature: {tm}, response_diagnostic: {rd})"\
-		.format(tm=self.temperature, rd=self.response_diagnostic)
+		return "FMRIMeasurement(date: {date}, temperature: {tm}, response_diagnostic: {rd})"\
+		.format(date=self.date, tm=self.temperature, rd=self.response_diagnostic)
 
 class FMRIAnimalPreparationProtocol(Protocol):
 	__tablename__ = 'fmri_animal_preparation_protocols'
@@ -409,7 +409,7 @@ class Animal(Base):
 		genotypes=", ".join([self.genotypes[i].construct+"("+self.genotypes[i].zygosity+")" for i in range(len(self.genotypes))]),
 		treatments=", ".join([self.treatments[i].protocol.solution for i in range(len(self.treatments))]),
 		cages=", ".join([str(self.cage_stays[i].cage_id)+"("+str(self.cage_stays[i].start_date)+" - "+str(self.cage_stays[i].start_date)+")" for i in range(len(self.cage_stays))]),
-		measurements=", ".join([self.measurements[i].__str__() for i in range(len(self.measurements))]),
+		measurements="\n\t\t\t\t".join([self.measurements[i].__str__() for i in range(len(self.measurements))]),
 		)
 
 class CageStay(Base):
@@ -454,6 +454,9 @@ class WeightMeasurement(Measurement):
 	weight = Column(Float)
 	weight_unit_id = Column(Integer, ForeignKey('measurement_units.id'))
 	weight_unit = relationship("MeasurementUnit", foreign_keys=[weight_unit_id])
+	def __str__(self):
+		return "WeightMeasurement(date: {date}, weight: {w}{wu})"\
+		.format(date=self.date, w=self.weight, wu=self.weight_unit.code)
 
 class Biopsy(Base):
 	__tablename__ = "biopsies"
