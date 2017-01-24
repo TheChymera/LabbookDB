@@ -385,16 +385,16 @@ class Animal(Base):
 		return "<Animal(id='%s', genotypes='%s', sex='%s', ear_punches='%s', treatment='%s')>"\
 		% (self.id, [self.genotypes[i].construct+" "+self.genotypes[i].zygosity for i in range(len(self.genotypes))], self.sex, self.ear_punches,[self.treatments[i].protocol.solution for i in range(len(self.treatments))])
 	def __str__(self):
-		return "Animal(id={id}, sex={sex}, ear_punches={ep}):\n\
-				external IDs:\t{eids}\n\
-				genotypes:\t{genotypes}\n\
-				treatments:\t{treatments}\n\
-				"\
-			.format(id=self.id, sex=self.sex, ep=self.ear_punches,
-			eids=", ".join([self.external_ids[i].identifier+"("+self.external_ids[i].database+")" for i in range(len(self.external_ids))]),
-			genotypes=", ".join([self.genotypes[i].construct+"("+self.genotypes[i].zygosity+")" for i in range(len(self.genotypes))]),
-			treatments=[self.treatments[i].protocol.solution for i in range(len(self.treatments))],
-			)
+		return "Animal(id: {id}, sex: {sex}, ear_punches: {ep}, birth_date: {bd}, death_date: {dd}, death_reason: {dr}):\n\
+		external_ids:\t{eids}\n\
+		genotypes:\t{genotypes}\n\
+		treatments:\t{treatments}\n\
+		"\
+		.format(id=self.id, sex=self.sex, ep=self.ear_punches, bd=self.birth_date, dd=self.death_date, dr=self.death_reason,
+		eids=", ".join([self.external_ids[i].identifier+"("+self.external_ids[i].database+")" for i in range(len(self.external_ids))]),
+		genotypes=", ".join([self.genotypes[i].construct+"("+self.genotypes[i].zygosity+")" for i in range(len(self.genotypes))]),
+		treatments=[self.treatments[i].protocol.solution for i in range(len(self.treatments))],
+		)
 
 class CageStay(Base):
 	__tablename__ = "cage_stays"
