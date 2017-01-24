@@ -386,11 +386,13 @@ class Animal(Base):
 		% (self.id, [self.genotypes[i].construct+" "+self.genotypes[i].zygosity for i in range(len(self.genotypes))], self.sex, self.ear_punches,[self.treatments[i].protocol.solution for i in range(len(self.treatments))])
 	def __str__(self):
 		return "Animal(id={id}, sex={sex}, ear_punches={ep}):\n\
-				\tgenotypes:\t{genotypes}\n\
-				\ttreatments:\t{treatments}\n\
+				external IDs:\t{eids}\n\
+				genotypes:\t{genotypes}\n\
+				treatments:\t{treatments}\n\
 				"\
 			.format(id=self.id, sex=self.sex, ep=self.ear_punches,
-			genotypes="\n\t\t\t".join([self.genotypes[i].construct+" "+self.genotypes[i].zygosity for i in range(len(self.genotypes))]),
+			eids=", ".join([self.external_ids[i].identifier+"("+self.external_ids[i].database+")" for i in range(len(self.external_ids))]),
+			genotypes=", ".join([self.genotypes[i].construct+"("+self.genotypes[i].zygosity+")" for i in range(len(self.genotypes))]),
 			treatments=[self.treatments[i].protocol.solution for i in range(len(self.treatments))],
 			)
 
