@@ -395,7 +395,7 @@ class Animal(Base):
 	def __str__(self):
 		return "Animal(id: {id}, sex: {sex}, ear_punches: {ep}):\n"\
 		"\tbirth_date:\t{bd}\n"\
-		"\tdeath_date:\t{dd}\t(death_reason: {dr})\n"\
+		"\tdeath_date:\t{dd}\t(projected/death_reason: {dr})\n"\
 		"\texternal_ids:\t{eids}\n"\
 		"\tgenotypes:\t{genotypes}\n"\
 		"\tcages:\t\t{cages}\n"\
@@ -408,7 +408,7 @@ class Animal(Base):
 		genotypes=", ".join([self.genotypes[i].construct+"("+self.genotypes[i].zygosity+")" for i in range(len(self.genotypes))]),
 		treatments=", ".join([self.treatments[i].protocol.solution for i in range(len(self.treatments))]),
 		cages=", ".join([str(self.cage_stays[i].cage_id)+"("+str(self.cage_stays[i].start_date)+" - "+str(self.cage_stays[i].start_date)+")" for i in range(len(self.cage_stays))]),
-		measurements="\n\t\t\t\t".join([self.measurements[i].__str__() for i in range(len(self.measurements))]),
+		measurements="\n\t\t\t".join([self.measurements[i].__str__() for i in range(len(self.measurements))]),
 		)
 
 class CageStay(Base):
