@@ -33,7 +33,7 @@ def animal_id_table(db_path,
 	df = df.sort_index(ascending=False)
 
 	if save_as:
-		df.to_html(os.path.abspath(os.path.expanduser(save_as+".html"), col_space=300)
+		df.to_html(os.path.abspath(os.path.expanduser(save_as+".html"), col_space=300))
 	else:
 		print(df)
 		print(df.columns)
