@@ -14,8 +14,18 @@ def animal_id_table(db_path,
 	save_as=None,
 	):
 	"""
-	Return the list of animals and the
+	Extract list of animal IDs and their death dates and eithe rprint it to screen or save it as an HTML file.
+
+	Parameters
+	----------
+
+	db_path : string
+	Path to the database file to query.
+
+	save_as : string or None, optional
+	Path under which to save the HTML report (".html" is automatically appended). If None, the report is printed to the terminal.
 	"""
+
 	df = selection.data_selection(db_path, "animal ids")
 
 	df = df.set_index(['AnimalExternalIdentifier_animal_id', 'AnimalExternalIdentifier_database'])['AnimalExternalIdentifier_identifier'].unstack(1).join(df.groupby('AnimalExternalIdentifier_animal_id')['Animal_death_date'].first()).reset_index()
@@ -23,10 +33,11 @@ def animal_id_table(db_path,
 	df = df.sort_index(ascending=False)
 
 	if save_as:
-		df.to_html(os.path.abspath(os.path.expanduser(save_as)), col_space=300)
+		df.to_html(os.path.abspath(os.path.expanduser(save_as+".html"), col_space=300)
 	else:
 		print(df)
 		print(df.columns)
+	return
 
 def further_cages(db_path):
 	"""
