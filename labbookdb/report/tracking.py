@@ -1,7 +1,10 @@
 import os
 import pandas as pd
 
-import selection
+try:
+	from selection import data_selection
+except ImportError:
+	from .selection import data_selection
 
 try:
 	from ..db import query
@@ -26,7 +29,7 @@ def animal_id_table(db_path,
 	Path under which to save the HTML report (".html" is automatically appended). If None, the report is printed to the terminal.
 	"""
 
-	df = selection.data_selection(db_path, "animal ids")
+	df = data_selection(db_path, "animal ids")
 
 	df = df.set_index(['AnimalExternalIdentifier_animal_id', 'AnimalExternalIdentifier_database'])['AnimalExternalIdentifier_identifier'].unstack(1).join(df.groupby('AnimalExternalIdentifier_animal_id')['Animal_death_date'].first()).reset_index()
 	df.set_index('AnimalExternalIdentifier_animal_id', inplace=True)
@@ -47,7 +50,7 @@ def further_cages(db_path):
 	db_path -- path to database file to query (needs to be protocolizer-style)
 	"""
 
-	df = selection.data_selection(db_path, "cage list")
+	df = data_selection(db_path, "cage list")
 
 	cages = df["Cage_id"].dropna().tolist()
 	cages = list(set([int(i) for i in cages]))
