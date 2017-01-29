@@ -8,7 +8,7 @@ except ImportError:
 
 try:
 	from ..db import query
-except ValueError:
+except (ValueError, SystemError):
 	import sys
 	sys.path.append('/home/chymera/src/LabbookDB/labbookdb/db/')
 	import query
