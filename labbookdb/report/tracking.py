@@ -59,7 +59,6 @@ def animals_info(db_path,
 	"""
 
 	df = data_selection(db_path, "animals info")
-	print(df.columns)
 
 	aggregation_dict = {
 		'Animal_death_date' : lambda x: ', '.join(set([str(i) for i in x])),
