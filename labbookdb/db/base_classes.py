@@ -97,6 +97,10 @@ class Protocol(Base):
 		'polymorphic_on': type
 		}
 
+	def __str__(self):
+		return "Protocol(code: {code})"\
+		.format(code=self.code)
+
 class Measurement(Base):
 	__tablename__ = "measurements"
 	id = Column(Integer, primary_key=True)

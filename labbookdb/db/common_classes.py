@@ -252,6 +252,10 @@ class Treatment(Base):
 	protocol_id = Column(Integer, ForeignKey('treatment_protocols.id'))
 	protocol = relationship('TreatmentProtocol')
 
+	def __str__(self):
+		return "Treatment(start: {start_date}, end: {end_date}, protocol: {protocol})"\
+		.format(start_date=self.start_date, end_date=self.end_date, protocol=self.protocol)
+
 #animal classes:
 
 class Animal(Base):
@@ -275,7 +279,6 @@ class Animal(Base):
 	treatments = relationship("Treatment", secondary=treatment_animal_association, backref="animals")
 
 	observations = relationship("Observation")
-	uncategorized_treatments = relationship("UncategorizedTreatment")
 
 	biopsies = relationship("Biopsy", backref="animal")
 
