@@ -112,6 +112,8 @@ def animal_info(db_path, identifier,
 		.options(contains_eager('external_ids'))
 	else:
 		sql_query = sql_query.filter(Animal.id == identifier)
+
+	animal = [i.__str__() for i in sql_query][0]
 	try:
 		animal = [i.__str__() for i in sql_query][0]
 	except:

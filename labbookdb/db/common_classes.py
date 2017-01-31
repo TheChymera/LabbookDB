@@ -147,8 +147,13 @@ class FMRIMeasurement(Measurement):
 	laser_stimulation = relationship("LaserStimulationProtocol")
 
 	def __str__(self):
-		return "FMRIMeasurement(date: {date}, temperature: {tm}, response_diagnostic: {rd})"\
-		.format(date=self.date, tm=self.temperature, rd=self.response_diagnostic)
+		template = "fMRI({date}"
+		if self.temperature:
+			template += ", temp: {temp}"
+		if any(["failed to indicate response to stimulus" in self.irregularities[i].description for i in range(len(self.irregularities))]):
+			template += ", NONRESPONDENT"
+		template += ")"
+		return template.format(date=dt_format(self.date), temp=self.temperature)
 
 class FMRIAnimalPreparationProtocol(Protocol):
 	__tablename__ = 'fmri_animal_preparation_protocols'
@@ -253,8 +258,8 @@ class Treatment(Base):
 	protocol = relationship('TreatmentProtocol')
 
 	def __str__(self):
-		return "Treatment(start: {start_date}, end: {end_date}, protocol: {protocol})"\
-		.format(start_date=self.start_date, end_date=self.end_date, protocol=self.protocol)
+		return "protocol {protocol_code}, {start_date} - {end_date}"\
+		.format(start_date=dt_format(self.start_date), end_date=dt_format(self.end_date), protocol_code=self.protocol.code)
 
 #animal classes:
 
@@ -287,20 +292,20 @@ class Animal(Base):
 		% (self.id, [self.genotypes[i].construct+" "+self.genotypes[i].zygosity for i in range(len(self.genotypes))], self.sex, self.ear_punches,[self.treatments[i].protocol.solution for i in range(len(self.treatments))])
 	def __str__(self):
 		return "Animal(id: {id}, sex: {sex}, ear_punches: {ep}):\n"\
-		"\tbirth_date:\t{bd}\n"\
-		"\tdeath_date:\t{dd}\t(projected/death_reason: {dr})\n"\
+		"\tbirth:\t{bd}\n"\
+		"\tdeath:\t{dd}\t(projected/death_reason: {dr})\n"\
 		"\texternal_ids:\t{eids}\n"\
 		"\tgenotypes:\t{genotypes}\n"\
-		"\tcages:\t\t{cages}\n"\
+		"\tcage_stays:\t{cage_stays}\n"\
 		"\ttreatments:\t{treatments}\n"\
 		"\tmeasurements:\t{measurements}\n"\
 		.format(id=self.id, sex=self.sex, ep=self.ear_punches,
-		bd=self.birth_date,
-		dd=self.death_date, dr=self.death_reason,
+		bd=dt_format(self.birth_date),
+		dd=dt_format(self.death_date), dr=self.death_reason,
 		eids=", ".join([self.external_ids[i].identifier+"("+self.external_ids[i].database+")" for i in range(len(self.external_ids))]),
 		genotypes=", ".join([self.genotypes[i].construct+"("+self.genotypes[i].zygosity+")" for i in range(len(self.genotypes))]),
-		treatments=", ".join([self.treatments[i].protocol.solution.name for i in range(len(self.treatments))]),
-		cages=", ".join([str(self.cage_stays[i].cage_id)+"("+str(self.cage_stays[i].start_date)+" - "+str(self.cage_stays[i].start_date)+")" for i in range(len(self.cage_stays))]),
+		treatments="\n\t\t\t".join([self.treatments[i].__str__() for i in range(len(self.treatments))]),
+		cage_stays="\n\t\t\t".join([self.cage_stays[i].__str__() for i in range(len(self.cage_stays))]),
 		measurements="\n\t\t\t".join([self.measurements[i].__str__() for i in range(len(self.measurements))]),
 		)
 
@@ -315,6 +320,10 @@ class CageStay(Base):
 	cage = relationship("Cage", back_populates="stays")
 
 	single_caged = Column(String) #if singel caged, state reason
+
+	def __str__(self):
+		return "cage {cage_id}, {start_date} - {end_date}"\
+		.format(cage_id=self.cage_id, start_date=dt_format(self.start_date), end_date=dt_format(self.end_date))
 
 class Cage(Base):
 	__tablename__ = "cages"
@@ -334,8 +343,9 @@ class WeightMeasurement(Measurement):
 	weight = Column(Float)
 	weight_unit_id = Column(Integer, ForeignKey('measurement_units.id'))
 	weight_unit = relationship("MeasurementUnit", foreign_keys=[weight_unit_id])
+
 	def __str__(self):
-		return "WeightMeasurement(date: {date}, weight: {w}{wu})"\
+		return "Weight({date}, weight: {w}{wu})"\
 		.format(date=self.date, w=self.weight, wu=self.weight_unit.code)
 
 class BrainBiopsy(Biopsy):

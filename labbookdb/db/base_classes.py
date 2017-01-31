@@ -1,7 +1,16 @@
+import datetime
 from sqlalchemy import Column, Integer, String, Sequence, Table, ForeignKey, Float, DateTime, Boolean, ForeignKeyConstraint
 from sqlalchemy.orm import validates, backref, relationship
 from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
+
+def dt_format(dt):
+	if not dt:
+		return "ONGOING"
+	elif dt.time()==datetime.time(0,0,0):
+		return dt.date()
+	else:
+		return dt
 
 authors_association = Table('authors_associations', Base.metadata,
 	Column('protocols_id', Integer, ForeignKey('protocols.id')),
@@ -119,5 +128,5 @@ class Measurement(Base):
 		}
 
 	def __str__(self):
-		return "Measurement(date: {date}, type: {type})"\
-		.format(date=self.date, type=self.type)
+		return "{type}(date: {date})"\
+		.format(date=dt_format(self.date), type=self.type)
