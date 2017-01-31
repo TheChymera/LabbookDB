@@ -1,6 +1,5 @@
 #!/usr/bin/python
 
-from datetime import datetime
 import argh
 import json
 import numpy
@@ -57,7 +56,7 @@ def get_related_ids(session, engine, parameters):
 			for value in values:
 				value=int(value) # the value is returned as a numpy object
 				if field[-4:] == "date": # support for date entry matching (the values have to be passes as string but matched as datetime)
-					value = datetime(*[int(i) for i in value.split(",")])
+					value = datetime.datetime(*[int(i) for i in value.split(",")])
 				# we are generally looking to match values, but sometimes the parent table does not have an id column, but only a relationship column (e.g. in one to many relationships)
 				try:
 					sql_query = sql_query.filter(getattr(allowed_classes[category], field)==value)
@@ -65,7 +64,7 @@ def get_related_ids(session, engine, parameters):
 					sql_query = sql_query.filter(getattr(allowed_classes[category], field).contains(*[i for i in objects]))
 		else:
 			if field[-4:] == "date": # support for date entry matching (the values have to be passes as string but matched as datetime)
-				value = datetime(*[int(i) for i in value.split(",")])
+				value = datetime.datetime(*[int(i) for i in value.split(",")])
 			sql_query = sql_query.filter(getattr(allowed_classes[category], field)==value)
 	mystring = sql_query.with_labels().statement
 	mydf = pd.read_sql_query(mystring,engine)
@@ -124,7 +123,7 @@ def add_generic(db_path, parameters, walkthrough=False, session=None, engine=Non
 	myobject = category_class()
 	for key, _ in sorted(parameters.items()):
 		if key[-4:] == "date":
-			parameters[key] = datetime(*[int(i) for i in parameters[key].split(",")])
+			parameters[key] = datetime.datetime(*[int(i) for i in parameters[key].split(",")])
 		if key[-3:] == "_id" and not isinstance(parameters[key], int):
 			try:
 				input_values, _ = get_related_ids(session, engine, parameters[key])
