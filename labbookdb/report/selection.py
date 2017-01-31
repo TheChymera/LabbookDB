@@ -62,13 +62,23 @@ def data_selection(db_path, data_type, treatment_start_dates=[]):
 			("Animal.cage_stays",),
 			("CageStay.cage",),
 			]
-	elif data_type == "animal ids":
+	elif data_type == "animals id":
 		col_entries=[
-		("Animal","death_date"),
+		("Animal","id"),
 		("AnimalExternalIdentifier",),
 		]
 		join_entries=[
 		("Animal.external_ids",),
+		]
+	elif data_type == "animals info":
+		col_entries=[
+		("Animal","death_date"),
+		("AnimalExternalIdentifier",),
+		("Genotype",),
+		]
+		join_entries=[
+		("Animal.external_ids",),
+		("Animal.genotypes",),
 		]
 
 
