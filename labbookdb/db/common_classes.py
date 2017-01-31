@@ -3,94 +3,39 @@ try:
 except ImportError:
 	from .base_classes import *
 
-genotype_association = Table('genotype_associations', Base.metadata,
-	Column('genotypes_id', Integer, ForeignKey('genotypes.id')),
-	Column('animals_id', Integer, ForeignKey('animals.id'))
-)
-treatment_animal_association = Table('treatment_animal_associations', Base.metadata,
-	Column('treatments_id', Integer, ForeignKey('treatments.id')),
-	Column('animals_id', Integer, ForeignKey('animals.id'))
-)
-treatment_cage_association = Table('treatment_cage_associations', Base.metadata,
-	Column('treatments_id', Integer, ForeignKey('treatments.id')),
-	Column('cages_id', Integer, ForeignKey('cages.id'))
-)
-operator_association = Table('operator_associations', Base.metadata,
-	Column('operator_id', Integer, ForeignKey('operators.id')),
-	Column('fmri_measurements_id', Integer, ForeignKey('fmri_measurements.id'))
-)
-ingredients_association = Table('ingredients_associations', Base.metadata,
-	Column('solutions_id', Integer, ForeignKey('solutions.id')),
-	Column('ingredients_id', Integer, ForeignKey('ingredients.id'))
-)
-irregularities_association = Table('irregularities_associations', Base.metadata,
-	Column('fmri_measurements_id', Integer, ForeignKey('fmri_measurements.id')),
-	Column('irregularities_id', Integer, ForeignKey('irregularities.id'))
-)
-authors_association = Table('authors_associations', Base.metadata,
-	Column('protocols_id', Integer, ForeignKey('protocols.id')),
-	Column('operators_id', Integer, ForeignKey('operators.id'))
-)
 cage_stay_association = Table('cage_stay_associations', Base.metadata,
 	Column('cage_stays_id', Integer, ForeignKey('cage_stays.id')),
 	Column('animals_id', Integer, ForeignKey('animals.id'))
-)
+	)
+genotype_association = Table('genotype_associations', Base.metadata,
+	Column('genotypes_id', Integer, ForeignKey('genotypes.id')),
+	Column('animals_id', Integer, ForeignKey('animals.id'))
+	)
+ingredients_association = Table('ingredients_associations', Base.metadata,
+	Column('solutions_id', Integer, ForeignKey('solutions.id')),
+	Column('ingredients_id', Integer, ForeignKey('ingredients.id'))
+	)
+irregularities_association = Table('irregularities_associations', Base.metadata,
+	Column('fmri_measurements_id', Integer, ForeignKey('fmri_measurements.id')),
+	Column('irregularities_id', Integer, ForeignKey('irregularities.id'))
+	)
+operator_association = Table('operator_associations', Base.metadata,
+	Column('operator_id', Integer, ForeignKey('operators.id')),
+	Column('fmri_measurements_id', Integer, ForeignKey('fmri_measurements.id'))
+	)
+treatment_animal_association = Table('treatment_animal_associations', Base.metadata,
+	Column('treatments_id', Integer, ForeignKey('treatments.id')),
+	Column('animals_id', Integer, ForeignKey('animals.id'))
+	)
+treatment_cage_association = Table('treatment_cage_associations', Base.metadata,
+	Column('treatments_id', Integer, ForeignKey('treatments.id')),
+	Column('cages_id', Integer, ForeignKey('cages.id'))
+	)
 
 #context-sensitive default functions
 #(need to be functions taking only one input - http://docs.sqlalchemy.org/en/latest/core/defaults.html#context-sensitive-default-functions)
 def mydefaultname(context):
 	return context.current_parameters.get("name")
-
-#meta classes:
-
-class Biopsy(Base):
-	__tablename__ = "biopsies"
-	id = Column(Integer, primary_key=True)
-	start_date = Column(DateTime)
-	animal_id = Column(Integer, ForeignKey('animals.id'))
-	extraction_protocol_id = Column(Integer, ForeignKey('protocols.id'))
-	extraction_protocol = relationship("Protocol", foreign_keys=[extraction_protocol_id])
-	sample_location = Column(String) #id of the physical sample
-	fluorescent_microscopy = relationship("FluorescentMicroscopyMeasurement", backref="biopsy")
-	type = Column(String(50))
-	__mapper_args__ = {
-		'polymorphic_identity': 'biopsy',
-		'polymorphic_on': type
-		}
-
-class Protocol(Base):
-	__tablename__ = "protocols"
-	id = Column(Integer, primary_key=True)
-	code = Column(String, unique=True)
-	name = Column(String, unique=True)
-	authors = relationship("Operator", secondary=authors_association)
-
-	type = Column(String(50))
-	__mapper_args__ = {
-		'polymorphic_identity': 'protocol',
-		'polymorphic_on': type
-		}
-
-class Measurement(Base):
-	__tablename__ = "measurements"
-	id = Column(Integer, primary_key=True)
-	date = Column(DateTime)
-
-	animal_id = Column(Integer, ForeignKey('animals.id')) # only set in per-animal measurements
-	cage_id = Column(Integer, ForeignKey('cages.id')) # only set in per-cage measurements
-
-	operator_id = Column(Integer, ForeignKey('operators.id'))
-	operator = relationship("Operator")
-
-	type = Column(String(50))
-	__mapper_args__ = {
-		'polymorphic_identity': 'measurement',
-		'polymorphic_on': type
-		}
-
-	def __str__(self):
-		return "Measurement(date: {date}, type: {type})"\
-		.format(date=self.date, type=self.type)
 
 #general classes:
 

@@ -3,6 +3,11 @@ from sqlalchemy.orm import validates, backref, relationship
 from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
+authors_association = Table('authors_associations', Base.metadata,
+	Column('protocols_id', Integer, ForeignKey('protocols.id')),
+	Column('operators_id', Integer, ForeignKey('operators.id'))
+	)
+
 class Genotype(Base):
 	__tablename__ = "genotypes"
 	id = Column(Integer, primary_key=True)
@@ -61,3 +66,54 @@ class LaserStimulationProtocol(Base):
 	stimulation_onset = Column(Float)
 	stimulus_frequency = Column(Float)
 	pulse_width = Column(Float)
+
+#meta classes:
+
+class Biopsy(Base):
+	__tablename__ = "biopsies"
+	id = Column(Integer, primary_key=True)
+	start_date = Column(DateTime)
+	animal_id = Column(Integer, ForeignKey('animals.id'))
+	extraction_protocol_id = Column(Integer, ForeignKey('protocols.id'))
+	extraction_protocol = relationship("Protocol", foreign_keys=[extraction_protocol_id])
+	sample_location = Column(String) #id of the physical sample
+	fluorescent_microscopy = relationship("FluorescentMicroscopyMeasurement", backref="biopsy")
+	type = Column(String(50))
+	__mapper_args__ = {
+		'polymorphic_identity': 'biopsy',
+		'polymorphic_on': type
+		}
+
+class Protocol(Base):
+	__tablename__ = "protocols"
+	id = Column(Integer, primary_key=True)
+	code = Column(String, unique=True)
+	name = Column(String, unique=True)
+	authors = relationship("Operator", secondary=authors_association)
+
+	type = Column(String(50))
+	__mapper_args__ = {
+		'polymorphic_identity': 'protocol',
+		'polymorphic_on': type
+		}
+
+class Measurement(Base):
+	__tablename__ = "measurements"
+	id = Column(Integer, primary_key=True)
+	date = Column(DateTime)
+
+	animal_id = Column(Integer, ForeignKey('animals.id')) # only set in per-animal measurements
+	cage_id = Column(Integer, ForeignKey('cages.id')) # only set in per-cage measurements
+
+	operator_id = Column(Integer, ForeignKey('operators.id'))
+	operator = relationship("Operator")
+
+	type = Column(String(50))
+	__mapper_args__ = {
+		'polymorphic_identity': 'measurement',
+		'polymorphic_on': type
+		}
+
+	def __str__(self):
+		return "Measurement(date: {date}, type: {type})"\
+		.format(date=self.date, type=self.type)
