@@ -13,6 +13,8 @@ except (ValueError, SystemError):
 	sys.path.append('/home/chymera/src/LabbookDB/labbookdb/db/')
 	import query
 
+TABLE_COL_SPACE = 200
+
 def animals_id(db_path,
 	save_as=None,
 	):
@@ -37,7 +39,7 @@ def animals_id(db_path,
 	df = df.sort_index(ascending=False)
 
 	if save_as:
-		df.to_html(os.path.abspath(os.path.expanduser(save_as+".html"), col_space=300))
+		df.to_html(os.path.abspath(os.path.expanduser(save_as+".html"), col_space=TABLE_COL_SPACE))
 	else:
 		print(df)
 	return
@@ -71,7 +73,7 @@ def animals_info(db_path,
 	df = df.sort_index(ascending=False)
 
 	if save_as:
-		df.to_html(os.path.abspath(os.path.expanduser(save_as+".html")), col_space=300)
+		df.to_html(os.path.abspath(os.path.expanduser(save_as+".html")), col_space=TABLE_COL_SPACE)
 	else:
 		print(df)
 	return
