@@ -203,13 +203,6 @@ class Observation(Base):
 	unit = relationship("MeasurementUnit")
 	animal_id = Column(Integer, ForeignKey('animals.id'))
 
-class UncategorizedTreatment(Base):
-	__tablename__ = "uncategorized_treatment"
-	id = Column(Integer, primary_key=True)
-	date = Column(DateTime)
-	description = Column(String)
-	animal_id = Column(Integer, ForeignKey('animals.id'))
-
 class TreatmentProtocol(Protocol):
 	__tablename__ = 'treatment_protocols'
 	__mapper_args__ = {'polymorphic_identity': 'treatment'}
