@@ -1,9 +1,7 @@
-from sqlalchemy import create_engine, Column, Integer, String, Sequence, Table, ForeignKey, Float, DateTime, ForeignKeyConstraint, Boolean
-from sqlalchemy.orm import backref, relationship, sessionmaker, validates
-from os import path
-
-from sqlalchemy.ext.declarative import declarative_base
-Base = declarative_base()
+try:
+	from base_classes import *
+except ImportError:
+	from .base_classes import *
 
 genotype_association = Table('genotype_associations', Base.metadata,
 	Column('genotypes_id', Integer, ForeignKey('genotypes.id')),
@@ -45,6 +43,21 @@ def mydefaultname(context):
 
 #meta classes:
 
+class Biopsy(Base):
+	__tablename__ = "biopsies"
+	id = Column(Integer, primary_key=True)
+	start_date = Column(DateTime)
+	animal_id = Column(Integer, ForeignKey('animals.id'))
+	extraction_protocol_id = Column(Integer, ForeignKey('protocols.id'))
+	extraction_protocol = relationship("Protocol", foreign_keys=[extraction_protocol_id])
+	sample_location = Column(String) #id of the physical sample
+	fluorescent_microscopy = relationship("FluorescentMicroscopyMeasurement", backref="biopsy")
+	type = Column(String(50))
+	__mapper_args__ = {
+		'polymorphic_identity': 'biopsy',
+		'polymorphic_on': type
+		}
+
 class Protocol(Base):
 	__tablename__ = "protocols"
 	id = Column(Integer, primary_key=True)
@@ -57,18 +70,6 @@ class Protocol(Base):
 		'polymorphic_identity': 'protocol',
 		'polymorphic_on': type
 		}
-
-# class ExternalIdentifier(Base):
-# 	__tablename__ = "external_identifiers"
-# 	id = Column(Integer, primary_key=True)
-# 	database = Column(String)
-# 	identifier = Column(String)
-#
-# 	type = Column(String(50))
-# 	__mapper_args__ = {
-# 		'polymorphic_identity': 'external_identifier',
-# 		'polymorphic_on': type
-# 		}
 
 class Measurement(Base):
 	__tablename__ = "measurements"
@@ -110,26 +111,6 @@ class Evaluation(Base):
 
 	measurement_id = Column(Integer, ForeignKey('measurements.id'))
 
-class Operator(Base):
-	__tablename__ = "operators"
-	id = Column(Integer, primary_key=True)
-	code = Column(String, unique=True)
-	full_name = Column(String)
-	affiliation = Column(String)
-	email = Column(String)
-
-	@validates('email')
-	def validate_email(self, key, address):
-		assert '@' in address
-		return address
-
-class MeasurementUnit(Base):
-	__tablename__ = "measurement_units"
-	id = Column(Integer, primary_key=True)
-	code = Column(String, unique=True)
-	long_name = Column(String)
-	siunitx = Column(String)
-
 class Substance(Base):
 	__tablename__ = "substances"
 	id = Column(Integer, primary_key=True)
@@ -161,7 +142,6 @@ class Solution(Base):
 	supplier = Column(String)
 	supplier_product_code = Column(String)
 	contains = relationship("Ingredient", secondary=ingredients_association)
-
 
 	def __repr__(self):
 		return "<Solution(id='%s', code='%s', name='%s', contains='%s')>"\
@@ -207,16 +187,6 @@ class OpenFieldTestMeasurement(Measurement):
 	arena_id = Column(Integer, ForeignKey('arenas.id'))
 	evaluations = relationship("Evaluation")
 
-#fMRI classes:
-
-class FMRIScannerSetup(Base):
-	__tablename__ = "fmri_scanner_setups"
-	id = Column(Integer, primary_key=True)
-	code = Column(String, unique=True)
-	coil = Column(String)
-	scanner = Column(String)
-	support = Column(String)
-
 class FMRIMeasurement(Measurement):
 	__tablename__ = 'fmri_measurements'
 	__mapper_args__ = {'polymorphic_identity': 'fmri'}
@@ -255,18 +225,6 @@ class FMRIAnimalPreparationProtocol(Protocol):
 
 	respiration = Column(String)
 
-class LaserStimulationProtocol(Base):
-	__tablename__ = "laser_stimulation_protocols"
-	id = Column(Integer, primary_key=True)
-	code = Column(String, unique=True)
-	#tme values specified in seconds, frequencies in hertz
-	stimulus_repetitions = Column(Integer)
-	stimulus_duration = Column(Float)
-	inter_stimulus_duration = Column(Float)
-	stimulation_onset = Column(Float)
-	stimulus_frequency = Column(Float)
-	pulse_width = Column(Float)
-
 #treatment classes:
 
 class HandlingHabituation(Base):
@@ -288,11 +246,6 @@ class HandlingHabituationProtocol(Protocol):
 	individual_picking_up = Column(Boolean)
 	group_picking_up = Column(Boolean)
 	transparent_tube = Column(Boolean)
-
-class Irregularity(Base):
-	__tablename__ = "irregularities"
-	id = Column(Integer, primary_key=True)
-	description = Column(String, unique=True)
 
 class Observation(Base):
 	__tablename__ = "observations"
@@ -434,18 +387,6 @@ class Cage(Base):
 	location = Column(String)
 	stays = relationship("CageStay", back_populates="cage")
 
-
-class Genotype(Base):
-	__tablename__ = "genotypes"
-	id = Column(Integer, primary_key=True)
-	code = Column(String, unique=True)
-	construct = Column(String)
-	zygosity = Column(String)
-
-	def __repr__(self):
-		return "<Genotype(code='%s', construct='%s' zygosity='%s')>"\
-		% (self.code, self.construct, self.zygosity)
-
 class WeightMeasurement(Measurement):
 	__tablename__ = 'weight_measurements'
 	__mapper_args__ = {'polymorphic_identity': 'weight'}
@@ -456,21 +397,6 @@ class WeightMeasurement(Measurement):
 	def __str__(self):
 		return "WeightMeasurement(date: {date}, weight: {w}{wu})"\
 		.format(date=self.date, w=self.weight, wu=self.weight_unit.code)
-
-class Biopsy(Base):
-	__tablename__ = "biopsies"
-	id = Column(Integer, primary_key=True)
-	start_date = Column(DateTime)
-	animal_id = Column(Integer, ForeignKey('animals.id'))
-	extraction_protocol_id = Column(Integer, ForeignKey('protocols.id'))
-	extraction_protocol = relationship("Protocol", foreign_keys=[extraction_protocol_id])
-	sample_location = Column(String) #id of the physical sample
-	fluorescent_microscopy = relationship("FluorescentMicroscopyMeasurement", backref="biopsy")
-	type = Column(String(50))
-	__mapper_args__ = {
-		'polymorphic_identity': 'biopsy',
-		'polymorphic_on': type
-		}
 
 class BrainBiopsy(Biopsy):
 	__tablename__ = "brain_biopsies"

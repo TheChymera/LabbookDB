@@ -8,7 +8,7 @@ except ImportError:
 
 try:
 	from ..db import query
-except ValueError:
+except (ValueError, SystemError):
 	import sys
 	sys.path.append('/home/chymera/src/LabbookDB/labbookdb/db/')
 	import query
@@ -72,7 +72,7 @@ def animals_info(db_path,
 	df = df.sort_index(ascending=False)
 
 	if save_as:
-		df.to_html(os.path.abspath(os.path.expanduser(save_as+".html"), col_space=300))
+		df.to_html(os.path.abspath(os.path.expanduser(save_as+".html")), col_space=300)
 	else:
 		print(df)
 	return
