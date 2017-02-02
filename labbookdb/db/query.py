@@ -43,6 +43,7 @@ allowed_classes = {
 	"Incubation": Incubation,
 	"LaserStimulationProtocol": LaserStimulationProtocol,
 	"MeasurementUnit": MeasurementUnit,
+	"Measurement": Measurement,
 	"Operator": Operator,
 	"Observation": Observation,
 	"Protocol": Protocol,

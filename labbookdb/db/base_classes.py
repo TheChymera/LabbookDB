@@ -16,6 +16,10 @@ authors_association = Table('authors_associations', Base.metadata,
 	Column('protocols_id', Integer, ForeignKey('protocols.id')),
 	Column('operators_id', Integer, ForeignKey('operators.id'))
 	)
+irregularities_association = Table('irregularities_associations', Base.metadata,
+	Column('measurements_id', Integer, ForeignKey('measurements.id')),
+	Column('irregularities_id', Integer, ForeignKey('irregularities.id'))
+	)
 
 class Genotype(Base):
 	__tablename__ = "genotypes"
@@ -118,6 +122,7 @@ class Measurement(Base):
 	animal_id = Column(Integer, ForeignKey('animals.id')) # only set in per-animal measurements
 	cage_id = Column(Integer, ForeignKey('cages.id')) # only set in per-cage measurements
 
+	irregularities = relationship("Irregularity", secondary=irregularities_association)
 	operator_id = Column(Integer, ForeignKey('operators.id'))
 	operator = relationship("Operator")
 

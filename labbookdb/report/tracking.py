@@ -68,10 +68,13 @@ def animals_info(db_path,
 		}
 
 	df = df.rename(columns={'AnimalExternalIdentifier_animal_id': 'ID'})
+	print(df)
+	return
 	df = df.set_index(['ID', 'AnimalExternalIdentifier_database'])['AnimalExternalIdentifier_identifier'].unstack(1).join(df.groupby('ID').agg(aggregation_dict)).reset_index()
 	df.set_index('ID', inplace=True)
 	df = df.sort_index(ascending=False)
 
+	return
 	if save_as:
 		df.to_html(os.path.abspath(os.path.expanduser(save_as+".html")), col_space=TABLE_COL_SPACE)
 	else:
@@ -108,4 +111,4 @@ def further_cages(db_path):
 	return next_cage, skipped_cages
 
 if __name__ == '__main__':
-	animal_info_table("~/syncdata/meta.db")
+	animals_info("~/syncdata/meta.db")

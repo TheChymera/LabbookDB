@@ -75,10 +75,14 @@ def data_selection(db_path, data_type, treatment_start_dates=[]):
 		("Animal","death_date"),
 		("AnimalExternalIdentifier",),
 		("Genotype",),
+		("Measurement",),
+		("Irregularity",),
 		]
 		join_entries=[
 		("Animal.external_ids",),
 		("Animal.genotypes",),
+		("Animal.measurements",),
+		("Measurement.irregularities",),
 		]
 
 

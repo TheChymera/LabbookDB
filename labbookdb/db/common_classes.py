@@ -15,10 +15,6 @@ ingredients_association = Table('ingredients_associations', Base.metadata,
 	Column('solutions_id', Integer, ForeignKey('solutions.id')),
 	Column('ingredients_id', Integer, ForeignKey('ingredients.id'))
 	)
-irregularities_association = Table('irregularities_associations', Base.metadata,
-	Column('fmri_measurements_id', Integer, ForeignKey('fmri_measurements.id')),
-	Column('irregularities_id', Integer, ForeignKey('irregularities.id'))
-	)
 operator_association = Table('operator_associations', Base.metadata,
 	Column('operator_id', Integer, ForeignKey('operators.id')),
 	Column('fmri_measurements_id', Integer, ForeignKey('fmri_measurements.id'))
@@ -141,7 +137,6 @@ class FMRIMeasurement(Measurement):
 	preparation = relationship("FMRIAnimalPreparationProtocol")
 	scanner_setup_id = Column(Integer, ForeignKey('fmri_scanner_setups.id'))
 	scanner_setup = relationship("FMRIScannerSetup")
-	irregularities = relationship("Irregularity", secondary=irregularities_association)
 
 	laser_stimulation_id = Column(Integer, ForeignKey('laser_stimulation_protocols.id'))
 	laser_stimulation = relationship("LaserStimulationProtocol")
