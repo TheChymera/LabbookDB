@@ -75,16 +75,30 @@ def data_selection(db_path, data_type, treatment_start_dates=[]):
 		("Animal","death_date"),
 		("AnimalExternalIdentifier",),
 		("Genotype",),
-		("Measurement",),
-		("LaserStimulationProtocol",),
-		("Irregularity",),
 		]
 		join_entries=[
 		("Animal.external_ids",),
 		("Animal.genotypes",),
+		]
+	elif data_type == "animals measurements":
+		col_entries=[
+		("Animal","id"),
+		("Measurement","id"),
+		("LaserStimulationProtocol","code"),
+		]
+		join_entries=[
+		("Animal.measurements",),
+		("FMRIMeasurement.laser_stimulations",),
+		]
+	elif data_type == "animals measurements irregularities":
+		col_entries=[
+		("Animal","id"),
+		("Measurement","id"),
+		("Irregularity","description"),
+		]
+		join_entries=[
 		("Animal.measurements",),
 		("FMRIMeasurement.irregularities",),
-		("FMRIMeasurement.laser_stimulations",),
 		]
 
 

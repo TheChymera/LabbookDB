@@ -61,20 +61,44 @@ def animals_info(db_path,
 	"""
 
 	df = data_selection(db_path, "animals info")
+	functional_scan_df = data_selection(db_path, "animals measurements")
+	nonresponder_df = data_selection(db_path, "animals measurements irregularities")
 
 	aggregation_dict = {
 		'Animal_death_date' : lambda x: ', '.join(set([str(i) for i in x])),
-		'Genotype_code' : lambda x: ', '.join(set(x))
+		'Genotype_code' : lambda x: ', '.join(set(x)),
+		}
+	collapse_stuimulations = {
+		'LaserStimulationProtocol_code' : lambda x: 0 if list(x) == [] else 1,
+		"Animal_id" : lambda x: list(x)[0],
+		}
+	count_scans = {
+		'occurences' : lambda x: sum(x),
+		}
+	collapse_nonresponders = {
+		'Irregularity_description' : lambda x: 1 if "ICA failed to indicate response to stimulus" in list(x) else 0,
+		"Animal_id" : lambda x: list(x)[0],
 		}
 
-	df = df.rename(columns={'AnimalExternalIdentifier_animal_id': 'ID'})
-	print(df)
-	return
-	df = df.set_index(['ID', 'AnimalExternalIdentifier_database'])['AnimalExternalIdentifier_identifier'].unstack(1).join(df.groupby('ID').agg(aggregation_dict)).reset_index()
-	df.set_index('ID', inplace=True)
+	functional_scan_df = functional_scan_df.groupby('Measurement_id').agg(collapse_stuimulations)
+	functional_scan_df = functional_scan_df.rename(columns={'LaserStimulationProtocol_code': 'occurences'})
+	functional_scan_df = functional_scan_df.groupby('Animal_id').agg(count_scans)
+
+	nonresponder_df = nonresponder_df.groupby('Measurement_id').agg(collapse_nonresponders)
+	nonresponder_df = nonresponder_df.rename(columns={'Irregularity_description': 'occurences'})
+	nonresponder_df = nonresponder_df.groupby('Animal_id').agg(count_scans)
+
+	df = df.rename(columns={'AnimalExternalIdentifier_animal_id': 'Animal_id'})
+	df = df.set_index(['Animal_id', 'AnimalExternalIdentifier_database'])['AnimalExternalIdentifier_identifier'].unstack(1).join(df.groupby('Animal_id').agg(aggregation_dict)).reset_index()
+	df.set_index('Animal_id', inplace=True)
+	df['nonresponsive'] = nonresponder_df
+	df['functional'] = functional_scan_df
+	df[['nonresponsive', 'functional']] = df[["nonresponsive", 'functional']].fillna(0).astype(int)
+	df["responsive functional meausrements"] = df['functional'] - df['nonresponsive']
+	df["responsive functional meausrements"] = df["responsive functional meausrements"].astype(str) +"/"+ df['functional'].astype(str)
+	df.drop(['nonresponsive', 'functional'], axis = 1, inplace = True, errors = 'ignore')
 	df = df.sort_index(ascending=False)
 
-	return
 	if save_as:
 		df.to_html(os.path.abspath(os.path.expanduser(save_as+".html")), col_space=TABLE_COL_SPACE)
 	else:
@@ -111,4 +135,4 @@ def further_cages(db_path):
 	return next_cage, skipped_cages
 
 if __name__ == '__main__':
-	animals_info("~/syncdata/meta.db")
+	animals_info("~/syncdata/meta.db","~/animals_info")
