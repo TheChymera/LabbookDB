@@ -6,7 +6,7 @@ import sys
 
 import pandas as pd
 
-from datetime import *
+import datetime
 from sqlalchemy import create_engine, literal, or_, inspection
 from os import path
 from sqlalchemy.orm import sessionmaker, aliased, contains_eager
@@ -70,11 +70,11 @@ def get_related_id(session, engine, parameters):
 			for value in values:
 				value=int(value) # the value is returned as a numpy object
 				if field[-4:] == "date": # support for date entry matching (the values have to be passes as string but matched as datetime)
-					value = datetime(*[int(i) for i in value.split(",")])
+					value = datetime.datetime(*[int(i) for i in value.split(",")])
 				sql_query = sql_query.filter(getattr(allowed_classes[category], field)==value)
 		else:
 			if field[-4:] == "date": # support for date entry matching (the values have to be passes as string but matched as datetime)
-				value = datetime(*[int(i) for i in value.split(",")])
+				value = datetime.datetime(*[int(i) for i in value.split(",")])
 			sql_query = sql_query.filter(getattr(allowed_classes[category], field)==value)
 	mystring = sql_query.statement
 	mydf = pd.read_sql_query(mystring,engine)
@@ -243,7 +243,8 @@ def get_df(db_path, col_entries=[], join_entries=[], filters=[], outerjoin=False
 		if sub_filter:
 			if sub_filter[1][-4:] == "date" and isinstance(sub_filter[2], str):
 				for ix, i in enumerate(sub_filter[2:]):
-					sub_filter[2+ix] = datetime(*[int(a) for a in i.split(",")])
+					print(sub_filter)
+					sub_filter[2+ix] = datetime.datetime(*[int(a) for a in i.split(",")])
 			if len(sub_filter) == 3:
 				sql_query = sql_query.filter(getattr(allowed_classes[sub_filter[0]], sub_filter[1]) == sub_filter[2])
 			else:
