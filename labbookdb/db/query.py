@@ -156,7 +156,7 @@ def add_all_columns(cols, class_name):
 		column = getattr(joinclassobject, col.key)
 		cols.append(column.label("{}_{}".format(class_name, col_name)))
 
-def get_df(db_path, col_entries=[], join_entries=[], filters=[], outerjoin=False):
+def get_df(db_path, col_entries=[], join_entries=[], filters=[], outerjoin=False, join_types=[]):
 	"""Return a dataframe from a complex query of a LabbookDB-style database
 
 	Arguments
@@ -204,7 +204,6 @@ def get_df(db_path, col_entries=[], join_entries=[], filters=[], outerjoin=False
 
 	"""
 
-
 	session, engine = loadSession(db_path)
 
 	cols=[]
@@ -233,8 +232,8 @@ def get_df(db_path, col_entries=[], join_entries=[], filters=[], outerjoin=False
 		joins.append(join_parameters)
 
 	sql_query = session.query(*cols)
-	for join in joins:
-		if outerjoin:
+	for ix, join in enumerate(joins):
+		if outerjoin or not join_types or join_types[ix] == "outer":
 			sql_query = sql_query.outerjoin(*join)
 		else:
 			sql_query = sql_query.join(*join)
@@ -243,7 +242,6 @@ def get_df(db_path, col_entries=[], join_entries=[], filters=[], outerjoin=False
 		if sub_filter:
 			if sub_filter[1][-4:] == "date" and isinstance(sub_filter[2], str):
 				for ix, i in enumerate(sub_filter[2:]):
-					print(sub_filter)
 					sub_filter[2+ix] = datetime.datetime(*[int(a) for a in i.split(",")])
 			if len(sub_filter) == 3:
 				sql_query = sql_query.filter(getattr(allowed_classes[sub_filter[0]], sub_filter[1]) == sub_filter[2])
