@@ -9,7 +9,7 @@ from behaviopy import plotting
 import matplotlib.pyplot as plt
 
 def sucrose_preference(db_path, treatment_start_dates,
-	columns=["0 to 2", "2 to 5"],
+	columns=[],
 	rename_treatments={"cFluDW":"Fluoxetine","cFluDW_":"Control"},
 	):
 	"""Plot sucrose preference scatterplot.
@@ -31,8 +31,11 @@ def sucrose_preference(db_path, treatment_start_dates,
 	Dictionary specifying a rename scheme for the treatments. Keys are names to change and values are what to change the names to.
 	"""
 
-	raw_df = selection.data_selection(db_path, "sucrose preference", treatment_start_dates=treatment_start_dates)
-	plottable_df = formatting.plottable_sucrosepreference_df(raw_df)
+	animals_df = selection.animals_by_cage_treatment(db_path, start_dates=treatment_start_dates)
+	animals = list(set(animals_df["Animal_id"]))
+	raw_df = selection.by_animals(db_path, "sucrose preference", animals=animals)
+	full_df = animals_df.merge(raw_df, on="Animal_id", suffixes=("_Treatment",""))
+	plottable_df = formatting.plottable_sucrosepreference_df(full_df)
 	plotting.sucrose_preference(plottable_df, legend_loc=4, columns=columns, rename_treatments=rename_treatments)
 
 def forced_swim(db_path, plot_style, treatment_start_dates,
