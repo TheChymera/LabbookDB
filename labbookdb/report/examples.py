@@ -12,14 +12,19 @@ import selection
 import tracking
 import query
 
+def cage_sucrose_preference():
+	behaviour.sucrose_preference(db_path, treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5",])
+def all_sucrose_preference():
+	behaviour.sucrose_preference(db_path, treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5","2016,11,24,21,30"])
+def animal_sucrose_preference():
+	behaviour.sucrose_preference(db_path, treatment_start_dates=["2016,11,24,21,30"])
+
 if __name__ == '__main__':
 	db_path="~/syncdata/meta.db"
-	# sucrose_preference(db_path, treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5"])
+	all_sucrose_preference()
 	# forced_swim(db_path, "ttest", treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5"], columns=["2 to 4", "2 to 6"])
 	# behaviour.forced_swim(db_path, "tsplot", treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5"])
 	# forced_swim(db_path, "pointplot", treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5"])
 	# forced_swim(db_path, "pointplot", treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5"], period_label="interval [2 min]")
 	# forced_swim(db_path, "tsplot", treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5"], period_label="interval [2 min]")
-	# plt.show()
-	# print(table)
-	# tracking.animal_id_table(db_path,"~/animals.html")
+	plt.show()
