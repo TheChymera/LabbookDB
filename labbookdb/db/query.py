@@ -233,10 +233,10 @@ def get_df(db_path, col_entries=[], join_entries=[], filters=[], outerjoin=False
 
 	sql_query = session.query(*cols)
 	for ix, join in enumerate(joins):
-		if outerjoin or not join_types or join_types[ix] == "outer":
-			sql_query = sql_query.outerjoin(*join)
-		else:
+		if (not outerjoin and not join_types) or join_types[ix] == "inner":
 			sql_query = sql_query.join(*join)
+		elif outerjoin or join_types[ix] == "outer":
+			sql_query = sql_query.outerjoin(*join)
 
 	for sub_filter in filters:
 		if sub_filter:
