@@ -120,7 +120,7 @@ def data_selection(db_path, data_type, treatment_start_dates=[]):
 	A list containing the treatment start date or dates by which to filter the cages for the sucrose preference measurements.
 	Items should be strings in datetime format, e.g. "2016,4,25,19,30".
 	"""
-	elif data_type == "forced swim":
+	if data_type == "forced swim":
 		col_entries=[
 			("Animal","id"),
 			("Cage","id"),
