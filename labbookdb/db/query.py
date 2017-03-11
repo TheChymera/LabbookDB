@@ -87,6 +87,7 @@ def get_related_id(session, engine, parameters):
 	engine.dispose()
 	return input_values
 
+@argh.arg('-d', '--database', type=str)
 def animal_info(db_path, identifier,
 	database=None,
 	):
