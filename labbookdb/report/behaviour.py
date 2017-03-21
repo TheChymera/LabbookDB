@@ -36,7 +36,6 @@ def sucrose_preference(db_path, treatment_start_dates,
 	raw_df = selection.by_animals(db_path, "sucrose preference", animals=animals)
 	full_df = animals_df.merge(raw_df, on="Animal_id", suffixes=("_Treatment",""))
 	plottable_df = formatting.plottable_sucrosepreference_df(full_df)
-	print(plottable_df)
 	plotting.sucrose_preference(plottable_df, legend_loc=4, columns=columns, rename_treatments=rename_treatments)
 
 def forced_swim(db_path, plot_style, treatment_start_dates,
