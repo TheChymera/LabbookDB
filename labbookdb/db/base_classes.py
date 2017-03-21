@@ -114,8 +114,47 @@ class Protocol(Base):
 		return "Protocol(code: {code})"\
 		.format(code=self.code)
 
+class Virus(Base):
+	__tablename__ = "viruses"
+	id = Column(Integer, primary_key=True)
+	code = Column(String, unique=True)
+	name = Column(String, unique=True)
+	authors = relationship("Operator", secondary=authors_association)
+
+	type = Column(String(50))
+	__mapper_args__ = {
+		'polymorphic_identity': 'protocol',
+		'polymorphic_on': type
+		}
+
+	def __str__(self):
+		return "Protocol(code: {code})"\
+		.format(code=self.code)
+
 class Measurement(Base):
 	__tablename__ = "measurements"
+	id = Column(Integer, primary_key=True)
+	date = Column(DateTime)
+
+	animal_id = Column(Integer, ForeignKey('animals.id')) # only set in per-animal measurements
+	cage_id = Column(Integer, ForeignKey('cages.id')) # only set in per-cage measurements
+
+	irregularities = relationship("Irregularity", secondary=irregularities_association)
+	operator_id = Column(Integer, ForeignKey('operators.id'))
+	operator = relationship("Operator")
+
+	type = Column(String(50))
+	__mapper_args__ = {
+		'polymorphic_identity': 'measurement',
+		'polymorphic_on': type
+		}
+
+	def __str__(self):
+		return "{type}(date: {date})"\
+		.format(date=dt_format(self.date), type=self.type)
+
+class Operation(Base):
+	__tablename__ = "operations"
 	id = Column(Integer, primary_key=True)
 	date = Column(DateTime)
 

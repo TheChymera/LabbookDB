@@ -172,6 +172,17 @@ class FMRIAnimalPreparationProtocol(Protocol):
 
 	respiration = Column(String)
 
+class VirusInjectionProtocol(Protocol):
+	__tablename__ = 'operation_protocols'
+	__mapper_args__ = {'polymorphic_identity': 'operation'}
+	id = Column(Integer, ForeignKey('protocols.id'), primary_key=True)
+	amount = Column(Float) # injected virus amount, in microlitres
+
+	stereotactic_target_id = Column(Integer, ForeignKey('stereotactic_targets.id'))
+	stereotactic_target = relationship("StereotacticTarget", foreign_keys=[stereotactic_target_id])
+	virus_id = Column(Integer, ForeignKey('viruses.id'))
+	virus = relationship("Virus", foreign_keys=[virus_id])
+
 #treatment classes:
 
 class HandlingHabituation(Base):
