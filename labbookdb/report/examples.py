@@ -19,6 +19,8 @@ def sucrose_preference(measurement_mode):
 		behaviour.sucrose_preference(db_path, treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5",])
 	elif measurement_mode == "animal":
 		behaviour.sucrose_preference(db_path, treatment_start_dates=["2016,11,24,21,30"])
+	elif measurement_mode == "aileen_switching_sides":
+		behaviour.sucrose_preference(db_path, treatment_start_dates=["2017,1,31,22,0"])
 	elif measurement_mode == "any":
 		behaviour.sucrose_preference(db_path, treatment_start_dates=ALL_COHORT_START_DATES)
 
@@ -28,7 +30,7 @@ if __name__ == '__main__':
 	# forced_swim(db_path, "pointplot", treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5"])
 	# forced_swim(db_path, "pointplot", treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5"], period_label="interval [2 min]")
 
-	sucrose_preference("cage")
+	sucrose_preference("aileen")
 
 	# behaviour.forced_swim(db_path, "tsplot", treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5"])
 	# behaviour.forced_swim(db_path, "tsplot", treatment_start_dates=["2016,11,24,21,30"])
