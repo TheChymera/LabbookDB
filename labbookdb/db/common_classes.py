@@ -160,9 +160,9 @@ class AnesthesiaProtocol(Protocol):
 
 	bolus_to_maintenance_anesthesia_injection_delay = Column(String)
 
-	induction = relationship("Treatment", secondary=treatment_protocol_association)
-	bolus = relationship("Treatment", secondary=treatment_protocol_association)
-	maintenance = relationship("Treatment", secondary=treatment_protocol_association)
+	induction = relationship("TreatmentProtocol", secondary=treatment_protocol_association)
+	bolus = relationship("TreatmentProtocol", secondary=treatment_protocol_association)
+	maintenance = relationship("TreatmentProtocol", secondary=treatment_protocol_association)
 
 	# induction_anesthesia_gas_id = Column(Integer, ForeignKey('treatment_protocols.id'))
 	# induction_anesthesia_gas = relationship("TreatmentProtocol", foreign_keys=[induction_anesthesia_gas_id])
