@@ -158,7 +158,7 @@ class AnesthesiaProtocol(Protocol):
 	__mapper_args__ = {'polymorphic_identity': 'anesthesia'}
 	id = Column(Integer, ForeignKey('protocols.id'), primary_key=True)
 
-	bolus_to_maintenance_delay = Column(String)
+	bolus_to_maintenance_delay = Column(String) #delay from start of bolus delivery to start of maintenance delivery, in seconds
 	respiration = Column(String)
 
 	induction = relationship("TreatmentProtocol", secondary=anesthesia_association)
