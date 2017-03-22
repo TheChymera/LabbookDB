@@ -285,7 +285,7 @@ class Operation(Base):
 
 	animal_id = Column(Integer, ForeignKey('animals.id')) # only set in per-animal measurements
 
-	irregularities = relationship("Irregularity", secondary=irregularities_association)
+	irregularities = relationship("Irregularity", secondary=operations_irregularities_association)
 	operator_id = Column(Integer, ForeignKey('operators.id'))
 	operator = relationship("Operator")
 
