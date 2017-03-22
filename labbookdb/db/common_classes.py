@@ -137,8 +137,8 @@ class FMRIMeasurement(Measurement):
 	__mapper_args__ = {'polymorphic_identity': 'fmri'}
 	id = Column(Integer, ForeignKey('measurements.id'), primary_key=True)
 	temperature = Column(Float)
-	preparation_id = Column(Integer, ForeignKey('fmri_animal_preparation_protocols.id'))
-	preparation = relationship("FMRIAnimalPreparationProtocol")
+	anesthesia_id = Column(Integer, ForeignKey('anesthesia_protocols.id'))
+	anesthesia = relationship("AnesthesiaProtocol")
 	scanner_setup_id = Column(Integer, ForeignKey('fmri_scanner_setups.id'))
 	scanner_setup = relationship("FMRIScannerSetup")
 
