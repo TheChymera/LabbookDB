@@ -23,6 +23,10 @@ treatment_protocol_association = Table('treatment_protocol_associations', Base.m
 	Column('treatments_id', Integer, ForeignKey('treatments.id')),
 	Column('protocols_id', Integer, ForeignKey('protocols.id'))
 	)
+treatment_animal_association = Table('treatment_animal_associations', Base.metadata,
+	Column('treatments_id', Integer, ForeignKey('treatments.id')),
+	Column('animals_id', Integer, ForeignKey('animals.id'))
+	)
 treatment_cage_association = Table('treatment_cage_associations', Base.metadata,
 	Column('treatments_id', Integer, ForeignKey('treatments.id')),
 	Column('cages_id', Integer, ForeignKey('cages.id'))
