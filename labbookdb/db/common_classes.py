@@ -270,6 +270,22 @@ class Treatment(Base):
 		return "protocol {protocol_code}, {start_date} - {end_date}"\
 		.format(start_date=dt_format(self.start_date), end_date=dt_format(self.end_date), protocol_code=self.protocol.code)
 
+#operation classes:
+class Operation(Base):
+	__tablename__ = "operations"
+	id = Column(Integer, primary_key=True)
+	date = Column(DateTime)
+
+	animal_id = Column(Integer, ForeignKey('animals.id')) # only set in per-animal measurements
+
+	irregularities = relationship("Irregularity", secondary=irregularities_association)
+	operator_id = Column(Integer, ForeignKey('operators.id'))
+	operator = relationship("Operator")
+
+	# def __str__(self):
+		# return "(date: {date})"\
+		# .format(date=dt_format(self.date), type=self.type)
+
 #animal classes:
 
 class Animal(Base):
