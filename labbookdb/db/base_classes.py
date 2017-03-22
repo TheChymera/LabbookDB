@@ -125,6 +125,18 @@ class Virus(Base):
 		return "Virus(code: {code}, long_code: {long_code})"\
 		.format(code=self.code, long_code=self.long_code)
 
+class OrthogonalStereotacticTarget(Base):
+	__tablename__ = "orthogonal_stereotactic_targets"
+	id = Column(Integer, primary_key=True)
+	reference = Column(String)
+	posteroanterior = Column(Float)
+	leftright = Column(Float)
+	superoinferior = Column(Float)
+
+	def __str__(self):
+		return "OrthogonalStereotacticTarget({reference}: {pa}(PA), {lr}(LR), {si}(SI))"\
+		.format(reference=self.reference, pa=self.posteroanterior, lr=self.leftright, si=self.superoinferior)
+
 class Measurement(Base):
 	__tablename__ = "measurements"
 	id = Column(Integer, primary_key=True)
