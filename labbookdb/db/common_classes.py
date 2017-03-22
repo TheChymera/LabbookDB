@@ -19,9 +19,9 @@ laser_stimulations_association = Table('laser_stimulations_associations', Base.m
 	Column('fmri_measurements_id', Integer, ForeignKey('fmri_measurements.id')),
 	Column('laser_stimulation_protocols_id', Integer, ForeignKey('laser_stimulation_protocols.id'))
 	)
-treatment_protocol_association = Table('treatment_protocol_associations', Base.metadata,
-	Column('treatments_id', Integer, ForeignKey('treatments.id')),
-	Column('protocols_id', Integer, ForeignKey('protocols.id'))
+anesthesia_association = Table('anesthesia_associations', Base.metadata,
+	Column('anesthesia_protocols_id', Integer, ForeignKey('anesthesia_protocols.id')),
+	Column('treatment_protocols_id', Integer, ForeignKey('treatment_protocols.id'))
 	)
 treatment_animal_association = Table('treatment_animal_associations', Base.metadata,
 	Column('treatments_id', Integer, ForeignKey('treatments.id')),
@@ -160,9 +160,9 @@ class AnesthesiaProtocol(Protocol):
 
 	bolus_to_maintenance_anesthesia_injection_delay = Column(String)
 
-	induction = relationship("TreatmentProtocol", secondary=treatment_protocol_association)
-	bolus = relationship("TreatmentProtocol", secondary=treatment_protocol_association)
-	maintenance = relationship("TreatmentProtocol", secondary=treatment_protocol_association)
+	induction = relationship("TreatmentProtocol", secondary=anesthesia_association)
+	bolus = relationship("TreatmentProtocol", secondary=anesthesia_association)
+	maintenance = relationship("TreatmentProtocol", secondary=anesthesia_association)
 
 	# induction_anesthesia_gas_id = Column(Integer, ForeignKey('treatment_protocols.id'))
 	# induction_anesthesia_gas = relationship("TreatmentProtocol", foreign_keys=[induction_anesthesia_gas_id])
