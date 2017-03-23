@@ -79,7 +79,7 @@ def by_animals(db_path, select, animals):
 	accepted_select_values = ["sucrose preference"]
 
 	if select == "sucrose preference":
-		join_types = ["inner","inner","inner","inner","inner","inner"]
+		join_types = ["inner","inner","inner"]
 		col_entries=[
 			("Animal","id"),
 			("Cage","id"),
