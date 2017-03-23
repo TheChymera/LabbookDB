@@ -132,7 +132,8 @@ def further_cages(db_path):
 			else:
 				break
 
-	return next_cage, skipped_cages
+	print("Next open cage number: {0}\nSkipped cage numbers:{1}".format(next_cage, ", ".join([str(i) for i in skipped_cages])))
+	return
 
 if __name__ == '__main__':
 	animals_info("~/syncdata/meta.db","~/animals_info")
