@@ -62,8 +62,10 @@ def plottable_sucrosepreference_df(reference_df):
 			sucrose_prefernce = sucrose_consumption/(water_consumption + sucrose_consumption)
 			preferences["Period [days]"] = key
 			preferences["Sucrose Preference Ratio"] = sucrose_prefernce
-			preferences["treatment"] = cage_id_measurement_df["TreatmentProtocol_code"].tolist()[0]
-			preferences["cage id"] = cage_id # this may not actually be needed, as the same info is contained in the index
+			preferences["Sucrose Bottle Position"] = cage_id_measurement_df["SucrosePreferenceMeasurement_sucrose_bottle_position"].tolist()[0]
+			preferences["Sucrose Concentration"] = cage_id_measurement_df["SucrosePreferenceMeasurement_sucrose_concentration"].tolist()[0]
+			preferences["Treatment"] = cage_id_measurement_df["TreatmentProtocol_code"].tolist()[0]
+			preferences["Cage ID"] = cage_id # this may not actually be needed, as the same info is contained in the index
 			preferences_df_slice = pd.DataFrame(preferences, index=[cage_id])
 			preferences_df = pd.concat([preferences_df, preferences_df_slice])
 
