@@ -5,11 +5,12 @@ except (SystemError, ValueError):
 if not __package__:
 	import sys, os
 	sys.path.append(os.path.expanduser('~/src/behaviopy'))
-from behaviopy import plotting
+from behaviopy import plotting, standard
 import matplotlib.pyplot as plt
 
 def sucrose_preference(db_path, treatment_start_dates,
-	columns=[],
+	comparisons={"Period [days]":[]},
+	compare="Treatment",
 	rename_treatments={"cFluDW":"Fluoxetine","cFluDW_":"Control"},
 	):
 	"""Plot sucrose preference scatterplot.
@@ -24,8 +25,11 @@ def sucrose_preference(db_path, treatment_start_dates,
 	A list containing the treatment start date or dates by which to filter the cages for the sucrose preference measurements.
 	Items should be strings in datetime format, e.g. "2016,4,25,19,30".
 
-	columns : list, optional
-	Which sucrose preference data columns to plot, values can be "0 to 2" and "2 to 5"
+	comparison_instances : dict, optional
+	Which sucrose preference data columns to plot, values can be "Xa to Xb" with Xa and Xb contingent on the timing of measurements.
+
+	compare : string, optional
+	Which parameter to compare. Must be a column name from df.
 
 	rename_treatments : dict, optional
 	Dictionary specifying a rename scheme for the treatments. Keys are names to change and values are what to change the names to.
@@ -36,7 +40,8 @@ def sucrose_preference(db_path, treatment_start_dates,
 	raw_df = selection.by_animals(db_path, "sucrose preference", animals=animals)
 	full_df = animals_df.merge(raw_df, on="Animal_id", suffixes=("_Treatment",""))
 	plottable_df = formatting.plottable_sucrosepreference_df(full_df)
-	plotting.sucrose_preference(plottable_df, legend_loc=4, columns=columns, rename_treatments=rename_treatments)
+
+	plotting.sucrose_preference(plottable_df, compare=compare, comparisons=comparisons, rename_treatments=rename_treatments)
 
 def forced_swim(db_path, plot_style, treatment_start_dates,
 	columns=["2 to 4"],
