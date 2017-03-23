@@ -16,8 +16,12 @@ authors_association = Table('authors_associations', Base.metadata,
 	Column('protocols_id', Integer, ForeignKey('protocols.id')),
 	Column('operators_id', Integer, ForeignKey('operators.id'))
 	)
-irregularities_association = Table('irregularities_associations', Base.metadata,
+measurements_irregularities_association = Table('measurements_irregularities_association', Base.metadata,
 	Column('measurements_id', Integer, ForeignKey('measurements.id')),
+	Column('irregularities_id', Integer, ForeignKey('irregularities.id'))
+	)
+operations_irregularities_association = Table('operations_irregularities_association', Base.metadata,
+	Column('operations_id', Integer, ForeignKey('operations.id')),
 	Column('irregularities_id', Integer, ForeignKey('irregularities.id'))
 	)
 
@@ -114,6 +118,40 @@ class Protocol(Base):
 		return "Protocol(code: {code})"\
 		.format(code=self.code)
 
+class Virus(Base):
+	__tablename__ = "viruses"
+	id = Column(Integer, primary_key=True)
+	code = Column(String, unique=True)
+	long_code = Column(String, unique=True)
+	name = Column(String, unique=True)
+
+	def __str__(self):
+		return "Virus(code: {code}, long_code: {long_code})"\
+		.format(code=self.code, long_code=self.long_code)
+
+class Implant(Base):
+	__tablename__ = "implants"
+	id = Column(Integer, primary_key=True)
+	code = Column(String, unique=True)
+	long_code = Column(String, unique=True)
+	name = Column(String, unique=True)
+
+	def __str__(self):
+		return "Implant(code: {code}, long_code: {long_code})"\
+		.format(code=self.code, long_code=self.long_code)
+
+class OrthogonalStereotacticTarget(Base):
+	__tablename__ = "orthogonal_stereotactic_targets"
+	id = Column(Integer, primary_key=True)
+	reference = Column(String)
+	posteroanterior = Column(Float)
+	leftright = Column(Float)
+	superoinferior = Column(Float)
+
+	def __str__(self):
+		return "OrthogonalStereotacticTarget({reference}: {pa}(PA), {lr}(LR), {si}(SI))"\
+		.format(reference=self.reference, pa=self.posteroanterior, lr=self.leftright, si=self.superoinferior)
+
 class Measurement(Base):
 	__tablename__ = "measurements"
 	id = Column(Integer, primary_key=True)
@@ -122,7 +160,7 @@ class Measurement(Base):
 	animal_id = Column(Integer, ForeignKey('animals.id')) # only set in per-animal measurements
 	cage_id = Column(Integer, ForeignKey('cages.id')) # only set in per-cage measurements
 
-	irregularities = relationship("Irregularity", secondary=irregularities_association)
+	irregularities = relationship("Irregularity", secondary=measurements_irregularities_association)
 	operator_id = Column(Integer, ForeignKey('operators.id'))
 	operator = relationship("Operator")
 

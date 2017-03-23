@@ -19,9 +19,9 @@ laser_stimulations_association = Table('laser_stimulations_associations', Base.m
 	Column('fmri_measurements_id', Integer, ForeignKey('fmri_measurements.id')),
 	Column('laser_stimulation_protocols_id', Integer, ForeignKey('laser_stimulation_protocols.id'))
 	)
-operator_association = Table('operator_associations', Base.metadata,
-	Column('operator_id', Integer, ForeignKey('operators.id')),
-	Column('fmri_measurements_id', Integer, ForeignKey('fmri_measurements.id'))
+anesthesia_association = Table('anesthesia_associations', Base.metadata,
+	Column('anesthesia_protocols_id', Integer, ForeignKey('anesthesia_protocols.id')),
+	Column('treatment_protocols_id', Integer, ForeignKey('treatment_protocols.id'))
 	)
 treatment_animal_association = Table('treatment_animal_associations', Base.metadata,
 	Column('treatments_id', Integer, ForeignKey('treatments.id')),
@@ -137,8 +137,8 @@ class FMRIMeasurement(Measurement):
 	__mapper_args__ = {'polymorphic_identity': 'fmri'}
 	id = Column(Integer, ForeignKey('measurements.id'), primary_key=True)
 	temperature = Column(Float)
-	preparation_id = Column(Integer, ForeignKey('fmri_animal_preparation_protocols.id'))
-	preparation = relationship("FMRIAnimalPreparationProtocol")
+	anesthesia_id = Column(Integer, ForeignKey('anesthesia_protocols.id'))
+	anesthesia = relationship("AnesthesiaProtocol")
 	scanner_setup_id = Column(Integer, ForeignKey('fmri_scanner_setups.id'))
 	scanner_setup = relationship("FMRIScannerSetup")
 
@@ -153,24 +153,38 @@ class FMRIMeasurement(Measurement):
 		template += ")"
 		return template.format(date=dt_format(self.date), temp=self.temperature)
 
-class FMRIAnimalPreparationProtocol(Protocol):
-	__tablename__ = 'fmri_animal_preparation_protocols'
-	__mapper_args__ = {'polymorphic_identity': 'fmri_animal_preparation'}
+class AnesthesiaProtocol(Protocol):
+	__tablename__ = 'anesthesia_protocols'
+	__mapper_args__ = {'polymorphic_identity': 'anesthesia'}
 	id = Column(Integer, ForeignKey('protocols.id'), primary_key=True)
-	induction_anesthesia_gas_id = Column(Integer, ForeignKey('treatment_protocols.id'))
-	induction_anesthesia_gas = relationship("TreatmentProtocol", foreign_keys=[induction_anesthesia_gas_id])
-	bolus_anesthesia_injection_id = Column(Integer, ForeignKey('treatment_protocols.id'))
-	bolus_anesthesia_injection = relationship("TreatmentProtocol", foreign_keys=[bolus_anesthesia_injection_id])
-	maintenance_anesthesia_gas_id = Column(Integer, ForeignKey('treatment_protocols.id'))
-	maintenance_anesthesia_gas = relationship("TreatmentProtocol", foreign_keys=[maintenance_anesthesia_gas_id])
-	maintenance_anesthesia_injection_id = Column(Integer, ForeignKey('treatment_protocols.id'))
-	maintenance_anesthesia_injection = relationship("TreatmentProtocol", foreign_keys=[maintenance_anesthesia_injection_id])
-	bolus_muscle_relaxant_injection_id = Column(Integer, ForeignKey('treatment_protocols.id'))
-	bolus_muscle_relaxant_injection = relationship("TreatmentProtocol", foreign_keys=[bolus_muscle_relaxant_injection_id])
-	maintenance_muscle_relaxant_injection_id = Column(Integer, ForeignKey('treatment_protocols.id'))
-	maintenance_muscle_relaxant_injection = relationship("TreatmentProtocol", foreign_keys=[maintenance_muscle_relaxant_injection_id])
 
+	bolus_to_maintenance_delay = Column(Float) #delay from start of bolus delivery to start of maintenance delivery, in seconds
 	respiration = Column(String)
+
+	induction = relationship("TreatmentProtocol", secondary=anesthesia_association)
+	bolus = relationship("TreatmentProtocol", secondary=anesthesia_association)
+	maintenance = relationship("TreatmentProtocol", secondary=anesthesia_association)
+
+class VirusInjectionProtocol(Protocol):
+	__tablename__ = 'virus_injection_protocols'
+	__mapper_args__ = {'polymorphic_identity': 'virus_injection'}
+	id = Column(Integer, ForeignKey('protocols.id'), primary_key=True)
+	amount = Column(Float) # injected virus amount, in microlitres
+
+	stereotactic_target_id = Column(Integer, ForeignKey('orthogonal_stereotactic_targets.id'))
+	stereotactic_target = relationship("OrthogonalStereotacticTarget", foreign_keys=[stereotactic_target_id])
+	virus_id = Column(Integer, ForeignKey('viruses.id'))
+	virus = relationship("Virus", foreign_keys=[virus_id])
+
+class OpticImplantProtocol(Protocol):
+	__tablename__ = 'optic_implant_protocols'
+	__mapper_args__ = {'polymorphic_identity': 'optic_implant'}
+	id = Column(Integer, ForeignKey('protocols.id'), primary_key=True)
+
+	stereotactic_target_id = Column(Integer, ForeignKey('orthogonal_stereotactic_targets.id'))
+	stereotactic_target = relationship("OrthogonalStereotacticTarget", foreign_keys=[stereotactic_target_id])
+	implant_id = Column(Integer, ForeignKey('implants.id'))
+	implant = relationship("Implant", foreign_keys=[implant_id])
 
 #treatment classes:
 
@@ -258,6 +272,26 @@ class Treatment(Base):
 	def __str__(self):
 		return "protocol {protocol_code}, {start_date} - {end_date}"\
 		.format(start_date=dt_format(self.start_date), end_date=dt_format(self.end_date), protocol_code=self.protocol.code)
+
+#operation classes:
+class Operation(Base):
+	__tablename__ = "operations"
+	id = Column(Integer, primary_key=True)
+	date = Column(DateTime)
+
+	animal_id = Column(Integer, ForeignKey('animals.id')) # only set in per-animal measurements
+
+	irregularities = relationship("Irregularity", secondary=operations_irregularities_association)
+	operator_id = Column(Integer, ForeignKey('operators.id'))
+	operator = relationship("Operator")
+	anesthesia_id = Column(Integer, ForeignKey('anesthesia_protocols.id'))
+	anesthesia = relationship("AnesthesiaProtocol", foreign_keys=[anesthesia_id])
+	protocol_id = Column(Integer, ForeignKey('protocols.id'))
+	protocol = relationship("Protocol", foreign_keys=[protocol_id])
+
+	# def __str__(self):
+		# return "(date: {date})"\
+		# .format(date=dt_format(self.date), type=self.type)
 
 #animal classes:
 

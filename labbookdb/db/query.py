@@ -20,6 +20,7 @@ except (ValueError, SystemError):
 allowed_classes = {
 	"Animal": Animal,
 	"AnimalExternalIdentifier": AnimalExternalIdentifier,
+	"AnesthesiaProtocol": AnesthesiaProtocol,
 	"Arena": Arena,
 	"Cage": Cage,
 	"CageStay": CageStay,
@@ -32,7 +33,6 @@ allowed_classes = {
 	"FluorescentMicroscopyMeasurement": FluorescentMicroscopyMeasurement,
 	"FMRIMeasurement": FMRIMeasurement,
 	"FMRIScannerSetup": FMRIScannerSetup,
-	"FMRIAnimalPreparationProtocol": FMRIAnimalPreparationProtocol,
 	"ForcedSwimTestMeasurement": ForcedSwimTestMeasurement,
 	"OpenFieldTestMeasurement": OpenFieldTestMeasurement,
 	"Genotype": Genotype,
