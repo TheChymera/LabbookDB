@@ -129,6 +129,17 @@ class Virus(Base):
 		return "Virus(code: {code}, long_code: {long_code})"\
 		.format(code=self.code, long_code=self.long_code)
 
+class Implant(Base):
+	__tablename__ = "implants"
+	id = Column(Integer, primary_key=True)
+	code = Column(String, unique=True)
+	long_code = Column(String, unique=True)
+	name = Column(String, unique=True)
+
+	def __str__(self):
+		return "Implant(code: {code}, long_code: {long_code})"\
+		.format(code=self.code, long_code=self.long_code)
+
 class OrthogonalStereotacticTarget(Base):
 	__tablename__ = "orthogonal_stereotactic_targets"
 	id = Column(Integer, primary_key=True)

@@ -166,8 +166,8 @@ class AnesthesiaProtocol(Protocol):
 	maintenance = relationship("TreatmentProtocol", secondary=anesthesia_association)
 
 class VirusInjectionProtocol(Protocol):
-	__tablename__ = 'operation_protocols'
-	__mapper_args__ = {'polymorphic_identity': 'operation'}
+	__tablename__ = 'virus_injection_protocols'
+	__mapper_args__ = {'polymorphic_identity': 'virus_injection'}
 	id = Column(Integer, ForeignKey('protocols.id'), primary_key=True)
 	amount = Column(Float) # injected virus amount, in microlitres
 
@@ -175,6 +175,16 @@ class VirusInjectionProtocol(Protocol):
 	stereotactic_target = relationship("OrthogonalStereotacticTarget", foreign_keys=[stereotactic_target_id])
 	virus_id = Column(Integer, ForeignKey('viruses.id'))
 	virus = relationship("Virus", foreign_keys=[virus_id])
+
+class OpticImplantProtocol(Protocol):
+	__tablename__ = 'optic_implant_protocols'
+	__mapper_args__ = {'polymorphic_identity': 'optic_implant'}
+	id = Column(Integer, ForeignKey('protocols.id'), primary_key=True)
+
+	stereotactic_target_id = Column(Integer, ForeignKey('orthogonal_stereotactic_targets.id'))
+	stereotactic_target = relationship("OrthogonalStereotacticTarget", foreign_keys=[stereotactic_target_id])
+	implant_id = Column(Integer, ForeignKey('implants.id'))
+	implant = relationship("Implant", foreign_keys=[implant_id])
 
 #treatment classes:
 
@@ -274,6 +284,10 @@ class Operation(Base):
 	irregularities = relationship("Irregularity", secondary=operations_irregularities_association)
 	operator_id = Column(Integer, ForeignKey('operators.id'))
 	operator = relationship("Operator")
+	anesthesia_id = Column(Integer, ForeignKey('anesthesia_protocols.id'))
+	anesthesia = relationship("AnesthesiaProtocol", foreign_keys=[anesthesia_id])
+	protocol_id = Column(Integer, ForeignKey('protocols.id'))
+	protocol = relationship("Protocol", foreign_keys=[protocol_id])
 
 	# def __str__(self):
 		# return "(date: {date})"\
