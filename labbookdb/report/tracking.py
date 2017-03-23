@@ -132,7 +132,10 @@ def further_cages(db_path):
 			else:
 				break
 
-	print("Next open cage number: {0}\nSkipped cage numbers:{1}".format(next_cage, ", ".join([str(i) for i in skipped_cages])))
+	if not skipped_cages:
+		skipped_cages = ["None"]
+
+	print("Next open cage number: {0}\nSkipped cage numbers: {1}".format(next_cage, ", ".join([str(i) for i in skipped_cages])))
 	return
 
 if __name__ == '__main__':
