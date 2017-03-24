@@ -5,7 +5,7 @@ except (SystemError, ValueError):
 if not __package__:
 	import sys, os
 	sys.path.append(os.path.expanduser('~/src/behaviopy'))
-from behaviopy import plotting, standard
+from behaviopy import plotting
 import matplotlib.pyplot as plt
 
 def sucrose_preference(db_path, treatment_start_dates,
@@ -79,6 +79,7 @@ def forced_swim(db_path, plot_style, treatment_start_dates,
 		elif period_label == "interval [2 min]":
 			periods={1:[0,120],2:[120,240],3:[240,360]}
 			plottable_df = formatting.plottable_sums(raw_df, plot_behaviour, identifier_column="Animal_id", periods=periods, period_label=period_label)
+		print(plottable_df)
 		plotting.forced_swim_timecourse(plottable_df, legend_loc="best", rename_treatments=rename_treatments, period_label=period_label, plotstyle=plot_style, plot_behaviour=plot_behaviour)
 	elif plot_style == "ttest":
 		periods = {}
