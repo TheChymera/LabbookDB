@@ -24,22 +24,24 @@ def sucrose_preference(cohorts, compare):
 	elif cohorts == "all":
 		treatment_start_dates = ALL_COHORT_START_DATES
 	if compare == "treatment":
-		behaviour.sucrose_preference(db_path, treatment_start_dates=treatment_start_dates, comparisons={"Period [days]":[]}, compare="Treatment",)
+		behaviour.sucrose_preference(db_path, treatment_start_dates=treatment_start_dates, comparisons={"Period [days]":[]}, compare="Treatment",save_df="")
 	elif compare == "side_preference":
-		behaviour.sucrose_preference(db_path, treatment_start_dates=treatment_start_dates, comparisons={"Cage ID":[]}, compare="Sucrose Bottle Position",)
+		behaviour.sucrose_preference(db_path, treatment_start_dates=treatment_start_dates, comparisons={"Cage ID":[]}, compare="Sucrose Bottle Position", save_df="")
 
 if __name__ == '__main__':
 	db_path="~/syncdata/meta.db"
 	# forced_swim(db_path, "pointplot", treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5"])
 	# forced_swim(db_path, "pointplot", treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5"], period_label="interval [2 min]")
 
-	# sucrose_preference("aileen_switching_sides", "treatment")
+	sucrose_preference("animal", "treatment")
+	# sucrose_preference("animal", "side_preference")
 
 	# behaviour.forced_swim(db_path, "tsplot", treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5"])
 	# behaviour.forced_swim(db_path, "tsplot", treatment_start_dates=["2016,11,24,21,30"])
-	behaviour.forced_swim(db_path, "tsplot", treatment_start_dates=ALL_COHORT_START_DATES)
+	# behaviour.forced_swim(db_path, "tsplot", treatment_start_dates=ALL_COHORT_START_DATES, save_df="")
+	# behaviour.forced_swim(db_path, "pointplot", treatment_start_dates=ALL_COHORT_START_DATES, save_df="")
 
 	# behaviour.forced_swim(db_path, "ttest", treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5"], columns=["2 to 4", "2 to 6"])
 	# behaviour.forced_swim(db_path, "ttest", treatment_start_dates=["2016,11,24,21,30"], columns=["2 to 4", "2 to 6"])
-	# behaviour.forced_swim(db_path, "ttest", treatment_start_dates=ALL_COHORT_START_DATES, columns=["2 to 4", "2 to 6"])
+	# behaviour.forced_swim(db_path, "ttest", treatment_start_dates=ALL_COHORT_START_DATES, columns=["2 to 4", "2 to 6"], save_df="")
 	plt.show()
