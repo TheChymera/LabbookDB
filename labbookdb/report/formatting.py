@@ -4,7 +4,7 @@ try:
 except (SystemError, ValueError):
 	import processing
 
-def plottable_sums(reference_df, behaviour, identifier_column="Animal_id", periods={}, period_label="period", metadata_columns={"TreatmentProtocol_code":"treatment"}):
+def plottable_sums(reference_df, behaviour, identifier_column="Animal_id", periods={}, period_label="period", metadata_columns={"TreatmentProtocol_code":"Treatment"}):
 	identifiers = list(set(reference_df[identifier_column]))
 	evaluation_df = pd.DataFrame({})
 	for identifier in identifiers:
@@ -23,9 +23,9 @@ def plottable_sums(reference_df, behaviour, identifier_column="Animal_id", perio
 				behaviour_ratio = sums[behaviour].values[0]/real_period_duration
 			except KeyError:
 				behaviour_ratio = 0
-			identifier_data[behaviour+" ratio"] = behaviour_ratio
+			identifier_data[behaviour.title()+" Ratio"] = behaviour_ratio
 			identifier_data[period_label] = period
-			identifier_data["identifier"] = identifier
+			identifier_data["Identifier"] = identifier
 			period_df_slice = pd.DataFrame(identifier_data, index=[identifier])
 			evaluation_df = pd.concat([evaluation_df, period_df_slice])
 
