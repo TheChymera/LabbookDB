@@ -32,11 +32,6 @@ treatment_cage_association = Table('treatment_cage_associations', Base.metadata,
 	Column('cages_id', Integer, ForeignKey('cages.id'))
 	)
 
-#context-sensitive default functions
-#(need to be functions taking only one input - http://docs.sqlalchemy.org/en/latest/core/defaults.html#context-sensitive-default-functions)
-def mydefaultname(context):
-	return context.current_parameters.get("name")
-
 
 #general classes:
 
@@ -62,7 +57,7 @@ class Substance(Base):
 	id = Column(Integer, primary_key=True)
 	code = Column(String, unique=True)
 	name = Column(String, unique=True)
-	long_name = Column(String, unique=True, default=mydefaultname, onupdate=mydefaultname)
+	long_name = Column(String, unique=True)
 	concentration = Column(Float)
 	concentration_unit_id = Column(Integer, ForeignKey('measurement_units.id'))
 	concentration_unit = relationship("MeasurementUnit")
