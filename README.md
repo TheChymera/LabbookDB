@@ -12,6 +12,3 @@ In comparison with other electronic formats based on a document concept, a **dat
 * More easily browsed
 * More easily queried
 * More easily integrated into data analysis functions
-
-## License
-[GPLv3](http://www.gnu.org/licenses/gpl-3.0.en.html)
