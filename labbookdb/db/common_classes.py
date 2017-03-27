@@ -65,7 +65,6 @@ class Substance(Base):
 	supplier_product_code = Column(String)
 	pubchem_sid = Column(String)
 
-
 class Ingredient(Base):
 	__tablename__ = "ingredients"
 	id = Column(Integer, primary_key=True)
