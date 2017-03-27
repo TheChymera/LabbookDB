@@ -13,6 +13,9 @@ except (ValueError, SystemError):
 	sys.path.append('/home/chymera/src/LabbookDB/labbookdb/db/')
 	import query
 
+sys.path.append(os.path.expanduser('~/src/timetableplot'))
+from ttp import timetable
+
 TABLE_COL_SPACE = 200
 
 def animals_id(db_path,
@@ -137,3 +140,57 @@ def further_cages(db_path):
 
 	print("Next open cage number: {0}\nSkipped cage numbers: {1}".format(next_cage, ", ".join([str(i) for i in skipped_cages])))
 	return
+
+def treatments_plot(db_path,
+	filters=[],
+	saturate=[],
+	save_df="",
+	save_plot="",
+	):
+	"""Plot a timetable of events per animal.
+
+	Parameters
+	----------
+
+	db_path : string
+	Path to the database file to query.
+
+	filters : list of list
+	A list of lists giving filters for the query. It is passed to ..query.get_df().
+
+	saturate : {list of str, list of dict}
+	A list of dictionaries or strings specifying by which criteria to saturate cells. It is passed to behaviopy.timetable.multi_plot()
+
+	save_df : string, optional
+	Path under which to save the plotted dataframe. ".csv" will be appended to the string, and the data will be saved in CSV format.
+	"""
+
+	col_entries=[
+		("Animal","id"),
+		("Treatment",),
+		("FMRIMeasurement",),
+		("TreatmentProtocol","code"),
+		("Cage","id"),
+		("Cage","Treatment",""),
+		("Cage","TreatmentProtocol","code"),
+		]
+	join_entries=[
+		("Animal.treatments",),
+		("FMRIMeasurement",),
+		("Treatment.protocol",),
+		("Animal.cage_stays",),
+		("CageStay.cage",),
+		("Cage_Treatment","Cage.treatments"),
+		("Cage_TreatmentProtocol","Cage_Treatment.protocol"),
+		]
+
+	# setting outerjoin to true will indirectly include controls
+	reference_df = query.get_df(db_path, col_entries=col_entries, join_entries=join_entries, filters=filters, outerjoin=True)
+
+	if save_df:
+		df_path = os.path.abspath(os.path.expanduser(save_df))
+		if not(df_path.endswith(".csv") or df_path.endswith(".CSV")):
+			df_path += ".csv"
+		reference_df.to_csv(df_path)
+
+	timetable.multi_plot(reference_df, "Animal_id", shade=["FMRIMeasurement_date"], saturate=saturate, save_plot=save_plot)
