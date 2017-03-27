@@ -13,8 +13,8 @@ except (ValueError, SystemError):
 	sys.path.append('/home/chymera/src/LabbookDB/labbookdb/db/')
 	import query
 
-sys.path.append(os.path.expanduser('~/src/timetableplot'))
-from ttp import timetable
+sys.path.append(os.path.expanduser('~/src/behaviopy'))
+from behaviopy import plotting
 
 TABLE_COL_SPACE = 200
 
@@ -193,4 +193,4 @@ def treatments_plot(db_path,
 			df_path += ".csv"
 		reference_df.to_csv(df_path)
 
-	timetable.multi_plot(reference_df, "Animal_id", shade=["FMRIMeasurement_date"], saturate=saturate, save_plot=save_plot)
+	plotting.timetable(reference_df, "Animal_id", shade=["FMRIMeasurement_date"], saturate=saturate, save_plot=save_plot)

@@ -11,9 +11,7 @@ except (ValueError, SystemError):
 if not __package__:
 	import sys, os
 	sys.path.append(os.path.expanduser('~/src/behaviopy'))
-	sys.path.append(os.path.expanduser('~/src/timetableplot'))
 from behaviopy import plotting
-from ttp import timetable
 import matplotlib.pyplot as plt
 import behaviour
 import selection
