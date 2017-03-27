@@ -278,7 +278,7 @@ class Operation(Base):
 	id = Column(Integer, primary_key=True)
 	date = Column(DateTime)
 
-	animal_id = Column(Integer, ForeignKey('animals.id')) # only set in per-animal measurements
+	animal_id = Column(Integer, ForeignKey('animals.id')) 
 
 	irregularities = relationship("Irregularity", secondary=operations_irregularities_association)
 	operator_id = Column(Integer, ForeignKey('operators.id'))
