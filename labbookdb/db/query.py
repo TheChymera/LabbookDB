@@ -45,6 +45,7 @@ allowed_classes = {
 	"MeasurementUnit": MeasurementUnit,
 	"Measurement": Measurement,
 	"Operator": Operator,
+	"Operation": Operation,
 	"Observation": Observation,
 	"Protocol": Protocol,
 	"SectioningProtocol": SectioningProtocol,
@@ -53,6 +54,8 @@ allowed_classes = {
 	"Solution": Solution,
 	"Treatment": Treatment,
 	"TreatmentProtocol": TreatmentProtocol,
+	"Virus": Virus,
+	"VirusInjectionProtocol": VirusInjectionProtocol,
 	"WeightMeasurement": WeightMeasurement,
 	}
 
