@@ -298,14 +298,13 @@ class Operation(Base):
 class Animal(Base):
 	__tablename__ = "animals"
 	id = Column(Integer, primary_key=True)
-	sex = Column(String)
-	ear_punches = Column(String)
-	maximal_severtity = Column(Integer, default=0)
-
 	birth_date = Column(DateTime)
-
 	death_date = Column(DateTime)
 	death_reason = Column(String)
+	ear_punches = Column(String)
+	license = Column(String)
+	maximal_severtity = Column(Integer, default=0)
+	sex = Column(String)
 
 	cage_stays = relationship("CageStay", secondary=cage_stay_association, backref="animals")
 
@@ -346,7 +345,6 @@ class CageStay(Base):
 	id = Column(Integer, primary_key=True)
 
 	start_date = Column(DateTime) #date of first occurence
-	end_date = Column(DateTime) #date of last occurence
 
 	cage_id = Column(Integer, ForeignKey('cages.id'))
 	cage = relationship("Cage", back_populates="stays")
@@ -354,8 +352,8 @@ class CageStay(Base):
 	single_caged = Column(String) #if singel caged, state reason
 
 	def __str__(self):
-		return "cage {cage_id}, {start_date} - {end_date}"\
-		.format(cage_id=self.cage_id, start_date=dt_format(self.start_date), end_date=dt_format(self.end_date))
+		return "cage {cage_id}, starting {start_date}"\
+		.format(cage_id=self.cage_id, start_date=dt_format(self.start_date))
 
 class Cage(Base):
 	__tablename__ = "cages"
