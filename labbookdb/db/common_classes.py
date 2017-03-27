@@ -37,6 +37,7 @@ treatment_cage_association = Table('treatment_cage_associations', Base.metadata,
 def mydefaultname(context):
 	return context.current_parameters.get("name")
 
+
 #general classes:
 
 class AnimalExternalIdentifier(Base):
@@ -92,6 +93,7 @@ class Solution(Base):
 		return "<Solution(id='%s', code='%s', name='%s', contains='%s')>"\
 		% (self.id, self.code, self.name, [str(self.contains[i].concentration)+" "+str(self.contains[i].concentration_unit.code)+" "+str(self.contains[i].substance.name) for i in range(len(self.contains))])
 
+
 #behavioural classes:
 
 class Arena(Base):
@@ -106,7 +108,6 @@ class Arena(Base):
 	wall_color = Column(String)
 
 	measurements = relationship("OpenFieldTestMeasurement")
-
 
 class ForcedSwimTestMeasurement(Measurement):
 	__tablename__ = 'forcedswimtest_measurements'
@@ -185,6 +186,7 @@ class OpticImplantProtocol(Protocol):
 	stereotactic_target = relationship("OrthogonalStereotacticTarget", foreign_keys=[stereotactic_target_id])
 	implant_id = Column(Integer, ForeignKey('implants.id'))
 	implant = relationship("Implant", foreign_keys=[implant_id])
+
 
 #treatment classes:
 
@@ -273,7 +275,9 @@ class Treatment(Base):
 		return "protocol {protocol_code}, {start_date} - {end_date}"\
 		.format(start_date=dt_format(self.start_date), end_date=dt_format(self.end_date), protocol_code=self.protocol.code)
 
+
 #operation classes:
+
 class Operation(Base):
 	__tablename__ = "operations"
 	id = Column(Integer, primary_key=True)
@@ -292,6 +296,7 @@ class Operation(Base):
 	# def __str__(self):
 		# return "(date: {date})"\
 		# .format(date=dt_format(self.date), type=self.type)
+
 
 #animal classes:
 
@@ -387,6 +392,7 @@ class BrainBiopsy(Biopsy):
 
 
 # DNA classes:
+
 class Incubation(Base):
 	__tablename__ = "incubations"
 	id = Column(Integer, primary_key=True)
@@ -472,7 +478,9 @@ class SectioningProtocol(Protocol):
 	start_midline_distance = Column(Float) #positive towards right of animal, in mm
 	start_depth = Column(Float) #in mm
 
-# Histological Measurements
+
+# Histological Classes
+
 class FluorescentMicroscopyMeasurement(Measurement):
 	__tablename__ = 'fluorescent_microscopy_measurements'
 	__mapper_args__ = {'polymorphic_identity': 'fluorescent_microscopy'}
