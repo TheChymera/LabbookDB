@@ -159,6 +159,7 @@ class AnesthesiaProtocol(Protocol):
 	induction = relationship("TreatmentProtocol", secondary=anesthesia_association)
 	bolus = relationship("TreatmentProtocol", secondary=anesthesia_association)
 	maintenance = relationship("TreatmentProtocol", secondary=anesthesia_association)
+	recovery_bolus = relationship("TreatmentProtocol", secondary=anesthesia_association)
 
 class VirusInjectionProtocol(Protocol):
 	__tablename__ = 'virus_injection_protocols'
