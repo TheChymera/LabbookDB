@@ -143,10 +143,17 @@ class Implant(Base):
 class OrthogonalStereotacticTarget(Base):
 	__tablename__ = "orthogonal_stereotactic_targets"
 	id = Column(Integer, primary_key=True)
+	code = Column(String, unique=True)
 	reference = Column(String)
+	depth_reference = Column(String, default="skull") # set to "dura" if the insertable is lowered to the dura before coordinate setting
+	# coordinates in millimetres
 	posteroanterior = Column(Float)
 	leftright = Column(Float)
 	superoinferior = Column(Float)
+	# angles in degrees
+	angle_posteroanterior = Column(Float)
+	angle_leftright = Column(Float)
+	angle_superoinferior = Column(Float)
 
 	def __str__(self):
 		return "OrthogonalStereotacticTarget({reference}: {pa}(PA), {lr}(LR), {si}(SI))"\
