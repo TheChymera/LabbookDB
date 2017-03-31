@@ -103,11 +103,9 @@ def update_parameter(db_path, entry_identification, parameters):
 
 	entry_class = allowed_classes[entry_identification.split(":")[0]]
 	my_id = get_related_ids(session, engine, entry_identification)[0][0]
-
 	myobject = session.query(entry_class).filter(entry_class.id == my_id)[0]
 
 	for parameter_key in parameters:
-		set_attribute = getattr(myobject, parameter_key)
 		parameter_expression = parameters[parameter_key]
 		if isinstance(parameter_expression, (str, int, float)):
 			if ":" in parameter_expression and "." in parameter_expression:
@@ -115,10 +113,13 @@ def update_parameter(db_path, entry_identification, parameters):
 				related_entry_class = allowed_classes[i.split(":")[0]]
 				for related_entry_id in related_entry_ids:
 					related_entry = session.query(related_entry_class).filter(related_entry_class.id == related_entry_id)[0]
-					set_attribute.append(related_entry)
+					setattr(myobject, parameter_key, related_entry)
 			else:
-				set_attribute.append(parameter_expression)
+				if parameter_key[-4:] == "date":
+					parameter_expression = datetime.datetime(*[int(i) for i in parameter_expression.split(",")])
+				setattr(myobject, parameter_key, parameter_expression)
 		else:
+			set_attribute = getattr(myobject, parameter_key)
 			for i in parameter_expression:
 				related_entry_ids, _ = get_related_ids(session, engine, i)
 				related_entry_class = allowed_classes[i.split(":")[0]]
@@ -158,7 +159,7 @@ def add_generic(db_path, parameters, walkthrough=False, session=None, engine=Non
 				input_value = int(input_value)
 				print("Setting", myobject.__class__.__name__+"'s",key,"attribute to",input_value)
 				setattr(myobject, key, input_value)
-		#this triggers on-the-fly related entry creation:
+		#this triggers on-the-fly related-entry creation:
 		elif isinstance(parameters[key], list):
 			related_entries=[]
 			for related_entry in parameters[key]:
