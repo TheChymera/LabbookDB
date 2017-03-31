@@ -9,10 +9,10 @@ except ImportError:
 try:
 	from ..db import query
 except (ValueError, SystemError):
-	import sys
-	sys.path.append('/home/chymera/src/LabbookDB/labbookdb/db/')
 	import query
 
+import sys
+sys.path.append('/home/chymera/src/LabbookDB/labbookdb/db/')
 sys.path.append(os.path.expanduser('~/src/behaviopy'))
 from behaviopy import plotting
 
