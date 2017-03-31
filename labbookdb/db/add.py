@@ -80,7 +80,20 @@ def get_related_ids(session, engine, parameters):
 	return input_values, sql_query
 
 def update_parameter(db_path, entry_identification, parameters):
-	"""Assigns a value to a givn parameter of a given entry
+	"""Assigns a value to a given parameter of a given entry.
+
+	Parameters
+	----------
+
+	db_path : str
+	A string especifying the database path
+
+	entry_identification : str
+	A LabbookDB syntax string specifying an instance of an object for which to update a parameter.
+	Example strings: "Animal:external_ids.AnimalExternalIdentifier:database.ETH/AIC&#&identifier.5701" , "Cage:id.14"
+
+	parameters : dict
+	A dictionary where keys are strings giving the names of attributes of the class selected by entry_identification, and values are either the values to assign (verbatim: string, int, or float) or LabbookDB syntax strings specifying a related entry, or a list of LabbookDB syntax strings specifying related entries.
 	"""
 
 	if isinstance(parameters, str):
@@ -94,13 +107,24 @@ def update_parameter(db_path, entry_identification, parameters):
 	myobject = session.query(entry_class).filter(entry_class.id == my_id)[0]
 
 	for parameter_key in parameters:
-		related_entries = getattr(myobject, parameter_key)
-		for parameter_expression in parameters[parameter_key]:
-			related_entry_ids, _ = get_related_ids(session, engine, parameter_expression)
-			related_entry_class = allowed_classes[parameter_expression.split(":")[0]]
-			for related_entry_id in related_entry_ids:
-				related_entry = session.query(related_entry_class).filter(related_entry_class.id == related_entry_id)[0]
-				related_entries.append(related_entry)
+		set_attribute = getattr(myobject, parameter_key)
+		parameter_expression = parameters[parameter_key]
+		if isinstance(parameter_expression, (str, int, float)):
+			if ":" in parameter_expression and "." in parameter_expression:
+				related_entry_ids, _ = get_related_ids(session, engine, i)
+				related_entry_class = allowed_classes[i.split(":")[0]]
+				for related_entry_id in related_entry_ids:
+					related_entry = session.query(related_entry_class).filter(related_entry_class.id == related_entry_id)[0]
+					set_attribute.append(related_entry)
+			else:
+				set_attribute.append(parameter_expression)
+		else:
+			for i in parameter_expression:
+				related_entry_ids, _ = get_related_ids(session, engine, i)
+				related_entry_class = allowed_classes[i.split(":")[0]]
+				for related_entry_id in related_entry_ids:
+					related_entry = session.query(related_entry_class).filter(related_entry_class.id == related_entry_id)[0]
+					set_attribute.append(related_entry)
 	commit_and_close(session, engine)
 
 def add_generic(db_path, parameters, walkthrough=False, session=None, engine=None):
