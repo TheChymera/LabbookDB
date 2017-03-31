@@ -23,6 +23,10 @@ anesthesia_association = Table('anesthesia_associations', Base.metadata,
 	Column('anesthesia_protocols_id', Integer, ForeignKey('anesthesia_protocols.id')),
 	Column('treatment_protocols_id', Integer, ForeignKey('treatment_protocols.id'))
 	)
+operation_association = Table('operation_associations', Base.metadata,
+	Column('operations_id', Integer, ForeignKey('operations.id')),
+	Column('protocols_id', Integer, ForeignKey('protocols.id'))
+	)
 treatment_animal_association = Table('treatment_animal_associations', Base.metadata,
 	Column('treatments_id', Integer, ForeignKey('treatments.id')),
 	Column('animals_id', Integer, ForeignKey('animals.id'))
@@ -278,15 +282,14 @@ class Operation(Base):
 	id = Column(Integer, primary_key=True)
 	date = Column(DateTime)
 
-	animal_id = Column(Integer, ForeignKey('animals.id')) 
+	animal_id = Column(Integer, ForeignKey('animals.id'))
 
 	irregularities = relationship("Irregularity", secondary=operations_irregularities_association)
 	operator_id = Column(Integer, ForeignKey('operators.id'))
 	operator = relationship("Operator")
 	anesthesia_id = Column(Integer, ForeignKey('anesthesia_protocols.id'))
 	anesthesia = relationship("AnesthesiaProtocol", foreign_keys=[anesthesia_id])
-	protocol_id = Column(Integer, ForeignKey('protocols.id'))
-	protocol = relationship("Protocol", foreign_keys=[protocol_id])
+	protocols = relationship("Protocol", secondary=operation_association)
 
 	# def __str__(self):
 		# return "(date: {date})"\
