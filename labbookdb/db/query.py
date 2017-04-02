@@ -47,6 +47,8 @@ allowed_classes = {
 	"Observation": Observation,
 	"Operator": Operator,
 	"Operation": Operation,
+	"OpticFiberImplant":OpticFiberImplant,
+	"OpticFiberImplantProtocol":OpticFiberImplantProtocol,
 	"OrthogonalStereotacticTarget": OrthogonalStereotacticTarget,
 	"Protocol": Protocol,
 	"SectioningProtocol": SectioningProtocol,
