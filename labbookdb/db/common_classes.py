@@ -327,7 +327,7 @@ class Animal(Base):
 	def __str__(self):
 		return "Animal(id: {id}, sex: {sex}, ear_punches: {ep}):\n"\
 		"\tbirth:\t{bd}\n"\
-		"\tdeath:\t{dd}\t(projected/death_reason: {dr})\n"\
+		"\tdeath:\t{dd}\t(death_reason: {dr})\n"\
 		"\texternal_ids:\t{eids}\n"\
 		"\tgenotypes:\t{genotypes}\n"\
 		"\tcage_stays:\t{cage_stays}\n"\
