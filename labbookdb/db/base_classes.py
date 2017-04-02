@@ -122,22 +122,24 @@ class Virus(Base):
 	__tablename__ = "viruses"
 	id = Column(Integer, primary_key=True)
 	code = Column(String, unique=True)
-	long_code = Column(String, unique=True)
-	name = Column(String, unique=True)
 
 	def __str__(self):
-		return "Virus(code: {code}, long_code: {long_code})"\
-		.format(code=self.code, long_code=self.long_code)
+		return "Virus(code: {code})"\
+		.format(code=self.code)
 
-class Implant(Base):
+class OpticFiberImplant(Base):
 	__tablename__ = "implants"
-	id = Column(Integer, primary_key=True)
+	id = Column(Integer, primary_keyTrue)
 	code = Column(String, unique=True)
 	long_code = Column(String, unique=True)
-	name = Column(String, unique=True)
+	ferrule_diameter = Column(Float) # in mm
+	length = Column(Float) # in mm
+	manufacturer_code = Column(String)
+	manufacturer = Column(String)
+	numerical_apperture = Column(Float)
 
 	def __str__(self):
-		return "Implant(code: {code}, long_code: {long_code})"\
+		return "OpticFiberImplant(code: {code}, long_code: {long_code})"\
 		.format(code=self.code, long_code=self.long_code)
 
 class OrthogonalStereotacticTarget(Base):

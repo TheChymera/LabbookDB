@@ -176,15 +176,15 @@ class VirusInjectionProtocol(Protocol):
 	virus_id = Column(Integer, ForeignKey('viruses.id'))
 	virus = relationship("Virus", foreign_keys=[virus_id])
 
-class OpticImplantProtocol(Protocol):
-	__tablename__ = 'optic_implant_protocols'
-	__mapper_args__ = {'polymorphic_identity': 'optic_implant'}
+class OpticFiberImplantProtocol(Protocol):
+	__tablename__ = 'optic_fiber_implant_protocols'
+	__mapper_args__ = {'polymorphic_identity': 'optic_fiber_implant'}
 	id = Column(Integer, ForeignKey('protocols.id'), primary_key=True)
 
 	stereotactic_target_id = Column(Integer, ForeignKey('orthogonal_stereotactic_targets.id'))
 	stereotactic_target = relationship("OrthogonalStereotacticTarget", foreign_keys=[stereotactic_target_id])
-	implant_id = Column(Integer, ForeignKey('implants.id'))
-	implant = relationship("Implant", foreign_keys=[implant_id])
+	optic_fiber_implant_id = Column(Integer, ForeignKey('implants.id'))
+	optic_fiber_implant = relationship("Implant", foreign_keys=[implant_id])
 
 
 #treatment classes:
