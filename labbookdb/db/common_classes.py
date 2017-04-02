@@ -184,7 +184,7 @@ class OpticFiberImplantProtocol(Protocol):
 	stereotactic_target_id = Column(Integer, ForeignKey('orthogonal_stereotactic_targets.id'))
 	stereotactic_target = relationship("OrthogonalStereotacticTarget", foreign_keys=[stereotactic_target_id])
 	optic_fiber_implant_id = Column(Integer, ForeignKey('implants.id'))
-	optic_fiber_implant = relationship("Implant", foreign_keys=[implant_id])
+	optic_fiber_implant = relationship("OpticFiberImplant", foreign_keys=[optic_fiber_implant_id])
 
 
 #treatment classes:
