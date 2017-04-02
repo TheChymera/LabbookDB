@@ -215,11 +215,14 @@ class Observation(Base):
 	date = Column(DateTime)
 	behaviour = Column(String)
 	physiology = Column(String)
-	value = Column(Float)
 	severtity = Column(Integer, default=0)
+	value = Column(Float)
+
+	animal_id = Column(Integer, ForeignKey('animals.id'))
 	unit_id = Column(Integer, ForeignKey('measurement_units.id'))
 	unit = relationship("MeasurementUnit")
-	animal_id = Column(Integer, ForeignKey('animals.id'))
+	operator_id = Column(Integer, ForeignKey('operators.id'))
+	operator = relationship("Operator")
 
 class TreatmentProtocol(Protocol):
 	__tablename__ = 'treatment_protocols'
