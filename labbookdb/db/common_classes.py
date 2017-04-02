@@ -294,9 +294,9 @@ class Operation(Base):
 	anesthesia = relationship("AnesthesiaProtocol", foreign_keys=[anesthesia_id])
 	protocols = relationship("Protocol", secondary=operation_association)
 
-	# def __str__(self):
-		# return "(date: {date})"\
-		# .format(date=dt_format(self.date), type=self.type)
+	def __str__(self):
+		return "Operation({date}: {protocols})"\
+		.format(date=dt_format(self.date), protocols="; ".join([i.type for i in self.protocols]))
 
 
 #animal classes:
@@ -321,6 +321,7 @@ class Animal(Base):
 	treatments = relationship("Treatment", secondary=treatment_animal_association, backref="animals")
 
 	observations = relationship("Observation")
+	operations = relationship("Operation")
 
 	biopsies = relationship("Biopsy", backref="animal")
 
@@ -334,6 +335,7 @@ class Animal(Base):
 		"\texternal_ids:\t{eids}\n"\
 		"\tgenotypes:\t{genotypes}\n"\
 		"\tcage_stays:\t{cage_stays}\n"\
+		"\toperations:\t{operations}\n"\
 		"\ttreatments:\t{treatments}\n"\
 		"\tmeasurements:\t{measurements}\n"\
 		.format(id=self.id, sex=self.sex, ep=self.ear_punches,
@@ -341,6 +343,7 @@ class Animal(Base):
 		dd=dt_format(self.death_date), dr=self.death_reason,
 		eids=", ".join([self.external_ids[i].identifier+"("+self.external_ids[i].database+")" for i in range(len(self.external_ids))]),
 		genotypes=", ".join([self.genotypes[i].construct+"("+self.genotypes[i].zygosity+")" for i in range(len(self.genotypes))]),
+		operations="\n\t\t\t".join([self.operations[i].__str__() for i in range(len(self.operations))]),
 		treatments="\n\t\t\t".join([self.treatments[i].__str__() for i in range(len(self.treatments))]),
 		cage_stays="\n\t\t\t".join([self.cage_stays[i].__str__() for i in range(len(self.cage_stays))]),
 		measurements="\n\t\t\t".join([self.measurements[i].__str__() for i in range(len(self.measurements))]),
