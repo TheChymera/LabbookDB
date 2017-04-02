@@ -112,15 +112,19 @@ def animal_info(db_path, identifier,
 	If specified gives a constraint on the AnimalExternalIdentifier.database colun AND truns the identifier attribute into a constraint on the AnimalExternalIdentifier.identifier column. If unspecified, the identfier argument is used as a constraint on the Animal.id column.
 	"""
 
-	session, engine = loadSession(db_path)
-	sql_query = session.query(Animal)
 	if database and identifier:
+		session, engine = loadSession(db_path)
+		sql_query = session.query(Animal)
 		sql_query = sql_query.join(Animal.external_ids)\
 		.filter(AnimalExternalIdentifier.database == database).filter(AnimalExternalIdentifier.identifier == identifier)\
 		.options(contains_eager('external_ids'))
-	else:
-		sql_query = sql_query.filter(Animal.id == identifier)
+		identifier = [i for i in sql_query][0].id
+		session.close()
+		engine.dispose()
 
+	session, engine = loadSession(db_path)
+	sql_query = session.query(Animal)
+	sql_query = sql_query.filter(Animal.id == identifier)
 	animal = [i.__str__() for i in sql_query][0]
 	try:
 		animal = [i.__str__() for i in sql_query][0]
