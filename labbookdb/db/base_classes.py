@@ -129,7 +129,7 @@ class Virus(Base):
 
 class OpticFiberImplant(Base):
 	__tablename__ = "implants"
-	id = Column(Integer, primary_keyTrue)
+	id = Column(Integer, primary_key=True)
 	code = Column(String, unique=True)
 	long_code = Column(String, unique=True)
 	ferrule_diameter = Column(Float) # in mm
