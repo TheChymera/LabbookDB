@@ -131,7 +131,7 @@ class OpticFiberImplant(Base):
 	__tablename__ = "implants"
 	id = Column(Integer, primary_key=True)
 	code = Column(String, unique=True)
-	long_code = Column(String, unique=True)
+	long_code = Column(String) #not necessarily uniqu, as we track different transmittances per model
 	ferrule_diameter = Column(Float) # in mm
 	length = Column(Float) # in mm
 	manufacturer_code = Column(String)
