@@ -363,6 +363,8 @@ class CageStay(Base):
 	def __str__(self):
 		return "cage {cage_id}, starting {start_date}"\
 		.format(cage_id=self.cage_id, start_date=dt_format(self.start_date))
+	def report_animals(self):
+		return ["Animal "+str(i.id)+"["+", ".join([j.identifier+"("+j.database+")" for j in i.external_ids])+"] starting "+dt_format(self.start_date) for i in self.animals]
 
 class Cage(Base):
 	__tablename__ = "cages"
@@ -374,6 +376,15 @@ class Cage(Base):
 	id_local = Column(String, unique=True)
 	location = Column(String)
 	stays = relationship("CageStay", back_populates="cage")
+
+	def __str__(self):
+		if self.id_local:
+			idl = self.id_local
+		else:
+			idl = self.id
+		return "Cage(id: {id}, location: {loc}, id_local: {idl}):\n"\
+		"\t{stays}"\
+		.format(id=self.id, idl=idl, loc=self.location, stays="\n\t".join(["\n\t".join(i.report_animals()) for i in self.stays]))
 
 class WeightMeasurement(Measurement):
 	__tablename__ = 'weight_measurements'

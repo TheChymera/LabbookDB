@@ -8,9 +8,9 @@ def dt_format(dt):
 	if not dt:
 		return "ONGOING"
 	elif dt.time()==datetime.time(0,0,0):
-		return dt.date()
+		return str(dt.date())
 	else:
-		return dt
+		return str(dt)
 
 authors_association = Table('authors_associations', Base.metadata,
 	Column('protocols_id', Integer, ForeignKey('protocols.id')),

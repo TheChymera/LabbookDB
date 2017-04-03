@@ -138,6 +138,36 @@ def animal_info(db_path, identifier,
 	session.close()
 	engine.dispose()
 
+def cage_info(db_path, identifier,
+	):
+	"""Return the __str__ attribute of an Animal object query filterd by the id column OR by arguments of the external_id objects.
+
+	Parameters
+	----------
+
+	db_path : string
+	Path to a LabbookDB formatted database.
+
+	identifier : int or string
+	The identifier of the animal
+
+	database : string or None, optional
+	If specified gives a constraint on the AnimalExternalIdentifier.database colun AND truns the identifier attribute into a constraint on the AnimalExternalIdentifier.identifier column. If unspecified, the identfier argument is used as a constraint on the Animal.id column.
+	"""
+
+	session, engine = loadSession(db_path)
+	sql_query = session.query(Cage)
+	sql_query = sql_query.filter(Cage.id == identifier)
+	cage = [i.__str__() for i in sql_query][0]
+	try:
+		cage = [i.__str__() for i in sql_query][0]
+	except:
+		print("No entry was found with {id} in the Cage.id column of the database located at {loc}.".format(id=identifier,loc=db_path))
+	else:
+		print(cage)
+	session.close()
+	engine.dispose()
+
 def loadSession(db_path):
 	db_path = "sqlite:///" + path.expanduser(db_path)
 	engine = create_engine(db_path, echo=False)
