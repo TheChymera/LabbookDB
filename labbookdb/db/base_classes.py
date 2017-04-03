@@ -137,6 +137,7 @@ class OpticFiberImplant(Base):
 	manufacturer_code = Column(String)
 	manufacturer = Column(String)
 	numerical_apperture = Column(Float)
+	transmittance = Column(Float) # in percent
 
 	def __str__(self):
 		return "OpticFiberImplant(code: {code}, long_code: {long_code})"\
