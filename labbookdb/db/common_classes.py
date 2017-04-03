@@ -27,6 +27,10 @@ operation_association = Table('operation_associations', Base.metadata,
 	Column('operations_id', Integer, ForeignKey('operations.id')),
 	Column('protocols_id', Integer, ForeignKey('protocols.id'))
 	)
+oprations_irregularities_association = Table('oprations_irregularities_association', Base.metadata,
+	Column('operations_id', Integer, ForeignKey('operations.id')),
+	Column('irregularities_id', Integer, ForeignKey('irregularities.id'))
+	)
 treatment_animal_association = Table('treatment_animal_associations', Base.metadata,
 	Column('treatments_id', Integer, ForeignKey('treatments.id')),
 	Column('animals_id', Integer, ForeignKey('animals.id'))
@@ -293,6 +297,7 @@ class Operation(Base):
 	anesthesia_id = Column(Integer, ForeignKey('anesthesia_protocols.id'))
 	anesthesia = relationship("AnesthesiaProtocol", foreign_keys=[anesthesia_id])
 	protocols = relationship("Protocol", secondary=operation_association)
+	irregularities = relationship("Irregularity", secondary=oprations_irregularities_association)
 
 	def __str__(self):
 		return "Operation({date}: {protocols})"\
