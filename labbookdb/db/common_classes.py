@@ -174,6 +174,8 @@ class VirusInjectionProtocol(Protocol):
 	__mapper_args__ = {'polymorphic_identity': 'virus_injection'}
 	id = Column(Integer, ForeignKey('protocols.id'), primary_key=True)
 	amount = Column(Float) # injected virus amount, in microlitres
+	virus_diffusion_time = Column(Float) # time to wait for virus to diffuse before retracting injector - in minutes
+	virus_injection_speed = Column(Float) # speed at which the virus is injected - in nanolitres per minute
 
 	stereotactic_target_id = Column(Integer, ForeignKey('orthogonal_stereotactic_targets.id'))
 	stereotactic_target = relationship("OrthogonalStereotacticTarget", foreign_keys=[stereotactic_target_id])
