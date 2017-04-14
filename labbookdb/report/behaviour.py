@@ -82,7 +82,7 @@ def forced_swim(db_path, plot_style, treatment_start_dates,
 	Path under which to save the plotted dataframe. ".csv" will be appended to the string if not yet presenr, and the data will be saved in CSV format.
 	"""
 
-	raw_df = selection.data_selection(db_path, "forced swim", treatment_start_dates=treatment_start_dates)
+	raw_df = selection.parameterized(db_path, "forced swim", treatment_start_dates=treatment_start_dates)
 
 	if plot_style in ["tsplot", "pointplot"]:
 		if not time_label:

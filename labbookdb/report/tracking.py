@@ -2,9 +2,9 @@ import os
 import pandas as pd
 
 try:
-	from selection import data_selection
+	from selection import parameterized
 except ImportError:
-	from .selection import data_selection
+	from .selection import parameterized
 
 try:
 	from ..db import query
@@ -34,7 +34,7 @@ def animals_id(db_path,
 	Path under which to save the HTML report (".html" is automatically appended). If None, the report is printed to the terminal.
 	"""
 
-	df = data_selection(db_path, "animals id")
+	df = parameterized(db_path, "animals id")
 
 	df = df.rename(columns={'AnimalExternalIdentifier_database': 'External Database:', 'AnimalExternalIdentifier_animal_id': 'ID'})
 	df = df.set_index(['ID', 'External Database:'])['AnimalExternalIdentifier_identifier'].unstack(1).reset_index()
@@ -63,9 +63,9 @@ def animals_info(db_path,
 	Path under which to save the HTML report (".html" is automatically appended). If None, the report is printed to the terminal.
 	"""
 
-	df = data_selection(db_path, "animals info")
-	functional_scan_df = data_selection(db_path, "animals measurements")
-	nonresponder_df = data_selection(db_path, "animals measurements irregularities")
+	df = parameterized(db_path, "animals info")
+	functional_scan_df = parameterized(db_path, "animals measurements")
+	nonresponder_df = parameterized(db_path, "animals measurements irregularities")
 
 	aggregation_dict = {
 		'Animal_death_date' : lambda x: ', '.join(set([str(i) for i in x])),
@@ -116,7 +116,7 @@ def further_cages(db_path):
 	db_path -- path to database file to query (needs to be protocolizer-style)
 	"""
 
-	df = data_selection(db_path, "cage list")
+	df = parameterized(db_path, "cage list")
 
 	cages = df["Cage_id"].dropna().tolist()
 	cages = list(set([int(i) for i in cages]))
