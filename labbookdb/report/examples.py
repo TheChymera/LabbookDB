@@ -5,7 +5,12 @@ import matplotlib.pyplot as plt
 import behaviour
 import tracking
 
-COHORT_DATES = ["2016,4,25,19,30","2016,5,19,23,5","2016,11,24,21,30","2017,1,31,22,0"]
+COHORT_DATES = [
+	{"treatment_start":"2016,4,25,19,30", "window_end":""},
+	{"treatment_start":"2016,5,19,23,5", "window_end":""},
+	{"treatment_start":"2016,11,24,21,30", "window_end":""},
+	{"treatment_start":"2017,1,31,22,0", "window_end":"2017,3,21"},
+	]
 
 def sucrose_preference(db_path, cohorts, compare):
 	if cohorts == "cage":
@@ -30,12 +35,15 @@ def treatments_plot(db_path, cohorts):
 		{"TreatmentProtocol_code":["aFluIV","Treatment_start_date"]},
 		{"TreatmentProtocol_code":["aFluSC","Treatment_start_date"]}
 		]
-	filters = [["Cage_Treatment","start_date",i] for i in cohorts]
-	tracking.treatments_plot(db_path, filters=filters, saturate=saturate, controls=True, save_df="~/lala.csv", save_plot="~/lala.png")
+	filters = [["Cage_Treatment","start_date",i["treatment_start"]] for i in cohorts]
+	window_end = [i["window_end"] for i in cohorts if i["window_end"] not in ("", None)]
+	window_end.sort()
+	window_end = window_end[-1]
+	tracking.treatments_plot(db_path, filters=filters, saturate=saturate, controls=True, save_df="~/lala.csv", save_plot="~/lala.png", window_end=window_end)
 
 if __name__ == '__main__':
 	db_path="~/syncdata/meta.db"
-	treatments_plot(db_path,COHORT_DATES[3])
+	treatments_plot(db_path,COHORT_DATES[3:4])
 
 	# sucrose_preference(db_path, "animal", "treatment")
 	# sucrose_preference(db_path,"animal", "side_preference")

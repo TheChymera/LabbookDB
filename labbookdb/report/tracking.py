@@ -146,6 +146,7 @@ def treatments_plot(db_path,
 	saturate=[],
 	save_df="",
 	save_plot="",
+	window_end="",
 	):
 	"""Plot a timetable of events per animal.
 
@@ -166,6 +167,9 @@ def treatments_plot(db_path,
 
 	save_df : string, optional
 	Path under which to save the plotted dataframe. ".csv" will be appended to the string, and the data will be saved in CSV format.
+
+	window_end : string
+	A datetime-formatted string (e.g. "2016,12,18") to apply as the timetable end date (overrides autodetected end).
 	"""
 	df = selection.timetable(db_path, filters, controls)
 
@@ -175,4 +179,4 @@ def treatments_plot(db_path,
 			df_path += ".csv"
 		df.to_csv(df_path)
 
-	plotting.timetable(df, "Animal_id", shade=["FMRIMeasurement_date"], saturate=saturate, save_plot=save_plot)
+	plotting.timetable(df, "Animal_id", shade=["FMRIMeasurement_date"], saturate=saturate, save_plot=save_plot, window_end=window_end)
