@@ -3,7 +3,6 @@ try:
 except (SystemError, ValueError):
 	import selection, formatting
 import behaviopy as bp
-import matplotlib.pyplot as plt
 from os import path
 
 def sucrose_preference(db_path, treatment_start_dates,
