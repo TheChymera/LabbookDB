@@ -39,7 +39,14 @@ def treatments_plot(db_path, cohorts):
 	window_end = [i["window_end"] for i in cohorts if i["window_end"] not in ("", None)]
 	window_end.sort()
 	window_end = window_end[-1]
-	tracking.treatments_plot(db_path, filters=filters, saturate=saturate, controls=True, save_df="~/lala.csv", save_plot="~/lala.png", window_end=window_end)
+	tracking.treatments_plot(db_path,
+		filters=filters,
+		saturate=saturate,
+		controls=True,
+		save_df="~/lala.csv",
+		save_plot="~/lala.png",
+		window_end=window_end,
+		)
 
 if __name__ == '__main__':
 	db_path="~/syncdata/meta.db"
