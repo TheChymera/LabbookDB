@@ -31,7 +31,7 @@ def treatments_plot(db_path, cohorts):
 		{"TreatmentProtocol_code":["aFluSC","Treatment_start_date"]}
 		]
 	filters = [["Cage_Treatment","start_date",i] for i in cohorts]
-	tracking.treatments_plot(db_path, filters, saturate, save_df="~/lala.csv", save_plot="~/lala.png")
+	tracking.treatments_plot(db_path, filters=filters, saturate=saturate, controls=True, save_df="~/lala.csv", save_plot="~/lala.png")
 
 if __name__ == '__main__':
 	db_path="~/syncdata/meta.db"

@@ -2,17 +2,16 @@ import os
 import pandas as pd
 
 try:
-	from selection import parameterized
-except ImportError:
-	from .selection import parameterized
-
-try:
 	from ..db import query
 except (ValueError, SystemError):
 	import query
 
+try:
+	import selection
+except ImportError:
+	from ..report import selection
+
 import sys
-sys.path.append('/home/chymera/src/LabbookDB/labbookdb/db/')
 sys.path.append(os.path.expanduser('~/src/behaviopy'))
 from behaviopy import plotting
 
@@ -34,7 +33,7 @@ def animals_id(db_path,
 	Path under which to save the HTML report (".html" is automatically appended). If None, the report is printed to the terminal.
 	"""
 
-	df = parameterized(db_path, "animals id")
+	df = selection.parameterized(db_path, "animals id")
 
 	df = df.rename(columns={'AnimalExternalIdentifier_database': 'External Database:', 'AnimalExternalIdentifier_animal_id': 'ID'})
 	df = df.set_index(['ID', 'External Database:'])['AnimalExternalIdentifier_identifier'].unstack(1).reset_index()
@@ -63,9 +62,9 @@ def animals_info(db_path,
 	Path under which to save the HTML report (".html" is automatically appended). If None, the report is printed to the terminal.
 	"""
 
-	df = parameterized(db_path, "animals info")
-	functional_scan_df = parameterized(db_path, "animals measurements")
-	nonresponder_df = parameterized(db_path, "animals measurements irregularities")
+	df = selection.parameterized(db_path, "animals info")
+	functional_scan_df = selection.parameterized(db_path, "animals measurements")
+	nonresponder_df = selection.parameterized(db_path, "animals measurements irregularities")
 
 	aggregation_dict = {
 		'Animal_death_date' : lambda x: ', '.join(set([str(i) for i in x])),
@@ -116,7 +115,7 @@ def further_cages(db_path):
 	db_path -- path to database file to query (needs to be protocolizer-style)
 	"""
 
-	df = parameterized(db_path, "cage list")
+	df = selection.parameterized(db_path, "cage list")
 
 	cages = df["Cage_id"].dropna().tolist()
 	cages = list(set([int(i) for i in cages]))
@@ -142,6 +141,7 @@ def further_cages(db_path):
 	return
 
 def treatments_plot(db_path,
+	controls=False,
 	filters=[],
 	saturate=[],
 	save_df="",
@@ -155,42 +155,24 @@ def treatments_plot(db_path,
 	db_path : string
 	Path to the database file to query.
 
-	filters : list of list
+	controls : bool
+	Whether to include controls (via outerjoin in `..query.get_df()`)
+
+	filters : list of list, optional
 	A list of lists giving filters for the query. It is passed to ..query.get_df().
 
-	saturate : {list of str, list of dict}
+	saturate : {list of str, list of dict}, optional
 	A list of dictionaries or strings specifying by which criteria to saturate cells. It is passed to behaviopy.timetable.multi_plot()
 
 	save_df : string, optional
 	Path under which to save the plotted dataframe. ".csv" will be appended to the string, and the data will be saved in CSV format.
 	"""
-
-	col_entries=[
-		("Animal","id"),
-		("Treatment",),
-		("FMRIMeasurement",),
-		("TreatmentProtocol","code"),
-		("Cage","id"),
-		("Cage","Treatment",""),
-		("Cage","TreatmentProtocol","code"),
-		]
-	join_entries=[
-		("Animal.treatments",),
-		("FMRIMeasurement",),
-		("Treatment.protocol",),
-		("Animal.cage_stays",),
-		("CageStay.cage",),
-		("Cage_Treatment","Cage.treatments"),
-		("Cage_TreatmentProtocol","Cage_Treatment.protocol"),
-		]
-
-	# setting outerjoin to true will indirectly include controls
-	reference_df = query.get_df(db_path, col_entries=col_entries, join_entries=join_entries, filters=filters, outerjoin=True)
+	df = selection.timetable(db_path, filters, controls)
 
 	if save_df:
 		df_path = os.path.abspath(os.path.expanduser(save_df))
 		if not(df_path.endswith(".csv") or df_path.endswith(".CSV")):
 			df_path += ".csv"
-		reference_df.to_csv(df_path)
+		df.to_csv(df_path)
 
-	plotting.timetable(reference_df, "Animal_id", shade=["FMRIMeasurement_date"], saturate=saturate, save_plot=save_plot)
+	plotting.timetable(df, "Animal_id", shade=["FMRIMeasurement_date"], saturate=saturate, save_plot=save_plot)

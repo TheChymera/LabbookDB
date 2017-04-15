@@ -101,6 +101,53 @@ def by_animals(db_path, select, animals):
 
 	return df
 
+def timetable(db_path, filters,
+	controls=False,
+	):
+	"""Select a dataframe with animals as rown and all timetable-relevant events as columns.
+
+	Parameters
+	----------
+
+	db_path : str
+	Path to a LabbookDB formatted database.
+
+	filters : list of list
+	A list of lists giving filters for the query. It is passed to `..query.get_df()`.
+
+	controls : bool
+	Whether to include controls (via outerjoin in `..query.get_df()`)
+	"""
+
+	col_entries=[
+		("Animal","id"),
+		("Treatment",),
+		("FMRIMeasurement",),
+		("TreatmentProtocol","code"),
+		("Cage","id"),
+		("Cage","Treatment",""),
+		("Cage","TreatmentProtocol","code"),
+		]
+	join_entries=[
+		("Animal.treatments",),
+		("FMRIMeasurement",),
+		("Treatment.protocol",),
+		("Animal.cage_stays",),
+		("CageStay.cage",),
+		("Cage_Treatment","Cage.treatments"),
+		("Cage_TreatmentProtocol","Cage_Treatment.protocol"),
+		]
+
+	# if treatment_start_dates:
+	# 	my_filter = ["Treatment","start_date"]
+	# 	my_filter.extend(treatment_start_dates)
+
+	# setting outerjoin to true will indirectly include controls
+	df = query.get_df(db_path, col_entries=col_entries, join_entries=join_entries, filters=filters, outerjoin=controls)
+
+	return df
+
+
 def parameterized(db_path, data_type, treatment_start_dates=[]):
 	"""Select dataframe from a LabbookDB style database.
 
@@ -118,7 +165,7 @@ def parameterized(db_path, data_type, treatment_start_dates=[]):
 	Items should be strings in datetime format, e.g. "2016,4,25,19,30".
 	"""
 
-	elif data_type == "animals id":
+	if data_type == "animals id":
 		col_entries=[
 			("Animal","id"),
 			("AnimalExternalIdentifier",),
