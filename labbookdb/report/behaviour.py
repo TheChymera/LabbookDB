@@ -2,9 +2,6 @@ try:
 	from ..report import selection, formatting
 except (SystemError, ValueError):
 	import selection, formatting
-if not __package__:
-	import sys, os
-	sys.path.append(os.path.expanduser('~/src/behaviopy'))
 import behaviopy as bp
 import matplotlib.pyplot as plt
 from os import path

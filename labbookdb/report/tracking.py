@@ -2,17 +2,15 @@ import os
 import pandas as pd
 
 try:
-	from ..db import query
-except (ValueError, SystemError):
-	import query
-
-try:
 	import selection
 except ImportError:
 	from ..report import selection
 
-import sys
-sys.path.append(os.path.expanduser('~/src/behaviopy'))
+try:
+	from ..db import query
+except (ValueError, SystemError):
+	import query
+
 from behaviopy import plotting
 
 TABLE_COL_SPACE = 200
