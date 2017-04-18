@@ -102,7 +102,8 @@ def by_animals(db_path, select, animals):
 	return df
 
 def timetable(db_path, filters,
-	controls=False,
+	default_join="outer",
+	join_types=[],
 	):
 	"""Select a dataframe with animals as rown and all timetable-relevant events as columns.
 
@@ -115,27 +116,33 @@ def timetable(db_path, filters,
 	filters : list of list
 	A list of lists giving filters for the query. It is passed to `..query.get_df()`.
 
-	controls : bool
-	Whether to include controls (via outerjoin in `..query.get_df()`)
+	outerjoin_all : bool
+	Pased as outerjoin_all to `..query.get_df()`
 	"""
 
 	col_entries=[
 		("Animal","id"),
 		("Treatment",),
-		("FMRIMeasurement",),
+		("FMRIMeasurement","date"),
+		("OpenFieldTestMeasurement","date"),
+		("ForcedSwimTestMeasurement","date"),
 		("TreatmentProtocol","code"),
 		("Cage","id"),
 		("Cage","Treatment",""),
 		("Cage","TreatmentProtocol","code"),
+		("SucrosePreferenceMeasurement","date"),
 		]
 	join_entries=[
 		("Animal.treatments",),
 		("FMRIMeasurement",),
+		("OpenFieldTestMeasurement","Animal.measurements"),
+		("ForcedSwimTestMeasurement","Animal.measurements"),
 		("Treatment.protocol",),
 		("Animal.cage_stays",),
 		("CageStay.cage",),
 		("Cage_Treatment","Cage.treatments"),
 		("Cage_TreatmentProtocol","Cage_Treatment.protocol"),
+		("SucrosePreferenceMeasurement","Cage.measurements"),
 		]
 
 	# if treatment_start_dates:
@@ -143,7 +150,7 @@ def timetable(db_path, filters,
 	# 	my_filter.extend(treatment_start_dates)
 
 	# setting outerjoin to true will indirectly include controls
-	df = query.get_df(db_path, col_entries=col_entries, join_entries=join_entries, filters=filters, outerjoin=controls)
+	df = query.get_df(db_path, col_entries=col_entries, join_entries=join_entries, filters=filters, default_join=default_join, join_types=join_types)
 
 	return df
 
