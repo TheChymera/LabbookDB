@@ -139,11 +139,14 @@ def further_cages(db_path):
 	return
 
 def treatments_plot(db_path,
-	controls=False,
+	default_join=False,
+	draw=[],
 	filters=[],
+	join_types=[],
 	saturate=[],
 	save_df="",
 	save_plot="",
+	shade=[],
 	window_end="",
 	):
 	"""Plot a timetable of events per animal.
@@ -154,8 +157,8 @@ def treatments_plot(db_path,
 	db_path : string
 	Path to the database file to query.
 
-	controls : bool
-	Whether to include controls (via outerjoin in `..query.get_df()`)
+	outerjoin_all : bool
+	Pased as outerjoin_all to `..query.get_df()`
 
 	filters : list of list, optional
 	A list of lists giving filters for the query. It is passed to ..query.get_df().
@@ -169,7 +172,7 @@ def treatments_plot(db_path,
 	window_end : string
 	A datetime-formatted string (e.g. "2016,12,18") to apply as the timetable end date (overrides autodetected end).
 	"""
-	df = selection.timetable(db_path, filters, controls)
+	df = selection.timetable(db_path, filters, default_join, join_types=join_types)
 
 	if save_df:
 		df_path = os.path.abspath(os.path.expanduser(save_df))
@@ -177,4 +180,4 @@ def treatments_plot(db_path,
 			df_path += ".csv"
 		df.to_csv(df_path)
 
-	plotting.timetable(df, "Animal_id", shade=["FMRIMeasurement_date"], saturate=saturate, save_plot=save_plot, window_end=window_end)
+	plotting.timetable(df, "Animal_id", draw=draw, shade=shade, saturate=saturate, save_plot=save_plot, window_end=window_end)

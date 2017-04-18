@@ -29,28 +29,42 @@ def sucrose_preference(db_path, cohorts, compare):
 def treatments_plot(db_path, cohorts):
 	if isinstance(cohorts,str):
 		cohorts = [cohorts]
+	shade = ["FMRIMeasurement_date"]
+	draw = [
+		{"TreatmentProtocol_code":["aFluIV","Treatment_start_date"]},
+		{"TreatmentProtocol_code":["aFluIV_","Treatment_start_date"]},
+		"OpenFieldTestMeasurement_date",
+		"ForcedSwimTestMeasurement_date",
+		]
 	saturate = [
 		{"Cage_TreatmentProtocol_code":["cFluDW","Cage_Treatment_start_date","Cage_Treatment_end_date"]},
 		{"Cage_TreatmentProtocol_code":["cFluDW_","Cage_Treatment_start_date","Cage_Treatment_end_date"]},
-		{"TreatmentProtocol_code":["aFluIV","Treatment_start_date"]},
-		{"TreatmentProtocol_code":["aFluSC","Treatment_start_date"]}
+		{"TreatmentProtocol_code":["aFluSC","Treatment_start_date"]},
 		]
 	filters = [["Cage_Treatment","start_date",i["treatment_start"]] for i in cohorts]
 	window_end = [i["window_end"] for i in cohorts if i["window_end"] not in ("", None)]
 	window_end.sort()
-	window_end = window_end[-1]
+	if window_end:
+		window_end = window_end[-1]
 	tracking.treatments_plot(db_path,
+		draw=draw,
 		filters=filters,
 		saturate=saturate,
-		controls=True,
+		default_join="outer",
+		#This loads only entries with fMRI measurements:
+		# join_types=["outer","inner","outer","outer","outer","outer","outer","outer","outer","outer"],
+		#This loads all entries:
+		join_types=["outer","outer","outer","outer","outer","outer","outer","outer","outer","outer"],
 		save_df="~/lala.csv",
 		save_plot="~/lala.png",
+		shade=shade,
 		window_end=window_end,
 		)
 
 if __name__ == '__main__':
 	db_path="~/syncdata/meta.db"
 	treatments_plot(db_path,COHORTS[3:4])
+	# treatments_plot(db_path,COHORTS[1:2])
 
 	# sucrose_preference(db_path, "animal", "treatment")
 	# sucrose_preference(db_path,"animal", "side_preference")
