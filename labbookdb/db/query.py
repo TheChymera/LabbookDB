@@ -279,9 +279,9 @@ def get_df(db_path, col_entries=[], join_entries=[], filters=[], outerjoin=False
 		else:
 			join_types.append("inner")
 	for ix, join in enumerate(joins):
-		if join_types[ix] == "inner":
+		if join_types[ix] == "inner" or (join_types[ix] == "" and outerjoin == False):
 			sql_query = sql_query.join(*join)
-		elif join_types[ix] == "outer":
+		elif join_types[ix] == "outer" or (join_types[ix] == "" and outerjoin == True):
 			sql_query = sql_query.outerjoin(*join)
 
 	for sub_filter in filters:
