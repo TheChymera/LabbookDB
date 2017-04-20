@@ -1,5 +1,8 @@
-from behaviopy import plotting
 import matplotlib.pyplot as plt
+import sys
+import os
+sys.path.append(os.path.expanduser('~/src/behaviopy'))
+from behaviopy import plotting
 import behaviour
 import tracking
 import selection
@@ -77,7 +80,7 @@ def treatments_plot(db_path, cohorts,
 
 if __name__ == '__main__':
 	db_path="~/syncdata/meta.db"
-	treatments_plot(db_path,COHORTS[0:1], per_cage=False)
+	# treatments_plot(db_path,COHORTS[0:1], per_cage=False)
 
 
 	# treatments_plot(db_path,COHORTS[4:5])
