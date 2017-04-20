@@ -11,6 +11,8 @@ try:
 except (ValueError, SystemError):
 	import query
 
+import sys
+sys.path.append(os.path.abspath(os.path.expanduser('~/src/behaviopy/')))
 from behaviopy import plotting
 
 TABLE_COL_SPACE = 200
@@ -143,6 +145,7 @@ def treatments_plot(db_path,
 	draw=[],
 	filters=[],
 	join_types=[],
+	real_dates=True,
 	saturate=[],
 	save_df="",
 	save_plot="",
@@ -180,4 +183,11 @@ def treatments_plot(db_path,
 			df_path += ".csv"
 		df.to_csv(df_path)
 
-	plotting.timetable(df, "Animal_id", draw=draw, shade=shade, saturate=saturate, save_plot=save_plot, window_end=window_end)
+	plotting.timetable(df, "Animal_id",
+		draw=draw,
+		shade=shade,
+		saturate=saturate,
+		save_plot=save_plot,
+		window_end=window_end,
+		real_dates=real_dates,
+		)
