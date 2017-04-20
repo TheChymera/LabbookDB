@@ -197,7 +197,13 @@ def add_all_columns(cols, class_name):
 		column = getattr(joinclassobject, col.key)
 		cols.append(column.label("{}_{}".format(class_name, col_name)))
 
-def get_df(db_path, col_entries=[], join_entries=[], filters=[], outerjoin=False, join_types=[]):
+def get_df(db_path,
+	col_entries=[],
+	default_join="inner",
+	filters=[],
+	join_entries=[],
+	join_types=[],
+	):
 	"""Return a dataframe from a complex query of a LabbookDB-style database
 
 	Arguments
@@ -217,7 +223,7 @@ def get_df(db_path, col_entries=[], join_entries=[], filters=[], outerjoin=False
 		If any of the elements contains a period, the expression will be evaluated as a class (preceeding the period) attribute (after the period)$
 	filters : list
 		A list of lists giving filters for the query. In each sub-list the first and second elements give the class and attribute to be matched. Every following element specifies a possible value for the class attribute (implemented as inclusive disjunction). If the attribute name ends in "date" the function compute datetime objects from the subsequent strings containing numbers separated by commas.
-
+	!!!incomplete documentation
 
 
 	Examples
@@ -274,9 +280,9 @@ def get_df(db_path, col_entries=[], join_entries=[], filters=[], outerjoin=False
 
 	sql_query = session.query(*cols)
 	while len(join_types) < len(joins):
-		if outerjoin:
+		if default_join == "outer":
 			join_types.append("outer")
-		else:
+		elif default_join == "inner":
 			join_types.append("inner")
 	for ix, join in enumerate(joins):
 		if join_types[ix] == "inner":

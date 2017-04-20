@@ -2,11 +2,7 @@ try:
 	from ..report import selection, formatting
 except (SystemError, ValueError):
 	import selection, formatting
-if not __package__:
-	import sys, os
-	sys.path.append(os.path.expanduser('~/src/behaviopy'))
 import behaviopy as bp
-import matplotlib.pyplot as plt
 from os import path
 
 def sucrose_preference(db_path, treatment_start_dates,
@@ -83,7 +79,7 @@ def forced_swim(db_path, plot_style, treatment_start_dates,
 	Path under which to save the plotted dataframe. ".csv" will be appended to the string if not yet presenr, and the data will be saved in CSV format.
 	"""
 
-	raw_df = selection.data_selection(db_path, "forced swim", treatment_start_dates=treatment_start_dates)
+	raw_df = selection.parameterized(db_path, "forced swim", treatment_start_dates=treatment_start_dates)
 
 	if plot_style in ["tsplot", "pointplot"]:
 		if not time_label:

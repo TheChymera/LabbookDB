@@ -54,6 +54,7 @@ def weights_plot(db_path, animals={}, start_date=None, end_date=None, include_re
 
 	mystring = sql_query.statement
 	df = pd.read_sql_query(mystring,engine)
+	print(df.columns)
 	if normalize:
 		reference_date = list(set(df[(df["treatments_protocol_code"] == "cFluDW")]["treatments_start_date"]))
 		if len(reference_date) >= 2:

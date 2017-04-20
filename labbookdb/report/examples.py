@@ -1,28 +1,18 @@
-try:
-	from ..report import selection, formatting
-except (SystemError, ValueError):
-	import selection, formatting
-try:
-	from ..db import query
-except (ValueError, SystemError):
-	import sys
-	sys.path.append('/home/chymera/src/LabbookDB/labbookdb/db/')
-	import query
-if not __package__:
-	import sys, os
-	sys.path.append(os.path.expanduser('~/src/behaviopy'))
 from behaviopy import plotting
 import matplotlib.pyplot as plt
 import behaviour
-import selection
 import tracking
-import query
+import selection
 
-COHORT_DATES = ["2016,4,25,19,30","2016,5,19,23,5","2016,11,24,21,30","2017,1,31,22,0"]
+COHORTS = [
+	{"treatment_start":"2015,11,11", "window_end":"2015,12,30"},
+	{"treatment_start":"2016,4,25,19,30", "window_end":""},
+	{"treatment_start":"2016,5,19,23,5", "window_end":""},
+	{"treatment_start":"2016,11,24,21,30", "window_end":""},
+	{"treatment_start":"2017,1,31,22,0", "window_end":"2017,3,21"},
+	]
 
 def sucrose_preference(db_path, cohorts, compare):
-	if isinatance(cohort_dates,str):
-		cohort_dates = [cohort_dates]
 	if cohorts == "cage":
 		treatment_start_dates = ["2016,4,25,19,30","2016,5,19,23,5",]
 	elif cohorts == "animal":
@@ -30,32 +20,70 @@ def sucrose_preference(db_path, cohorts, compare):
 	elif cohorts == "aileen_switching_sides":
 		treatment_start_dates = ["2017,1,31,22,0"]
 	elif cohorts == "all":
-		treatment_start_dates = COHORT_DATES
+		treatment_start_dates = [i["treatment_start"] for i in COHORTS]
+	else:
+		treatment_start_dates = cohorts
 	if compare == "treatment":
 		behaviour.sucrose_preference(db_path, treatment_start_dates=treatment_start_dates, comparisons={"Period [days]":[]}, compare="Treatment",save_df="")
 	elif compare == "side_preference":
 		behaviour.sucrose_preference(db_path, treatment_start_dates=treatment_start_dates, comparisons={"Cage ID":[]}, compare="Sucrose Bottle Position", save_df="")
 
-def treatments_plot(db_path, cohorts):
+def treatments_plot(db_path, cohorts,
+	per_cage=True,
+	):
+
 	if isinstance(cohorts,str):
 		cohorts = [cohorts]
+	shade = ["FMRIMeasurement_date"]
+	draw = [
+		{"TreatmentProtocol_code":["aFluIV_","Treatment_start_date"]},
+		{"TreatmentProtocol_code":["aFluIV","Treatment_start_date"]},
+		"OpenFieldTestMeasurement_date",
+		"ForcedSwimTestMeasurement_date",
+		{"TreatmentProtocol_code":["aFluSC","Treatment_start_date"]},
+		]
 	saturate = [
 		{"Cage_TreatmentProtocol_code":["cFluDW","Cage_Treatment_start_date","Cage_Treatment_end_date"]},
 		{"Cage_TreatmentProtocol_code":["cFluDW_","Cage_Treatment_start_date","Cage_Treatment_end_date"]},
-		{"TreatmentProtocol_code":["aFluIV","Treatment_start_date"]},
-		{"TreatmentProtocol_code":["aFluSC","Treatment_start_date"]}
+		{"TreatmentProtocol_code":["cFluIP","Treatment_start_date","Treatment_end_date"]},
 		]
-	filters = [["Cage_Treatment","start_date",i] for i in cohorts]
-	tracking.treatments_plot(db_path, filters, saturate, save_df="~/lala.csv", save_plot="~/lala.png")
+	if per_cage:
+		filters = [["Cage_Treatment","start_date",i["treatment_start"]] for i in cohorts]
+	else:
+		df = selection.animals_by_treatment(db_path, start_dates=[i["treatment_start"] for i in cohorts],)
+		animals = list(set(df["Animal_id"]))
+		animals = [str(i) for i in animals]
+		myfilter = ["Animal","id",]
+		myfilter.extend(animals)
+		filters = [myfilter]
+	window_end = [i["window_end"] for i in cohorts if i["window_end"] not in ("", None)]
+	window_end.sort()
+	if window_end:
+		window_end = window_end[-1]
+	tracking.treatments_plot(db_path,
+		draw=draw,
+		filters=filters,
+		saturate=saturate,
+		default_join="outer",
+		#This loads only entries with fMRI measurements:
+		# join_types=["outer","inner","outer","outer","outer","outer","outer","outer","outer","outer"],
+		#This loads all entries:
+		join_types=["outer","outer","outer","outer","outer","outer","outer","outer","outer","outer"],
+		save_df="~/lala.csv",
+		save_plot="~/lala.png",
+		shade=shade,
+		window_end=window_end,
+		)
 
 if __name__ == '__main__':
 	db_path="~/syncdata/meta.db"
-	# forced_swim(db_path, "pointplot", treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5"])
-	# forced_swim(db_path, "pointplot", treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5"], period_label="interval [2 min]")
+	treatments_plot(db_path,COHORTS[0:1], per_cage=False)
 
-	# treatments_plot(db_path,COHORT_DATES[3])
 
-	# sucrose_preference(db_path,"animal", "treatment")
+	# treatments_plot(db_path,COHORTS[4:5])
+	# treatments_plot(db_path,COHORTS[2:3])
+
+	# sucrose_preference(db_path, "aileen_switching_sides", "treatment")
 	# sucrose_preference(db_path,"animal", "side_preference")
 
 	# behaviour.forced_swim(db_path, "tsplot", treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5"])
