@@ -57,6 +57,7 @@ def sucrose_preference(db_path, treatment_start_dates,
 		plottable_df.to_csv(df_path)
 
 def forced_swim(db_path, plot_style, treatment_start_dates,
+	colorset=None,
 	columns=["2 to 4"],
 	rename_treatments={"cFluDW":"Fluoxetine","cFluDW_":"Control"},
 	time_label="",
@@ -93,7 +94,10 @@ def forced_swim(db_path, plot_style, treatment_start_dates,
 		elif time_label == "Interval [2 min]":
 			periods={1:[0,120],2:[120,240],3:[240,360]}
 			plottable_df = formatting.plottable_sums(raw_df, plot_behaviour, identifier_column="Animal_id", periods=periods, period_label=time_label)
-		bp.plotting.forced_swim_timecourse(plottable_df, legend_loc="best", rename_treatments=rename_treatments, time_label=time_label, plotstyle=plot_style, datacolumn_label="Immobility Ratio")
+		if colorset:
+			bp.plotting.forced_swim_timecourse(plottable_df, legend_loc="best", rename_treatments=rename_treatments, time_label=time_label, plotstyle=plot_style, datacolumn_label="Immobility Ratio", colorset=colorset)
+		else:
+			bp.plotting.forced_swim_timecourse(plottable_df, legend_loc="best", rename_treatments=rename_treatments, time_label=time_label, plotstyle=plot_style, datacolumn_label="Immobility Ratio")
 	elif plot_style == "ttest":
 		periods = {}
 		for column_name in columns:
@@ -102,7 +106,10 @@ def forced_swim(db_path, plot_style, treatment_start_dates,
 			end = int(end_minute)*60
 			periods[column_name] = [start,end]
 		plottable_df = formatting.plottable_sums(raw_df, plot_behaviour, period_label="Interval [minutes]", periods=periods)
-		bp.plotting.expandable_ttest(plottable_df, compare="Treatment", comparisons={"Interval [minutes]":[]}, datacolumn_label="Immobility Ratio", rename_treatments=rename_treatments)
+		if colorset:
+			bp.plotting.expandable_ttest(plottable_df, compare="Treatment", comparisons={"Interval [minutes]":[]}, datacolumn_label="Immobility Ratio", rename_treatments=rename_treatments, colorset=colorset)
+		else:
+			bp.plotting.expandable_ttest(plottable_df, compare="Treatment", comparisons={"Interval [minutes]":[]}, datacolumn_label="Immobility Ratio", rename_treatments=rename_treatments)
 
 	if save_df:
 		df_path = path.abspath(path.expanduser(save_df))
