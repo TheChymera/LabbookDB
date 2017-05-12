@@ -6,7 +6,7 @@ Base = declarative_base()
 
 def dt_format(dt):
 	if not dt:
-		return "ONGOING"
+		return "NO DATE"
 	elif dt.time()==datetime.time(0,0,0):
 		return str(dt.date())
 	else:
