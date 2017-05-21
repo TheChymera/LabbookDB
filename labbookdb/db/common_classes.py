@@ -382,6 +382,7 @@ class Cage(Base):
 	measurements = relationship("Measurement")
 	id_local = Column(String, unique=True)
 	location = Column(String)
+	environmental_enrichment = Column(String)
 	stays = relationship("CageStay", back_populates="cage")
 
 	def __str__(self):
