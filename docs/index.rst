@@ -1,2 +1,9 @@
+.. include:: ../README.rst
+
 .. toctree::
-   :maxdepth: 2
+  :hidden:
+  :maxdepth: 3
+
+  modules
+  objects
+
