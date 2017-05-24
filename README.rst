@@ -26,7 +26,7 @@ Installation
 Gentoo Linux
 ~~~~~~~~~~~~
 
-LabbookDB is available for Portage (the package manager of Gentoo Linux, derivative distributions, as well as BSD) via the [Chymeric Overlay](https://github.com/TheChymera/overlay).
+LabbookDB is available for Portage (the package manager of Gentoo Linux, derivative distributions, as well as BSD) via the `Chymeric Overlay <https://github.com/TheChymera/overlay>`_.
 Upon enabling the overlay, the package can be emerged:
 
 .. code-block:: console
