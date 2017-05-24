@@ -3,9 +3,9 @@ import sys
 import os
 sys.path.append(os.path.expanduser('~/src/behaviopy'))
 from behaviopy import plotting
-import behaviour
-import tracking
-import selection
+from .behaviour import forced_swim, sucrose_preference
+from .tracking import treatments_plot
+from .selection import animals_by_treatment
 
 COHORTS = [
 	{"treatment_start":"2015,11,11", "window_end":"2015,12,30"},
@@ -15,7 +15,7 @@ COHORTS = [
 	{"treatment_start":"2017,1,31,22,0", "window_end":"2017,3,21"},
 	]
 
-def sucrose_preference(db_path, cohorts, compare):
+def my_sucrose_preference(db_path, cohorts, compare):
 	if cohorts == "cage":
 		treatment_start_dates = ["2016,4,25,19,30","2016,5,19,23,5",]
 	elif cohorts == "animal":
@@ -27,11 +27,11 @@ def sucrose_preference(db_path, cohorts, compare):
 	else:
 		treatment_start_dates = cohorts
 	if compare == "treatment":
-		behaviour.sucrose_preference(db_path, treatment_start_dates=treatment_start_dates, comparisons={"Period [days]":[]}, compare="Treatment",save_df="")
+		sucrose_preference(db_path, treatment_start_dates=treatment_start_dates, comparisons={"Period [days]":[]}, compare="Treatment",save_df="")
 	elif compare == "side_preference":
-		behaviour.sucrose_preference(db_path, treatment_start_dates=treatment_start_dates, comparisons={"Cage ID":[]}, compare="Sucrose Bottle Position", save_df="")
+		sucrose_preference(db_path, treatment_start_dates=treatment_start_dates, comparisons={"Cage ID":[]}, compare="Sucrose Bottle Position", save_df="")
 
-def treatments_plot(db_path, cohorts,
+def treatments(db_path, cohorts,
 	per_cage=True,
 	):
 
@@ -53,7 +53,7 @@ def treatments_plot(db_path, cohorts,
 	if per_cage:
 		filters = [["Cage_Treatment","start_date",i["treatment_start"]] for i in cohorts]
 	else:
-		df = selection.animals_by_treatment(db_path, start_dates=[i["treatment_start"] for i in cohorts],)
+		df = animals_by_treatment(db_path, start_dates=[i["treatment_start"] for i in cohorts],)
 		animals = list(set(df["Animal_id"]))
 		animals = [str(i) for i in animals]
 		myfilter = ["Animal","id",]
@@ -63,7 +63,7 @@ def treatments_plot(db_path, cohorts,
 	window_end.sort()
 	if window_end:
 		window_end = window_end[-1]
-	tracking.treatments_plot(db_path,
+	treatments_plot(db_path,
 		draw=draw,
 		filters=filters,
 		saturate=saturate,
@@ -80,27 +80,27 @@ def treatments_plot(db_path, cohorts,
 
 if __name__ == '__main__':
 	db_path="~/syncdata/meta.db"
-	# treatments_plot(db_path,COHORTS[0:1], per_cage=False)
+	# treatments(db_path,COHORTS[0:1], per_cage=False)
 
 
-	# treatments_plot(db_path,COHORTS[4:5])
-	# treatments_plot(db_path,COHORTS[2:3])
+	# treatments(db_path,COHORTS[4:5])
+	# treatments(db_path,COHORTS[2:3])
 
-	sucrose_preference(db_path, "aileen_switching_sides", "treatment")
+	my_sucrose_preference(db_path, "aileen_switching_sides", "treatment")
 	# sucrose_preference(db_path,"animal", "side_preference")
 
-	# behaviour.forced_swim(db_path, "tsplot", treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5"])
-	# behaviour.forced_swim(db_path, "tsplot", treatment_start_dates=["2017,1,31,22,0","2016,11,24,21,30"])
-	# behaviour.forced_swim(db_path, "tsplot", treatment_start_dates=["2017,1,31,22,0"])
-	# behaviour.forced_swim(db_path, "pointplot", treatment_start_dates=["2017,1,31,22,0"])
-	# behaviour.forced_swim(db_path, "tsplot", treatment_start_dates=["2016,11,24,21,30"])
-	# behaviour.forced_swim(db_path, "tsplot", treatment_start_dates=ALL_COHORT_START_DATES, save_df="")
-	# behaviour.forced_swim(db_path, "pointplot", treatment_start_dates=ALL_COHORT_START_DATES, save_df="")
+	# forced_swim(db_path, "tsplot", treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5"])
+	# forced_swim(db_path, "tsplot", treatment_start_dates=["2017,1,31,22,0","2016,11,24,21,30"])
+	# forced_swim(db_path, "tsplot", treatment_start_dates=["2017,1,31,22,0"])
+	# forced_swim(db_path, "pointplot", treatment_start_dates=["2017,1,31,22,0"])
+	# forced_swim(db_path, "tsplot", treatment_start_dates=["2016,11,24,21,30"])
+	# forced_swim(db_path, "tsplot", treatment_start_dates=ALL_COHORT_START_DATES, save_df="")
+	# forced_swim(db_path, "pointplot", treatment_start_dates=ALL_COHORT_START_DATES, save_df="")
 
-	# behaviour.forced_swim(db_path, "ttest", treatment_start_dates=["2016,11,24,21,30","2017,1,31,22,0"], columns=["2 to 4", "2 to 6"])
-	# behaviour.forced_swim(db_path, "ttest", treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5","2017,1,31,22,0"], columns=["2 to 4", "2 to 6"])
-	# behaviour.forced_swim(db_path, "ttest", treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5","2016,11,24,21,30","2017,1,31,22,0"], columns=["2 to 4", "2 to 6"], colorset=["#56B4E9", "#E69F00", "#56B4E9", "#000000","#F0E442", "#0072B2", "#D55E00", "#CC79A7"])
-	# behaviour.forced_swim(db_path, "ttest", treatment_start_dates=["2017,1,31,22,0"], columns=["2 to 4"])
-	# behaviour.forced_swim(db_path, "ttest", treatment_start_dates=["2016,11,24,21,30"], columns=["2 to 4", "2 to 6"])
-	# behaviour.forced_swim(db_path, "ttest", treatment_start_dates=ALL_COHORT_START_DATES, columns=["2 to 4", "2 to 6"], save_df="")
+	# forced_swim(db_path, "ttest", treatment_start_dates=["2016,11,24,21,30","2017,1,31,22,0"], columns=["2 to 4", "2 to 6"])
+	# forced_swim(db_path, "ttest", treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5","2017,1,31,22,0"], columns=["2 to 4", "2 to 6"])
+	# forced_swim(db_path, "ttest", treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5","2016,11,24,21,30","2017,1,31,22,0"], columns=["2 to 4", "2 to 6"], colorset=["#56B4E9", "#E69F00", "#56B4E9", "#000000","#F0E442", "#0072B2", "#D55E00", "#CC79A7"])
+	# forced_swim(db_path, "ttest", treatment_start_dates=["2017,1,31,22,0"], columns=["2 to 4"])
+	# forced_swim(db_path, "ttest", treatment_start_dates=["2016,11,24,21,30"], columns=["2 to 4", "2 to 6"])
+	# forced_swim(db_path, "ttest", treatment_start_dates=ALL_COHORT_START_DATES, columns=["2 to 4", "2 to 6"], save_df="")
 	plt.show()
