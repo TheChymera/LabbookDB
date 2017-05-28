@@ -2,10 +2,17 @@ try:
 	from ..report import selection, formatting
 except (SystemError, ValueError):
 	import selection, formatting
-import behaviopy as bp
 from os import path
+try:
+	from behaviopy import plotting
+except ImportError:
+	import sys
+	sys.path.append(path.abspath(path.expanduser('~/src/behaviopy/')))
+	from behaviopy import plotting
 
 def sucrose_preference(db_path, treatment_start_dates,
+	bp_style=True,
+	colorset=None,
 	comparisons={"Period [days]":[]},
 	compare="Treatment",
 	rename_treatments={"cFluDW":"Fluoxetine","cFluDW_":"Control"},
@@ -22,6 +29,9 @@ def sucrose_preference(db_path, treatment_start_dates,
 	treatment_start_dates : list
 	A list containing the treatment start date or dates by which to filter the cages for the sucrose preference measurements.
 	Items should be strings in datetime format, e.g. "2016,4,25,19,30".
+
+	bp_style : bool, optional
+	Whether to let behaviopy apply its default style.
 
 	compare : string, optional
 	Which parameter to categorize the comparison by. Must be a column name from df.
@@ -44,13 +54,21 @@ def sucrose_preference(db_path, treatment_start_dates,
 	raw_df = selection.by_animals(db_path, "sucrose preference", animals=animals)
 	full_df = animals_df.merge(raw_df, on="Animal_id", suffixes=("_Treatment",""))
 	plottable_df = formatting.plottable_sucrosepreference_df(full_df)
-	bp.plotting.expandable_ttest(plottable_df, compare=compare, comparisons=comparisons, datacolumn_label="Sucrose Preference Ratio", rename_treatments=rename_treatments)
+	plotting.expandable_ttest(plottable_df,
+		compare=compare,
+		comparisons=comparisons,
+		datacolumn_label="Sucrose Preference Ratio",
+		rename_treatments=rename_treatments,
+		colorset=colorset,
+		)
 
 	if save_df:
 		df_path = path.abspath(path.expanduser(save_df))
 		if not(df_path.endswith(".csv") or df_path.endswith(".CSV")):
 			df_path += ".csv"
 		plottable_df.to_csv(df_path)
+
+	return plottable_df
 
 def forced_swim(db_path, plot_style, treatment_start_dates,
 	colorset=None,
@@ -60,7 +78,7 @@ def forced_swim(db_path, plot_style, treatment_start_dates,
 	plot_behaviour="immobility",
 	save_df="",
 	):
-	"""Plot sucrose preference scatterplot.
+	"""Plot forced swim scatterplot.
 
 	Parameters
 	----------
@@ -91,9 +109,9 @@ def forced_swim(db_path, plot_style, treatment_start_dates,
 			periods={1:[0,120],2:[120,240],3:[240,360]}
 			plottable_df = formatting.plottable_sums(raw_df, plot_behaviour, identifier_column="Animal_id", periods=periods, period_label=time_label)
 		if colorset:
-			bp.plotting.forced_swim_timecourse(plottable_df, legend_loc="best", rename_treatments=rename_treatments, time_label=time_label, plotstyle=plot_style, datacolumn_label="Immobility Ratio", colorset=colorset)
+			plotting.forced_swim_timecourse(plottable_df, legend_loc="best", rename_treatments=rename_treatments, time_label=time_label, plotstyle=plot_style, datacolumn_label="Immobility Ratio", colorset=colorset)
 		else:
-			bp.plotting.forced_swim_timecourse(plottable_df, legend_loc="best", rename_treatments=rename_treatments, time_label=time_label, plotstyle=plot_style, datacolumn_label="Immobility Ratio")
+			plotting.forced_swim_timecourse(plottable_df, legend_loc="best", rename_treatments=rename_treatments, time_label=time_label, plotstyle=plot_style, datacolumn_label="Immobility Ratio")
 	elif plot_style == "ttest":
 		periods = {}
 		for column_name in columns:
@@ -103,9 +121,9 @@ def forced_swim(db_path, plot_style, treatment_start_dates,
 			periods[column_name] = [start,end]
 		plottable_df = formatting.plottable_sums(raw_df, plot_behaviour, period_label="Interval [minutes]", periods=periods)
 		if colorset:
-			bp.plotting.expandable_ttest(plottable_df, compare="Treatment", comparisons={"Interval [minutes]":[]}, datacolumn_label="Immobility Ratio", rename_treatments=rename_treatments, colorset=colorset)
+			plotting.expandable_ttest(plottable_df, compare="Treatment", comparisons={"Interval [minutes]":[]}, datacolumn_label="Immobility Ratio", rename_treatments=rename_treatments, colorset=colorset)
 		else:
-			bp.plotting.expandable_ttest(plottable_df, compare="Treatment", comparisons={"Interval [minutes]":[]}, datacolumn_label="Immobility Ratio", rename_treatments=rename_treatments)
+			plotting.expandable_ttest(plottable_df, compare="Treatment", comparisons={"Interval [minutes]":[]}, datacolumn_label="Immobility Ratio", rename_treatments=rename_treatments)
 
 	if save_df:
 		df_path = path.abspath(path.expanduser(save_df))

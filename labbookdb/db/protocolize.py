@@ -4,8 +4,8 @@ import shutil
 from string import Template
 from sqlalchemy import create_engine, literal, inspection
 from sqlalchemy.orm import aliased, relation, scoped_session, sessionmaker, eagerload, subqueryload, joinedload, lazyload, Load
-from common_classes import *
-from utils import get_script_dir
+from .common_classes import *
+from .utils import get_script_dir
 import pandas as pd
 import os
 

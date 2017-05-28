@@ -1,9 +1,8 @@
 import os
 import numpy as np
 
-if not __package__:
-	import sys, os
-	sys.path.append(os.path.expanduser('~/src/behaviopy'))
+import sys, os
+sys.path.append(os.path.expanduser('~/src/behaviopy/'))
 from behaviopy import tracking
 
 from labbookdb.db.query import get_df

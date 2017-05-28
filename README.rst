@@ -1,0 +1,66 @@
+LabbookDB
+=========
+
+.. image:: https://readthedocs.org/projects/labbookdb/badge/?version=latest
+  :target: http://labbookdb.readthedocs.io/en/latest/?badge=latest
+  :alt: Documentation Status
+
+This package contains a relational database structure for life science research, and a number of functions to conveniently add and retrieve information - and generate summaries.
+The core concept of LabbookDB is that most of the information classically tracked in a lab book can be more efficiently and more reliably stored in a relational database.
+
+In comparison to a paper notebook, an **electronic** lab book is:
+
+* More easily stored
+* More easily shared
+* More easily backed up
+
+In comparison with other electronic formats based on a document concept, a **database** of experimental metadata is:
+
+* More easily browsed
+* More easily queried
+* More easily integrated into data analysis functions
+
+Installation
+------------
+
+Gentoo Linux
+~~~~~~~~~~~~
+
+LabbookDB is available for Portage (the package manager of Gentoo Linux, derivative distributions, as well as BSD) via the `Chymeric Overlay <https://github.com/TheChymera/overlay>`_.
+Upon enabling the overlay, the package can be emerged:
+
+.. code-block:: console
+
+    emerge labbookdb
+
+
+Python Package Manager (Users)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Python's `setuptools` allows you to install Python packages independently of your distribution (or operating system, even).
+This approach cannot manage any of our numerous non-Python dependencies (by design) and at the moment will not even manage Python dependencies;
+as such, given any other alternative, **we do not recommend this approach**:
+
+.. code-block:: console
+
+    git clone git@github.com:TheChymera/LabbookDB.git
+    cd LabbookDB
+    python setup.py install --user
+
+Python Package Manager (Developers)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Python's `setuptools` allows you to install Python packages independently of your distribution (or operating system, even);
+it also allows you to install a "live" version of the package - dynamically linking back to the source code.
+This permits you to test code (with real module functionality) as you develop it.
+This method is sub-par for dependency management (see above notice), but - as a developer - you should be able to manually ensure that your package manager provides the needed packages.
+
+.. code-block:: console
+
+    git clone git@github.com:TheChymera/LabbookDB.git
+    cd LabbookDB
+    mkdir ~/.python_develop
+    python setup.py develop --install-dir ~/.python_develop/
+    echo "export PYTHONPATH=\$HOME/.python_develop:\$PYTHONPATH" >> ~/.bashrc
+    echo "export PATH=\$HOME/.python_develop:\$PATH" >> ~/.bashrc
+    source ~/.bashrc
