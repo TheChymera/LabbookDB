@@ -194,6 +194,46 @@ def add_all_columns(cols, class_name):
 		column = getattr(joinclassobject, col.key)
 		cols.append(column.label("{}_{}".format(class_name, col_name)))
 
+def get_for_protocolize(db_path, class_name, code):
+	"""Return a dataframe containing a specific entry from a given class name, joined with its related tables up to three levels down.
+	"""
+	session, engine = loadSession(db_path)
+	cols = []
+	joins = []
+	classobject = ALLOWED_CLASSES[class_name]
+	insp = inspection.inspect(classobject)
+	for name, col in insp.columns.items():
+		cols.append(col.label(name))
+	for name, rel in insp.relationships.items():
+		alias = aliased(rel.mapper.class_, name=name)
+		joins.append((alias, rel.class_attribute))
+		for col_name, col in inspection.inspect(rel.mapper).columns.items():
+			#the id column causes double entries, as it is mapped once on the parent table (related_table_id) and once on the child table (table_id)
+			if col.key != "id":
+				aliased_col = getattr(alias, col.key)
+				cols.append(aliased_col.label("{}_{}".format(name, col_name)))
+
+		sub_insp = inspection.inspect(rel.mapper.class_)
+		for sub_name, sub_rel in sub_insp.relationships.items():
+			if "contains" not in sub_name:
+				sub_alias = aliased(sub_rel.mapper.class_, name=name+"_"+sub_name)
+				joins.append((sub_alias, sub_rel.class_attribute))
+				for sub_col_name, sub_col in inspection.inspect(sub_rel.mapper).columns.items():
+					#the id column causes double entries, as it is mapped once on the parent table (related_table_id) and once on the child table (table_id)
+					if sub_col.key != "id":
+						sub_aliased_col = getattr(sub_alias, sub_col.key)
+						cols.append(sub_aliased_col.label("{}_{}_{}".format(name, sub_name, sub_col_name)))
+
+	sql_query = session.query(*cols).select_from(classobject)
+	for join in joins:
+		sql_query = sql_query.outerjoin(*join)
+	sql_query = sql_query.filter(classobject.code == code)
+
+	mystring = sql_query.statement
+	mydf = pd.read_sql_query(mystring,engine)
+
+	return mydf
+
 def get_df(db_path,
 	col_entries=[],
 	default_join="inner",
