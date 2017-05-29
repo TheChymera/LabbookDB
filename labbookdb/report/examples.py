@@ -83,25 +83,25 @@ def treatments(db_path, cohorts,
 if __name__ == '__main__':
 	db_path="~/syncdata/meta.db"
 	# treatments(db_path,COHORTS[0:1], per_cage=False)
-
-
-	# treatments(db_path,COHORTS[4:5])
 	# treatments(db_path,COHORTS[2:3])
-
-	# my_sucrose_preference(db_path, "aileen_switching_sides", "treatment")
-
 	# forced_swim(db_path, "tsplot", treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5"])
+
+	################################################
+	#####Safe for usage with logging_examples#######
+	################################################
+	# treatments(db_path,COHORTS[4:5])
+	# my_sucrose_preference(db_path, "aileen_switching_sides", "treatment")
 	# forced_swim(db_path, "tsplot", treatment_start_dates=["2017,1,31,22,0","2016,11,24,21,30"])
 	# forced_swim(db_path, "tsplot", treatment_start_dates=["2017,1,31,22,0"])
 	# forced_swim(db_path, "pointplot", treatment_start_dates=["2017,1,31,22,0"])
 	# forced_swim(db_path, "tsplot", treatment_start_dates=["2016,11,24,21,30"])
 	# forced_swim(db_path, "tsplot", treatment_start_dates=[i["treatment_start"] for i in COHORTS], save_df="")
-	forced_swim(db_path, "pointplot", treatment_start_dates=[i["treatment_start"] for i in COHORTS], save_df="")
-
+	# forced_swim(db_path, "pointplot", treatment_start_dates=[i["treatment_start"] for i in COHORTS], save_df="")
 	# forced_swim(db_path, "ttest", treatment_start_dates=["2016,11,24,21,30","2017,1,31,22,0"], columns=["2 to 4", "2 to 6"])
 	# forced_swim(db_path, "ttest", treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5","2017,1,31,22,0"], columns=["2 to 4", "2 to 6"])
 	# forced_swim(db_path, "ttest", treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5","2016,11,24,21,30","2017,1,31,22,0"], columns=["2 to 4", "2 to 6"], colorset=["#56B4E9", "#E69F00", "#56B4E9", "#000000","#F0E442", "#0072B2", "#D55E00", "#CC79A7"])
 	# forced_swim(db_path, "ttest", treatment_start_dates=["2017,1,31,22,0"], columns=["2 to 4"])
 	# forced_swim(db_path, "ttest", treatment_start_dates=["2016,11,24,21,30"], columns=["2 to 4", "2 to 6"])
 	# forced_swim(db_path, "ttest", treatment_start_dates=[i["treatment_start"] for i in COHORTS], columns=["2 to 4", "2 to 6"], save_df="")
+
 	plt.show()
