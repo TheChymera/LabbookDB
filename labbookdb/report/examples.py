@@ -87,7 +87,6 @@ if __name__ == '__main__':
 	# treatments(db_path,COHORTS[2:3])
 
 	my_sucrose_preference(db_path, "aileen_switching_sides", "treatment")
-	# sucrose_preference(db_path,"animal", "side_preference")
 
 	# forced_swim(db_path, "tsplot", treatment_start_dates=["2016,4,25,19,30","2016,5,19,23,5"])
 	# forced_swim(db_path, "tsplot", treatment_start_dates=["2017,1,31,22,0","2016,11,24,21,30"])
