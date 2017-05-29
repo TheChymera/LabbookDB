@@ -14,10 +14,10 @@ import sqlalchemy
 
 try:
 	from .common_classes import *
-	from .query import allowed_classes
+	from .query import ALLOWED_CLASSES
 except ValueError:
 	from common_classes import *
-	from query import allowed_classes
+	from query import ALLOWED_CLASSES
 
 def loadSession(db_path):
 	db_path = "sqlite:///" + path.expanduser(db_path)
@@ -43,7 +43,7 @@ def instructions(kind):
 
 def get_related_ids(session, engine, parameters):
 	category = parameters.split(":",1)[0]
-	sql_query=session.query(allowed_classes[category])
+	sql_query=session.query(ALLOWED_CLASSES[category])
 	for field_value in parameters.split(":",1)[1].split("&&"):
 		field, value = field_value.split(".",1)
 		# this unpacks one level of AND separators.
@@ -60,16 +60,16 @@ def get_related_ids(session, engine, parameters):
 					value = datetime.datetime(*[int(i) for i in value.split(",")])
 				# we are generally looking to match values, but sometimes the parent table does not have an id column, but only a relationship column (e.g. in one to many relationships)
 				try:
-					sql_query = sql_query.filter(getattr(allowed_classes[category], field)==value)
+					sql_query = sql_query.filter(getattr(ALLOWED_CLASSES[category], field)==value)
 				except sqlalchemy.exc.InvalidRequestError:
-					sql_query = sql_query.filter(getattr(allowed_classes[category], field).contains(*[i for i in objects]))
+					sql_query = sql_query.filter(getattr(ALLOWED_CLASSES[category], field).contains(*[i for i in objects]))
 		else:
 			if field[-4:] == "date": # support for date entry matching (the values have to be passes as string but matched as datetime)
 				value = datetime.datetime(*[int(i) for i in value.split(",")])
-			sql_query = sql_query.filter(getattr(allowed_classes[category], field)==value)
+			sql_query = sql_query.filter(getattr(ALLOWED_CLASSES[category], field)==value)
 	mystring = sql_query.with_labels().statement
 	mydf = pd.read_sql_query(mystring,engine)
-	category_tablename = allowed_classes[category].__table__.name
+	category_tablename = ALLOWED_CLASSES[category].__table__.name
 	related_table_ids = mydf[category_tablename+"_id"]
 	input_values = list(related_table_ids)
 	input_values = [int(i) for i in input_values]
@@ -101,7 +101,7 @@ def append_parameter(db_path, entry_identification, parameters):
 
 	session, engine = loadSession(db_path)
 
-	entry_class = allowed_classes[entry_identification.split(":")[0]]
+	entry_class = ALLOWED_CLASSES[entry_identification.split(":")[0]]
 	my_id = get_related_ids(session, engine, entry_identification)[0][0]
 	myobject = session.query(entry_class).filter(entry_class.id == my_id)[0]
 
@@ -110,7 +110,7 @@ def append_parameter(db_path, entry_identification, parameters):
 		if isinstance(parameter_expression, (str, int, float)):
 			if ":" in parameter_expression and "." in parameter_expression:
 				related_entry_ids, _ = get_related_ids(session, engine, i)
-				related_entry_class = allowed_classes[i.split(":")[0]]
+				related_entry_class = ALLOWED_CLASSES[i.split(":")[0]]
 				for related_entry_id in related_entry_ids:
 					related_entry = session.query(related_entry_class).filter(related_entry_class.id == related_entry_id)[0]
 					setattr(myobject, parameter_key, related_entry)
@@ -126,7 +126,7 @@ def append_parameter(db_path, entry_identification, parameters):
 					set_attribute.append(new_entry)
 				elif isinstance(parameter_expression_entry, str):
 					related_entry_ids, _ = get_related_ids(session, engine, parameter_expression_entry)
-					related_entry_class = allowed_classes[parameter_expression_entry.split(":")[0]]
+					related_entry_class = ALLOWED_CLASSES[parameter_expression_entry.split(":")[0]]
 					for related_entry_id in related_entry_ids:
 						related_entry = session.query(related_entry_class).filter(related_entry_class.id == related_entry_id)[0]
 						set_attribute.append(related_entry)
@@ -143,7 +143,7 @@ def add_generic(db_path, parameters, walkthrough=False, session=None, engine=Non
 	if isinstance(parameters, str):
 		parameters = json.loads(parameters)
 
-	category_class = allowed_classes[parameters["CATEGORY"]]
+	category_class = ALLOWED_CLASSES[parameters["CATEGORY"]]
 	if list(parameters.keys()) == ["CATEGORY"]:
 		attributes = dir(category_class())
 		filtered_attributes = [i for i in attributes if i[0] != "_"]
@@ -172,7 +172,7 @@ def add_generic(db_path, parameters, walkthrough=False, session=None, engine=Non
 					related_entries.append(related_entry)
 				elif isinstance(related_entry, str):
 					my_id = get_related_ids(session, engine, related_entry)[0][0]
-					entry_class = allowed_classes[related_entry.split(":")[0]]
+					entry_class = ALLOWED_CLASSES[related_entry.split(":")[0]]
 					related_entry = session.query(entry_class).\
 						filter(entry_class.id == my_id).all()[0]
 					related_entries.append(related_entry)

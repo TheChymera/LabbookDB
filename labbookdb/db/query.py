@@ -17,7 +17,7 @@ try:
 except (ValueError, SystemError):
 	from common_classes import *
 
-allowed_classes = {
+ALLOWED_CLASSES = {
 	"Animal": Animal,
 	"AnimalExternalIdentifier": AnimalExternalIdentifier,
 	"AnesthesiaProtocol": AnesthesiaProtocol,
@@ -68,7 +68,7 @@ def instructions(kind):
 
 def get_related_id(session, engine, parameters):
 	category = parameters.split(":",1)[0]
-	sql_query=session.query(allowed_classes[category])
+	sql_query=session.query(ALLOWED_CLASSES[category])
 	for field_value in parameters.split(":",1)[1].split("&&"):
 		field, value = field_value.split(".",1)
 		if ":" in value:
@@ -77,11 +77,11 @@ def get_related_id(session, engine, parameters):
 				value=int(value) # the value is returned as a numpy object
 				if field[-4:] == "date": # support for date entry matching (the values have to be passes as string but matched as datetime)
 					value = datetime.datetime(*[int(i) for i in value.split(",")])
-				sql_query = sql_query.filter(getattr(allowed_classes[category], field)==value)
+				sql_query = sql_query.filter(getattr(ALLOWED_CLASSES[category], field)==value)
 		else:
 			if field[-4:] == "date": # support for date entry matching (the values have to be passes as string but matched as datetime)
 				value = datetime.datetime(*[int(i) for i in value.split(",")])
-			sql_query = sql_query.filter(getattr(allowed_classes[category], field)==value)
+			sql_query = sql_query.filter(getattr(ALLOWED_CLASSES[category], field)==value)
 	mystring = sql_query.statement
 	mydf = pd.read_sql_query(mystring,engine)
 	mydf = mydf.T.groupby(level=0).first().T #awkward hack to deal with polymorphic tables returning multiple IDs
@@ -185,7 +185,7 @@ def commit_and_close(session, engine):
 	engine.dispose()
 
 def add_all_columns(cols, class_name):
-	joinclassobject = allowed_classes[class_name]
+	joinclassobject = ALLOWED_CLASSES[class_name]
 
 	#we need to catch this esception, because for aliased classes a mapper is not directly returned
 	try:
@@ -258,10 +258,10 @@ def get_df(db_path,
 		if len(col_entry) == 1:
 			add_all_columns(cols, col_entry[0])
 		if len(col_entry) == 2:
-			cols.append(getattr(allowed_classes[col_entry[0]],col_entry[1]).label("{}_{}".format(*col_entry)))
+			cols.append(getattr(ALLOWED_CLASSES[col_entry[0]],col_entry[1]).label("{}_{}".format(*col_entry)))
 		if len(col_entry) == 3:
-			aliased_class = aliased(allowed_classes[col_entry[1]])
-			allowed_classes[col_entry[0]+"_"+col_entry[1]] = aliased_class
+			aliased_class = aliased(ALLOWED_CLASSES[col_entry[1]])
+			ALLOWED_CLASSES[col_entry[0]+"_"+col_entry[1]] = aliased_class
 			if col_entry[2] == "":
 				add_all_columns(cols, col_entry[0]+"_"+col_entry[1])
 			else:
@@ -273,9 +273,9 @@ def get_df(db_path,
 		for join_entry_substring in join_entry:
 			if "." in join_entry_substring:
 				class_name, table_name = join_entry_substring.split(".") #if this unpacks >2 values, the user specified strings are malformed
-				join_parameters.append(getattr(allowed_classes[class_name],table_name))
+				join_parameters.append(getattr(ALLOWED_CLASSES[class_name],table_name))
 			else:
-				join_parameters.append(allowed_classes[join_entry_substring])
+				join_parameters.append(ALLOWED_CLASSES[join_entry_substring])
 		joins.append(join_parameters)
 
 	sql_query = session.query(*cols)
@@ -296,9 +296,9 @@ def get_df(db_path,
 				for ix, i in enumerate(sub_filter[2:]):
 					sub_filter[2+ix] = datetime.datetime(*[int(a) for a in i.split(",")])
 			if len(sub_filter) == 3:
-				sql_query = sql_query.filter(getattr(allowed_classes[sub_filter[0]], sub_filter[1]) == sub_filter[2])
+				sql_query = sql_query.filter(getattr(ALLOWED_CLASSES[sub_filter[0]], sub_filter[1]) == sub_filter[2])
 			else:
-				sql_query = sql_query.filter(or_(getattr(allowed_classes[sub_filter[0]], sub_filter[1]) == v for v in sub_filter[2:]))
+				sql_query = sql_query.filter(or_(getattr(ALLOWED_CLASSES[sub_filter[0]], sub_filter[1]) == v for v in sub_filter[2:]))
 
 	mystring = sql_query.statement
 	df = pd.read_sql_query(mystring,engine)
