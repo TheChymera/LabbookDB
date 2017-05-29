@@ -64,3 +64,9 @@ This method is sub-par for dependency management (see above notice), but - as a 
     echo "export PYTHONPATH=\$HOME/.python_develop:\$PYTHONPATH" >> ~/.bashrc
     echo "export PATH=\$HOME/.python_develop:\$PATH" >> ~/.bashrc
     source ~/.bashrc
+
+Example Input
+-------------
+
+LabbookDB is designed to organize complex wet work data.
+We publish example input to generate a relationship-rich database in `logging_examples, a separate repository<https://bitbucket.org/TheChymera/logging_examples>`_.
