@@ -70,3 +70,30 @@ Example Input
 
 LabbookDB is designed to organize complex wet work data.
 We publish example input to generate a relationship-rich database in `logging_examples, a separate repository <https://bitbucket.org/TheChymera/logging_examples>`_.
+
+Dependencies
+------------
+
+* `Argh`_
+* `Pandas`_
+* `simplejson`_
+* `SQLAlchemy`_
+
+Optional Dependencies for Plotting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* `BehavioPy`_
+* `Matplotlib`_
+
+Optional Dependencies for Introspection
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* `Sadisplay`_
+
+.. _Argh: https://github.com/neithere/argh/
+.. _BehavioPy: https://github.com/TheChymera/behaviopy
+.. _Matplotlib: https://matplotlib.org/
+.. _Pandas: http://pandas.pydata.org/
+.. _Sadisplay: https://bitbucket.org/estin/sadisplay/wiki/Home
+.. _simplejson: https://github.com/simplejson/simplejson
+.. _SQLAlchemy: http://www.sqlalchemy.org/
