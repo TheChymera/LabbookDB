@@ -513,4 +513,4 @@ class FluorescentMicroscopyMeasurement(Measurement):
 	imaged_wavelength = Column(Float) #in nm
 	exposure = Column(Float) #in s
 	data = Column(String) #path data folder
-	biopsy_id = Column(Integer, ForeignKey('biopsies.id')) # only set in per-animal measurements
+	biopsy_id = Column(Integer, ForeignKey('biopsies.id'))
