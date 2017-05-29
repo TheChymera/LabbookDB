@@ -1,13 +1,13 @@
+import os
+import shutil
 import subprocess
 import tempfile
-import shutil
+import pandas as pd
 from string import Template
 from sqlalchemy import create_engine, literal, inspection
 from sqlalchemy.orm import aliased, relation, scoped_session, sessionmaker, eagerload, subqueryload, joinedload, lazyload, Load
-from .common_classes import *
-from .utils import get_script_dir
-import pandas as pd
-import os
+from ..db.common_classes import *
+from ..db.utils import get_script_dir
 
 tables = {"animals": Animal, "dna_extraction_protocols": DNAExtractionProtocol, "substances": Solution, "incubations": Incubation, "measurement_units": MeasurementUnit}
 
