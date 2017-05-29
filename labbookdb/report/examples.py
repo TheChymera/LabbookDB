@@ -2,10 +2,12 @@ import matplotlib.pyplot as plt
 from behaviopy import plotting
 try:
 	from .behaviour import forced_swim, sucrose_preference
+	from .protocolize import compose_tex, print_document
 	from .tracking import treatments_plot
 	from .selection import animals_by_treatment
 except SystemError:
 	from labbookdb.report.behaviour import forced_swim, sucrose_preference
+	from labbookdb.report.protocolize import compose_tex, print_document
 	from labbookdb.report.tracking import treatments_plot
 	from labbookdb.report.selection import animals_by_treatment
 
@@ -104,4 +106,8 @@ if __name__ == '__main__':
 	# forced_swim(db_path, "ttest", treatment_start_dates=["2016,11,24,21,30"], columns=["2 to 4", "2 to 6"])
 	# forced_swim(db_path, "ttest", treatment_start_dates=[i["treatment_start"] for i in COHORTS], columns=["2 to 4", "2 to 6"], save_df="")
 
-	plt.show()
+	# plt.show()
+	code = "EPDqEP"
+	class_name = "DNAExtractionProtocol"
+	tex=compose_tex(db_path, class_name,code)
+	print_document(tex, class_name[:-1]+"_"+code+".pdf")
