@@ -82,6 +82,12 @@ def treatments(db_path, cohorts,
 		window_end=window_end,
 		)
 
+def protocolize_dna_extraction():
+	code = "EPDqEP"
+	class_name = "DNAExtractionProtocol"
+	tex=compose_tex(db_path, class_name,code)
+	print_document(tex, class_name[:-1]+"_"+code+".pdf")
+
 if __name__ == '__main__':
 	db_path="~/syncdata/meta.db"
 	# treatments(db_path,COHORTS[0:1], per_cage=False)
@@ -105,9 +111,6 @@ if __name__ == '__main__':
 	# forced_swim(db_path, "ttest", treatment_start_dates=["2017,1,31,22,0"], columns=["2 to 4"])
 	# forced_swim(db_path, "ttest", treatment_start_dates=["2016,11,24,21,30"], columns=["2 to 4", "2 to 6"])
 	# forced_swim(db_path, "ttest", treatment_start_dates=[i["treatment_start"] for i in COHORTS], columns=["2 to 4", "2 to 6"], save_df="")
+	# protocolize_dna_extraction()
 
 	# plt.show()
-	code = "EPDqEP"
-	class_name = "DNAExtractionProtocol"
-	tex=compose_tex(db_path, class_name,code)
-	print_document(tex, class_name[:-1]+"_"+code+".pdf")
