@@ -1,15 +1,8 @@
 import os
 import pandas as pd
 
-try:
-	import selection
-except ImportError:
-	from ..report import selection
-
-try:
-	from ..db import query
-except (ValueError, SystemError):
-	import query
+from . import selection
+from ..db import query
 
 from behaviopy import plotting
 
