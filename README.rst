@@ -79,16 +79,22 @@ Dependencies
 * `simplejson`_
 * `SQLAlchemy`_
 
+Optional Dependencies for Introspection
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* `Sadisplay`_
+
+Optional Dependencies for PDF Protocol Generation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* `TeX Live`_
+
 Optional Dependencies for Plotting
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * `BehavioPy`_
 * `Matplotlib`_
 
-Optional Dependencies for Introspection
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* `Sadisplay`_
 
 .. _Argh: https://github.com/neithere/argh/
 .. _BehavioPy: https://github.com/TheChymera/behaviopy
@@ -97,3 +103,4 @@ Optional Dependencies for Introspection
 .. _Sadisplay: https://bitbucket.org/estin/sadisplay/wiki/Home
 .. _simplejson: https://github.com/simplejson/simplejson
 .. _SQLAlchemy: http://www.sqlalchemy.org/
+.. _TeX Live: https://www.tug.org/texlive/
