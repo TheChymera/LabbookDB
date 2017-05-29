@@ -1,9 +1,7 @@
 try:
 	from ..db import query
 except (ValueError, SystemError):
-	import sys
-	sys.path.append('/home/chymera/src/LabbookDB/labbookdb/db/')
-	import query
+	from labbookdb.db import query
 
 def animals_by_cage_treatment(db_path,
 	codes=[],

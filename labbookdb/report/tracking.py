@@ -11,8 +11,6 @@ try:
 except (ValueError, SystemError):
 	import query
 
-import sys
-sys.path.append(os.path.abspath(os.path.expanduser('~/src/behaviopy/')))
 from behaviopy import plotting
 
 TABLE_COL_SPACE = 200

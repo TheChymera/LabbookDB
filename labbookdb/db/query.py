@@ -12,10 +12,7 @@ from os import path
 from sqlalchemy.orm import sessionmaker, aliased, contains_eager
 import sqlalchemy
 
-try:
-	from .common_classes import *
-except (ValueError, SystemError):
-	from common_classes import *
+from .common_classes import *
 
 ALLOWED_CLASSES = {
 	"Animal": Animal,

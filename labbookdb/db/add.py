@@ -12,12 +12,8 @@ from os import path
 from sqlalchemy.orm import sessionmaker
 import sqlalchemy
 
-try:
-	from .common_classes import *
-	from .query import ALLOWED_CLASSES
-except ValueError:
-	from common_classes import *
-	from query import ALLOWED_CLASSES
+from .common_classes import *
+from .query import ALLOWED_CLASSES
 
 def loadSession(db_path):
 	db_path = "sqlite:///" + path.expanduser(db_path)

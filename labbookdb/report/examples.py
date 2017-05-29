@@ -1,11 +1,13 @@
 import matplotlib.pyplot as plt
-import sys
-import os
-sys.path.append(os.path.expanduser('~/src/behaviopy'))
 from behaviopy import plotting
-from .behaviour import forced_swim, sucrose_preference
-from .tracking import treatments_plot
-from .selection import animals_by_treatment
+try:
+	from .behaviour import forced_swim, sucrose_preference
+	from .tracking import treatments_plot
+	from .selection import animals_by_treatment
+except SystemError:
+	from labbookdb.report.behaviour import forced_swim, sucrose_preference
+	from labbookdb.report.tracking import treatments_plot
+	from labbookdb.report.selection import animals_by_treatment
 
 COHORTS = [
 	{"treatment_start":"2015,11,11", "window_end":"2015,12,30"},

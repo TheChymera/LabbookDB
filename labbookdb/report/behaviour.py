@@ -1,14 +1,6 @@
-try:
-	from ..report import selection, formatting
-except (SystemError, ValueError):
-	import selection, formatting
+from . import selection, formatting
 from os import path
-try:
-	from behaviopy import plotting
-except ImportError:
-	import sys
-	sys.path.append(path.abspath(path.expanduser('~/src/behaviopy/')))
-	from behaviopy import plotting
+from behaviopy import plotting
 
 def sucrose_preference(db_path, treatment_start_dates,
 	bp_style=True,
