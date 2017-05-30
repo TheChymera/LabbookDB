@@ -273,8 +273,8 @@ class Treatment(Base):
 	id = Column(Integer, primary_key=True)
 	start_date = Column(DateTime) #date of first occurence
 	end_date = Column(DateTime) #date of last occurence
-	protocol_id = Column(Integer, ForeignKey('treatment_protocols.id'))
-	protocol = relationship('TreatmentProtocol')
+	protocol_id = Column(Integer, ForeignKey('protocols.id'))
+	protocol = relationship('Protocol')
 
 	def __str__(self):
 		return "protocol {protocol_code}, {start_date} - {end_date}"\
