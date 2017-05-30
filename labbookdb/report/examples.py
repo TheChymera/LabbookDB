@@ -100,7 +100,7 @@ if __name__ == '__main__':
 	################################################
 	# treatments(db_path,COHORTS[4:5])
 	# my_sucrose_preference(db_path, "aileen_switching_sides", "treatment")
-	# forced_swim(db_path, "tsplot", treatment_start_dates=["2017,1,31,22,0","2016,11,24,21,30"])
+	forced_swim(db_path, "tsplot", treatment_start_dates=["2017,1,31,22,0","2016,11,24,21,30"])
 	# forced_swim(db_path, "tsplot", treatment_start_dates=["2017,1,31,22,0"])
 	# forced_swim(db_path, "pointplot", treatment_start_dates=["2017,1,31,22,0"])
 	# forced_swim(db_path, "tsplot", treatment_start_dates=["2016,11,24,21,30"])
@@ -114,4 +114,5 @@ if __name__ == '__main__':
 	# forced_swim(db_path, "ttest", treatment_start_dates=[i["treatment_start"] for i in COHORTS], columns=["2 to 4", "2 to 6"], save_df="")
 	# protocolize_dna_extraction(db_path)
 
-	# plt.show()
+	# plt.savefig("fst.pdf")
+	plt.show()
