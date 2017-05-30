@@ -17,5 +17,6 @@ def generate_schema(extent="all"):
 	graph.write_png('somefile.png')
 
 if __name__ == '__main__':
-	generate_schema(extent=["Animal","CageStay","Cage","Genotype","OpenFieldTestMeasurement","FMRIMeasurement"])
+	generate_schema(extent="all")
+	# generate_schema(extent=["Animal","CageStay","Cage","Genotype","OpenFieldTestMeasurement","FMRIMeasurement"])
 	# generate_schema(extent=["Animal","CageStay","Cage"])
