@@ -82,7 +82,7 @@ def treatments(db_path, cohorts,
 		window_end=window_end,
 		)
 
-def protocolize_dna_extraction():
+def protocolize_dna_extraction(db_path):
 	code = "EPDqEP"
 	class_name = "DNAExtractionProtocol"
 	tex=compose_tex(db_path, class_name,code)
@@ -111,6 +111,6 @@ if __name__ == '__main__':
 	# forced_swim(db_path, "ttest", treatment_start_dates=["2017,1,31,22,0"], columns=["2 to 4"])
 	# forced_swim(db_path, "ttest", treatment_start_dates=["2016,11,24,21,30"], columns=["2 to 4", "2 to 6"])
 	# forced_swim(db_path, "ttest", treatment_start_dates=[i["treatment_start"] for i in COHORTS], columns=["2 to 4", "2 to 6"], save_df="")
-	# protocolize_dna_extraction()
+	# protocolize_dna_extraction(db_path)
 
 	# plt.show()
