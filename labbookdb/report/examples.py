@@ -82,10 +82,11 @@ def treatments(db_path, cohorts,
 		window_end=window_end,
 		)
 
-def protocolize_dna_extraction(db_path):
-	code = "EPDqEP"
-	class_name = "DNAExtractionProtocol"
-	tex=compose_tex(db_path, class_name,code)
+def protocol(db_path,
+	class_name="DNAExtractionProtocol",
+	code="EPDqEP",
+	):
+	tex = compose_tex(db_path, class_name,code)
 	print_document(tex, class_name[:-1]+"_"+code+".pdf")
 
 if __name__ == '__main__':
