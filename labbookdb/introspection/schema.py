@@ -4,7 +4,7 @@ import sadisplay
 from os import path
 from labbookdb.db.query import ALLOWED_CLASSES
 
-def generate_schema(
+def generate(
 	extent="all",
 	save_dotfile="",
 	save_plot="",
@@ -31,6 +31,6 @@ def generate_schema(
 		graph.write_png(save_plot)
 
 if __name__ == '__main__':
-	# generate_schema(extent="all", save_plot="~/full_schema.png")
-	generate_schema(extent=["Animal","CageStay","Cage","Genotype","SucrosePreferenceMeasurement","FMRIMeasurement"], save_plot="~/measurements_schema.png")
-	# generate_schema(extent=["Animal","CageStay","Cage"], save_plot="~/cagestay_schema.png")
+	# generate(extent="all", save_plot="~/full_schema.png")
+	generate(extent=["Animal","CageStay","Cage","Genotype","SucrosePreferenceMeasurement","FMRIMeasurement"], save_plot="~/measurements_schema.png")
+	# generate(extent=["Animal","CageStay","Cage"], save_plot="~/cagestay_schema.png")
