@@ -1,6 +1,7 @@
 import codecs
 import sadisplay
 import pydotplus
+from os import path
 from labbookdb.db.query import ALLOWED_CLASSES
 
 def generate_schema(
@@ -17,14 +18,16 @@ def generate_schema(
 		desc = sadisplay.describe([ALLOWED_CLASSES[key] for key in extent])
 
 	if save_dotfile:
+		save_dotfile = path.abspath(path.expanduser(save_dotfile))
 		with codecs.open(save_dotfile, 'w', encoding='utf-8') as f:
 			f.write(sadisplay.dot(desc))
 
 	if save_plot:
+		save_plot = path.abspath(path.expanduser(save_plot))
 		graph = pydotplus.graph_from_dot_data(sadisplay.dot(desc))
 		graph.write_png(save_plot)
 
 if __name__ == '__main__':
-	generate_schema(extent="all")
-	# generate_schema(extent=["Animal","CageStay","Cage","Genotype","OpenFieldTestMeasurement","FMRIMeasurement"])
-	# generate_schema(extent=["Animal","CageStay","Cage"])
+	# generate_schema(extent="all", save_plot="~/full_schema.png")
+	generate_schema(extent=["Animal","CageStay","Cage","Genotype","SucrosePreferenceMeasurement","FMRIMeasurement"], save_plot="~/measurements_schema.png")
+	# generate_schema(extent=["Animal","CageStay","Cage"], save_plot="~/cagestay_schema.png")
