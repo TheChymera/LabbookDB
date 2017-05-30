@@ -54,7 +54,6 @@ if __name__ == '__main__':
 			"Cage",
 			"Measurement",
 			"Treatment",
-			"TreatmentProtocol",
 			"Protocol",
 			],
 		save_plot="~/fst_schema.pdf",
