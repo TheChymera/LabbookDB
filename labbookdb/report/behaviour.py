@@ -1,4 +1,7 @@
-from . import selection, formatting
+try:
+	from . import selection, formatting
+except SystemError:
+	from labbookdb.report import selection, formatting
 from os import path
 from behaviopy import plotting
 

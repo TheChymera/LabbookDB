@@ -1,8 +1,13 @@
 import os
 import pandas as pd
 
-from . import selection
-from ..db import query
+try:
+	from . import selection
+	from ..db import query
+except SystemError:
+	from labbookdb.report import selection
+	from labbookdb.db import query
+
 
 from behaviopy import plotting
 
