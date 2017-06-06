@@ -87,7 +87,7 @@ def protocol(db_path,
 	code="EPDqEP",
 	):
 	tex = compose_tex(db_path, class_name,code)
-	print_document(tex, class_name[:-1]+"_"+code+".pdf")
+	print_document(tex, class_name+"_"+code+".pdf")
 
 if __name__ == '__main__':
 	db_path="~/syncdata/meta.db"
