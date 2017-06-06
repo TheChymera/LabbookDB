@@ -90,9 +90,10 @@ def get_related_id(session, engine, parameters):
 	engine.dispose()
 	return input_values
 
-@argh.arg('-d', '--database', type=str)
-def animal_info(db_path, identifier,
-	database=None,
+@argh.arg('-p', '--db_path', type=str)
+@argh.arg('database', default=None, nargs="?")
+def animal_info(identifier, database,
+	db_path=None,
 	):
 	"""Return the __str__ attribute of an Animal object query filterd by the id column OR by arguments of the external_id objects.
 
@@ -106,7 +107,7 @@ def animal_info(db_path, identifier,
 	The identifier of the animal
 
 	database : string or None, optional
-	If specified gives a constraint on the AnimalExternalIdentifier.database colun AND truns the identifier attribute into a constraint on the AnimalExternalIdentifier.identifier column. If unspecified, the identfier argument is used as a constraint on the Animal.id column.
+	If specified gives a constraint on the AnimalExternalIdentifier.database column AND truns the identifier attribute into a constraint on the AnimalExternalIdentifier.identifier column. If unspecified, the identfier argument is used as a constraint on the Animal.id column.
 	"""
 
 	if database and identifier:
@@ -122,7 +123,6 @@ def animal_info(db_path, identifier,
 	session, engine = loadSession(db_path)
 	sql_query = session.query(Animal)
 	sql_query = sql_query.filter(Animal.id == identifier)
-	animal = [i.__str__() for i in sql_query][0]
 	try:
 		animal = [i.__str__() for i in sql_query][0]
 	except:
