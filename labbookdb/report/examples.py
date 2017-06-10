@@ -5,7 +5,7 @@ try:
 	from .protocolize import compose_tex, print_document
 	from .tracking import treatments_plot
 	from .selection import animals_by_treatment
-except SystemError:
+except (SystemError, ValueError):
 	from labbookdb.report.behaviour import forced_swim, sucrose_preference
 	from labbookdb.report.protocolize import compose_tex, print_document
 	from labbookdb.report.tracking import treatments_plot

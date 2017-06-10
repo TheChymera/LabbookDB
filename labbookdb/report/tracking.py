@@ -1,5 +1,5 @@
 import os
-import pandas as pd
+from behaviopy import plotting
 
 try:
 	from . import selection
@@ -8,8 +8,6 @@ except SystemError:
 	from labbookdb.report import selection
 	from labbookdb.db import query
 
-
-from behaviopy import plotting
 
 TABLE_COL_SPACE = 200
 
