@@ -45,22 +45,23 @@ if __name__ == '__main__':
 	# generate(extent="all", save_plot="~/full_schema.png")
 	# generate(extent=["Animal","CageStay","Cage","OpticFiberImplantProtocol","Operation","OrthogonalStereotacticTarget","Protocol"], save_plot="~/cagestay_schema.pdf", linker_tables=[operation_association])
 	# generate(extent=["Animal","CageStay","Cage",], save_plot="~/cagestay_schema.pdf", linker_tables=[cage_stay_association])
-	generate(
-		extent=[
-			"Animal",
-			"ForcedSwimTestMeasurement",
-			"Evaluation",
-			"CageStay",
-			"Cage",
-			"Measurement",
-			"Treatment",
-			"Protocol",
-			],
-		save_plot="~/fst_schema.pdf",
-		linker_tables=[
-			cage_stay_association,
-			treatment_cage_association,
-			],
-		)
+	# generate(
+	# 	extent=[
+	# 		"Animal",
+	# 		"ForcedSwimTestMeasurement",
+	# 		"Evaluation",
+	# 		"CageStay",
+	# 		"Cage",
+	# 		"Measurement",
+	# 		"Treatment",
+	# 		"Protocol",
+	# 		],
+	# 	save_plot="~/fst_schema.pdf",
+	# 	linker_tables=[
+	# 		cage_stay_association,
+	# 		treatment_cage_association,
+	# 		],
+	# 	)
 	# generate(extent=["Animal","CageStay","Cage","SucrosePreferenceMeasurement"], save_plot="~/measurements_schema.pdf")
+	generate(extent=["Animal","Operation","Protocol","Operator"], save_plot="~/basic_schema.pdf", linker_tables=[authors_association,operation_association])
 	# generate(extent=["Animal","FMRIMeasurement","OpenFieldTestMeasurement","WeightMeasurement"], save_plot="~/measurements_schema.pdf")
