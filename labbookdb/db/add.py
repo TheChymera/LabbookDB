@@ -82,14 +82,14 @@ def append_parameter(db_path, entry_identification, parameters):
 	----------
 
 	db_path : str
-	A string especifying the database path
+		A string especifying the database path
 
 	entry_identification : str
-	A LabbookDB syntax string specifying an instance of an object for which to update a parameter.
-	Example strings: "Animal:external_ids.AnimalExternalIdentifier:database.ETH/AIC&#&identifier.5701" , "Cage:id.14"
+		A LabbookDB syntax string specifying an instance of an object for which to update a parameter.
+		Example strings: "Animal:external_ids.AnimalExternalIdentifier:database.ETH/AIC&#&identifier.5701" , "Cage:id.14"
 
 	parameters : dict
-	A dictionary where keys are strings giving the names of attributes of the class selected by entry_identification, and values are either the values to assign (verbatim: string, int, or float) or LabbookDB syntax strings specifying a related entry, or a list of LabbookDB syntax strings specifying related entries, or a list of LabbookDB-style dictionaries specifying new entries to be created and linked.
+		A dictionary where keys are strings giving the names of attributes of the class selected by entry_identification, and values are either the values to assign (verbatim: string, int, or float) or LabbookDB syntax strings specifying a related entry, or a list of LabbookDB syntax strings specifying related entries, or a list of LabbookDB-style dictionaries specifying new entries to be created and linked.
 	"""
 
 	if isinstance(parameters, str):
