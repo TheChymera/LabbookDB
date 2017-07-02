@@ -3,6 +3,11 @@ python:
   - "2.7"
   - "3.5"
 # command to install dependencies
+before_install:
+  - pwd
+  - ls
+  - git clone https://bitbucket.org/TheChymera/demolog
+  - ls
 install:
   - pip install .
   - pip install -r requirements.txt
