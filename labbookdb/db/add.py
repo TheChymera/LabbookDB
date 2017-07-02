@@ -203,11 +203,3 @@ def double_entry(db_path, field, value):
 		return True
 	session.close()
 	engine.dispose()
-
-
-if __name__ == '__main__':
-	# add_generic("~/meta.db", parameters={"CATEGORY":"Animal", "id_eth":4001, "id_uzh":"M2763", "sex":"f", "ear_punches":"LR",
-		# "genotypes":["Genotype:code.eptg"]
-		# })
-	# update_parameter("~/meta.db", entry_identification="Cage:id_local.570974", parameters={"location":"AFS7pua"})
-	argh.dispatch_command(add_generic)
