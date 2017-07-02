@@ -4,6 +4,8 @@ LabbookDB
 .. image:: https://readthedocs.org/projects/labbookdb/badge/?version=latest
   :target: http://labbookdb.readthedocs.io/en/latest/?badge=latest
   :alt: Documentation Status
+.. image:: https://travis-ci.org/TheChymera/LabbookDB.svg?branch=master
+  :target: https://travis-ci.org/TheChymera/LabbookDB
 
 This package contains a relational database structure for life science research, and a number of functions to conveniently add and retrieve information - and generate summaries.
 The core concept of LabbookDB is that most of the information classically tracked in a lab book can be more efficiently and more reliably stored in a relational database.
