@@ -8,7 +8,7 @@ before_install:
   - git clone https://bitbucket.org/TheChymera/demolog
   - cd LabbookDB
 install:
-  - travis_wait 30 pip install -r requirements.txt
+  - travis_wait 20 pip install -r requirements.txt
   - pip install .
 script: 
   - py.test
