@@ -53,7 +53,7 @@ def add_to_db(session, engine, myobject):
 
 	Returns
 	-------
-	theid : int
+	object_id : int
 		Value of myobject.id attribute
 	"""
 
@@ -62,8 +62,8 @@ def add_to_db(session, engine, myobject):
 		session.commit()
 	except sqlalchemy.exc.IntegrityError:
 		print("Please make sure this was not a double entry:", myobject)
-	theid=myobject.id
-	return(theid)
+	object_id=myobject.id
+	return object_id
 
 def instructions(kind):
 	"""Print helpful instructions for common error-causing input issues
@@ -77,13 +77,46 @@ def instructions(kind):
 		print("Make sure you have entered the filter value correctly. This value is supposed to refer to the id column of another table and needs to be specified as \'table_identifier\'.\'field_by_which_to_filter\'.\'target_value\'")
 
 def get_related_ids(session, engine, parameters):
+	"""Return the .id attribute value for existing entries matched by a string following the LabbookDB-syntax.
+
+	Parameters
+	----------
+	session : sqlalchemy.orm.session.Session
+		Session instance, as created with labbookdb.db.add.load_session().
+	engine : sqlalchemy.engine.Engine
+		Engine instance correponding to the Session instance under session, as created with labbookdb.db.add.load_session().
+	parameters : str
+		LabbookDB-syntax string specifying an existing entry.
+
+	Returns
+	-------
+	ids : list of int
+		.id attribute values for the entries matched by the LabbookDB-syntax string.
+	sql_query : sqlalchemy.orm.query.Query
+		Query corresponding to the LabbookDB-syntax string
+
+	Examples
+	--------
+	>>> from labbookdb.db import add
+	>>> session, engine = add.load_session("lala.db")
+	>>> add.get_related_ids(s,e,"Animal:external_ids.AnimalExternalIdentifier:database.ETH/AIC/cdb&#&identifier.275511")
+	BaseException: No entry was found with a value of "275511" on the "identifier" column of the "AnimalExternalIdentifier" CATEGORY, in the database.
+	>>> add.get_related_ids(s,e,"Animal:external_ids.AnimalExternalIdentifier:database.ETH/AIC/cdb&&identifier.275511")
+	BaseException: No entry was found with a value of "ETH/AIC/cdb" on the "database" column of the "AnimalExternalIdentifier" CATEGORY, in the database.
+
+	Notes
+	-----
+	Recursivity :
+		This function calls itself recursively in order to get the .id attribute values of related entries (and related entries of related entries, etc.) specified in the LabbookDB-syntax string.
+		Multiple constraints are separated by double ampersands which may be separated by none or up to two hashtags, to specify at which level the constrains tshould be applied to.
+		One hashtag is removed on each recursion step, and the constraint is only evaluated when there are no hashtags left.
+		"Animal:external_ids.AnimalExternalIdentifier:database.ETH/AIC/cdb&#&identifier.275511" will look for both the database and the identifier attributes in the AnimalExternalIdentifier class, while "Animal:external_ids.AnimalExternalIdentifier:database.ETH/AIC/cdb&#&identifier.275511" will look for the database attribute on the AnimalExternalIdentifier class, and for the identifier attribute on the Animal class.
+	"""
+
 	category = parameters.split(":",1)[0]
 	sql_query=session.query(ALLOWED_CLASSES[category])
 	for field_value in parameters.split(":",1)[1].split("&&"):
 		field, value = field_value.split(".",1)
-		# this unpacks one level of AND separators.
-		# we use this so that "Animal:external_ids.AnimalExternalIdentifier:database.ETH/AIC/cdb&#&identifier.275511" will look for both the database and the identifier attributes in the AnimalExternalIdentifier class.
-		# if we use "Animal:external_ids.AnimalExternalIdentifier:database.ETH/AIC/cdb&#&identifier.275511" that will look for the database attribute on the AnimalExternalIdentifier class, and for the identifier attribute on the Animal class.
 		if "&#&" in value or "&##&" in value:
 			value=value.replace("&#&", "&&")
 			value=value.replace("&##&", "&#&")
@@ -106,13 +139,13 @@ def get_related_ids(session, engine, parameters):
 	mydf = pd.read_sql_query(mystring,engine)
 	category_tablename = ALLOWED_CLASSES[category].__table__.name
 	related_table_ids = mydf[category_tablename+"_id"]
-	input_values = list(related_table_ids)
-	input_values = [int(i) for i in input_values]
-	if input_values == []:
+	ids = list(related_table_ids)
+	ids = [int(i) for i in ids]
+	if ids == []:
 		raise BaseException("No entry was found with a value of \""+str(value)+"\" on the \""+field+"\" column of the \""+category+"\" CATEGORY, in the database.")
 	session.close()
 	engine.dispose()
-	return input_values, sql_query
+	return ids, sql_query
 
 def append_parameter(db_path, entry_identification, parameters):
 	"""Assigns a value to a given parameter of a given entry.
@@ -127,8 +160,8 @@ def append_parameter(db_path, entry_identification, parameters):
 		A LabbookDB syntax string specifying an instance of an object for which to update a parameter.
 		Example strings: "Animal:external_ids.AnimalExternalIdentifier:database.ETH/AIC&#&identifier.5701" , "Cage:id.14"
 
-	parameters : dict
-		A dictionary where keys are strings giving the names of attributes of the class selected by entry_identification, and values are either the values to assign (verbatim: string, int, or float) or LabbookDB syntax strings specifying a related entry, or a list of LabbookDB syntax strings specifying related entries, or a list of LabbookDB-style dictionaries specifying new entries to be created and linked.
+	parameters : str or dict
+		A LabbookDB-style dictionary (or JSON interpretable as dictionary), where keys are strings giving the names of attributes of the class selected by entry_identification, and values are either the values to assign (verbatim: string, int, or float) or LabbookDB-syntax strings specifying a related entry, or a list of LabbookDB-syntax strings specifying related entries, or a list of LabbookDB-style dictionaries specifying new entries to be created and linked.
 	"""
 
 	if isinstance(parameters, str):
@@ -174,8 +207,8 @@ def add_generic(db_path, parameters, session=None, engine=None):
 	----------
 	db_path : str
 		Path to database to open if session and engine parameters are not already passed, can be relative or use tilde to specify the user $HOME.
-	parameters : str
-		LabbookDB-syntax string specifying the entry class and attributes.
+	parameters : str or dict
+		A LabbookDB-style dictionary (or JSON interpretable as dictionary), where keys are "CATEGORY" and other strings specifying the attribute names for the object to be created, and values are the class name (for "CATEGORY") and either the values to assign (verbatim: string, int, or float) or LabbookDB-syntax strings specifying a related entry, or a list of LabbookDB-syntax strings specifying related entries, or a list of LabbookDB-style dictionaries specifying new entries to be created and linked.
 	session : sqlalchemy.orm.session.Session, optional
 		Session instance, as created with labbookdb.db.add.load_session().
 	engine : sqlalchemy.engine.Engine, optional
