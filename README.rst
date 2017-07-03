@@ -71,7 +71,7 @@ Example Input
 -------------
 
 LabbookDB is designed to organize complex wet work data.
-We publish example input to generate a relationship-rich database in a separate repository, `log_ex <https://bitbucket.org/TheChymera/log_ex>`_.
+We publish example input to generate a relationship-rich database in a separate repository, `demolog <https://bitbucket.org/TheChymera/demolog>`_.
 
 Dependencies
 ------------
