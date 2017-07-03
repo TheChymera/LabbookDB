@@ -167,7 +167,7 @@ def append_parameter(db_path, entry_identification, parameters):
 						set_attribute.append(related_entry)
 	commit_and_close(session, engine)
 
-def add_generic(db_path, parameters, walkthrough=False, session=None, engine=None):
+def add_generic(db_path, parameters, session=None, engine=None):
 	"""Adds new entries based on a parameter dictionary
 	"""
 	if not (session and engine) :
