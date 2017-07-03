@@ -1,3 +1,5 @@
+import pytest
+
 from labbookdb.db import add
 
 def test_related_entry_separators():
