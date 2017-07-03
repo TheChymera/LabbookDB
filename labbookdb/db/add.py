@@ -49,7 +49,7 @@ def add_to_db(session, engine, myobject):
 	engine : sqlalchemy.engine.Engine
 		Engine instance correponding to the Session instance under session, as created with labbookdb.db.add.load_session().
 	myobject : object
-		LabbookDB object with SQLAlchemy-compatibel attributes (e.g. as found under labbookdb.db.common_classes).
+		LabbookDB object with SQLAlchemy-compatible attributes (e.g. as found under labbookdb.db.common_classes).
 
 	Returns
 	-------
@@ -168,8 +168,27 @@ def append_parameter(db_path, entry_identification, parameters):
 	commit_and_close(session, engine)
 
 def add_generic(db_path, parameters, session=None, engine=None):
-	"""Adds new entries based on a parameter dictionary
+	"""Adds new entries based on a LabbookDB-syntax parameter dictionary.
+
+	Parameters
+	----------
+	db_path : str
+		Path to database to open if session and engine parameters are not already passed, can be relative or use tilde to specify the user $HOME.
+	parameters : str
+		LabbookDB-syntax string specifying the entry class and attributes.
+	session : sqlalchemy.orm.session.Session, optional
+		Session instance, as created with labbookdb.db.add.load_session().
+	engine : sqlalchemy.engine.Engine, optional
+		Engine instance correponding to the Session instance under session, as created with labbookdb.db.add.load_session().
+
+	Returns
+	-------
+	myobject : object
+		LabbookDB object with SQLAlchemy-compatible attributes (e.g. as found under labbookdb.db.common_classes).
+	object_id : int
+		Value of myobject.id attribute.
 	"""
+
 	if not (session and engine) :
 		session, engine = load_session(db_path)
 		close = True
@@ -225,20 +244,20 @@ def add_generic(db_path, parameters, session=None, engine=None):
 	return myobject, object_id
 
 def commit_and_close(session, engine):
+	"""Commit and close session and dispose of engine.
+	Nonfatal for sqlalchemy.exc.IntegrityError with print notification.
+
+	Parameters
+	----------
+	session : sqlalchemy.orm.session.Session, optional
+		Session instance, as created with labbookdb.db.add.load_session().
+	engine : sqlalchemy.engine.Engine, optional
+		Engine instance correponding to the Session instance under session, as created with labbookdb.db.add.load_session().
+	"""
+
 	try:
 		session.commit()
 	except sqlalchemy.exc.IntegrityError:
 		print("Please make sure this was not a double entry.")
-	session.close()
-	engine.dispose()
-
-def double_entry(db_path, field, value):
-	session, engine = load_session(db_path)
-	q=session.query(Animal).filter(getattr(Animal, field)==value)
-	if session.query(literal(True)).filter(q.exists()).scalar():
-		session.close()
-		engine.dispose()
-		print("Entry conflict for key "+field+" = "+value)
-		return True
 	session.close()
 	engine.dispose()
