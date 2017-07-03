@@ -59,10 +59,6 @@ ALLOWED_CLASSES = {
 	"WeightMeasurement": WeightMeasurement,
 	}
 
-def instructions(kind):
-	if kind == "table_identifier":
-		print("Make sure you have entered the filter value correctly. This value is supposed to refer to the id column of another table and needs to be specified as \'table_identifier\'.\'field_by_which_to_filter\'.\'target_value\'")
-
 def get_related_id(session, engine, parameters):
 	category = parameters.split(":",1)[0]
 	sql_query=session.query(ALLOWED_CLASSES[category])
