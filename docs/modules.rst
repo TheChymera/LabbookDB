@@ -1,8 +1,7 @@
-LabbookDB Modules
-=================
+labbookdb
+=========
 
 .. toctree::
 	:maxdepth: 4
 
 	labbookdb
-	setup
