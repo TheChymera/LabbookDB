@@ -40,6 +40,23 @@ def load_session(db_path):
 	return session, engine
 
 def add_to_db(session, engine, myobject):
+	"""Add an object to session and return the .id attribute value.
+
+	Parameters
+	----------
+	session : sqlalchemy.orm.session.Session
+		Session instance, as created with labbookdb.db.add.load_session().
+	engine : sqlalchemy.engine.Engine
+		Engine instance correponding to the Session instance under session, as created with labbookdb.db.add.load_session().
+	myobject : object
+		LabbookDB object with SQLAlchemy-compatibel attributes (e.g. as found under labbookdb.db.common_classes).
+
+	Returns
+	-------
+	theid : int
+		Value of myobject.id attribute
+	"""
+
 	session.add(myobject)
 	try:
 		session.commit()
@@ -49,6 +66,13 @@ def add_to_db(session, engine, myobject):
 	return(theid)
 
 def instructions(kind):
+	"""Print helpful instructions for common error-causing input issues
+
+	Parameters
+	----------
+	kind : {"table_identifier",}
+		Shorthand for the instructin message to be printed.
+	"""
 	if kind == "table_identifier":
 		print("Make sure you have entered the filter value correctly. This value is supposed to refer to the id column of another table and needs to be specified as \'table_identifier\'.\'field_by_which_to_filter\'.\'target_value\'")
 
