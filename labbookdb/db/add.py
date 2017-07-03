@@ -15,8 +15,23 @@ import sqlalchemy
 from .common_classes import *
 from .query import ALLOWED_CLASSES
 
-def loadSession(db_path):
-	db_path = "sqlite:///" + path.expanduser(db_path)
+def load_session(db_path):
+	"""Load and return a new SQLalchemy session and engine.
+
+	Parameters
+	----------
+	db_path : str
+		Path to desired database location, can be relative or use tilde to specify the user $HOME.
+
+	Returns
+	-------
+	session : sqlalchemy.orm.session.Session
+		Session instance.
+	engine : sqlalchemy.engine.Engine
+		Engine instance.
+	"""
+
+	db_path = "sqlite:///" + path.abspath(path.expanduser(db_path))
 	engine = create_engine(db_path, echo=False)
 	#it is very important that `autoflush == False`, otherwise if "treatments" or "measurements" entried precede "external_ids" the latter will insert a null on the animal_id column
 	Session = sessionmaker(bind=engine, autoflush=False)
@@ -95,7 +110,7 @@ def append_parameter(db_path, entry_identification, parameters):
 	if isinstance(parameters, str):
 		parameters = json.loads(parameters)
 
-	session, engine = loadSession(db_path)
+	session, engine = load_session(db_path)
 
 	entry_class = ALLOWED_CLASSES[entry_identification.split(":")[0]]
 	my_id = get_related_ids(session, engine, entry_identification)[0][0]
@@ -132,7 +147,7 @@ def add_generic(db_path, parameters, walkthrough=False, session=None, engine=Non
 	"""Adds new entries based on a parameter dictionary
 	"""
 	if not (session and engine) :
-		session, engine = loadSession(db_path)
+		session, engine = load_session(db_path)
 		close = True
 	else:
 		close = False
@@ -194,7 +209,7 @@ def commit_and_close(session, engine):
 	engine.dispose()
 
 def double_entry(db_path, field, value):
-	session, engine = loadSession(db_path)
+	session, engine = load_session(db_path)
 	q=session.query(Animal).filter(getattr(Animal, field)==value)
 	if session.query(literal(True)).filter(q.exists()).scalar():
 		session.close()

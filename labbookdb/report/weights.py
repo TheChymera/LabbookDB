@@ -8,14 +8,14 @@ from sqlalchemy import create_engine, or_, inspection
 from sqlalchemy.orm import sessionmaker, aliased
 
 from labbookdb.db.common_classes import *
-from labbookdb.db.query import loadSession
+from labbookdb.db.query import load_session
 
 import matplotlib
 matplotlib.style.use('ggplot')
 
 def weights_plot(db_path, animals={}, start_date=None, end_date=None, include_relationship_columns=[], normalize=True):
 	include_relationship_columns.append("weights")
-	session, engine = loadSession(db_path)
+	session, engine = load_session(db_path)
 
 	cols = []
 	joins = []

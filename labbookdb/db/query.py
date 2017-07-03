@@ -111,7 +111,7 @@ def animal_info(identifier, database,
 	"""
 
 	if database and identifier:
-		session, engine = loadSession(db_path)
+		session, engine = load_session(db_path)
 		sql_query = session.query(Animal)
 		sql_query = sql_query.join(Animal.external_ids)\
 		.filter(AnimalExternalIdentifier.database == database).filter(AnimalExternalIdentifier.identifier == identifier)\
@@ -120,7 +120,7 @@ def animal_info(identifier, database,
 		session.close()
 		engine.dispose()
 
-	session, engine = loadSession(db_path)
+	session, engine = load_session(db_path)
 	sql_query = session.query(Animal)
 	sql_query = sql_query.filter(Animal.id == identifier)
 	try:
@@ -152,7 +152,7 @@ def cage_info(db_path, identifier,
 	If specified gives a constraint on the AnimalExternalIdentifier.database colun AND truns the identifier attribute into a constraint on the AnimalExternalIdentifier.identifier column. If unspecified, the identfier argument is used as a constraint on the Animal.id column.
 	"""
 
-	session, engine = loadSession(db_path)
+	session, engine = load_session(db_path)
 	sql_query = session.query(Cage)
 	sql_query = sql_query.filter(Cage.id == identifier)
 	cage = [i.__str__() for i in sql_query][0]
@@ -165,7 +165,7 @@ def cage_info(db_path, identifier,
 	session.close()
 	engine.dispose()
 
-def loadSession(db_path):
+def load_session(db_path):
 	db_path = "sqlite:///" + path.expanduser(db_path)
 	engine = create_engine(db_path, echo=False)
 	Session = sessionmaker(bind=engine)
@@ -197,7 +197,7 @@ def add_all_columns(cols, class_name):
 def get_for_protocolize(db_path, class_name, code):
 	"""Return a dataframe containing a specific entry from a given class name, joined with its related tables up to three levels down.
 	"""
-	session, engine = loadSession(db_path)
+	session, engine = load_session(db_path)
 	cols = []
 	joins = []
 	classobject = ALLOWED_CLASSES[class_name]
@@ -288,7 +288,7 @@ def get_df(db_path,
 
 	"""
 
-	session, engine = loadSession(db_path)
+	session, engine = load_session(db_path)
 
 	cols=[]
 	for col_entry in col_entries:
