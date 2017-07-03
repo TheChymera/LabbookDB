@@ -2,15 +2,14 @@ language: python
 python:
   - "2.7"
   - "3.5"
-# command to install dependencies
+#clone demolog for example DB generation code
 before_install:
   - cd ..
   - git clone https://bitbucket.org/TheChymera/demolog
   - cd LabbookDB
 install:
-  - pip install .
   - travis_wait 30 pip install -r requirements.txt
-# command to run tests
+  - pip install .
 script: 
   - py.test
   - cd ../demolog/from_python_code && python generate_db.py
