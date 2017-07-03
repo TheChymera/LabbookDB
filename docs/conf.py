@@ -156,7 +156,18 @@ texinfo_documents = [
 	(master_doc, 'LabbookDB', 'LabbookDB Documentation', author, 'LabbookDB', 'One line description of project.', 'Miscellaneous'),
 ]
 
+def run_apidoc(_):
+	from sphinx.apidoc import main
+	import os
+	import sys
+	sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+	cur_dir = os.path.abspath(os.path.dirname(__file__))
+	module = '.'
+	output_path = os.path.join(cur_dir, 'source')
+	main(['-e', '-o', output_path, module, '--force'])
 
+def setup(app):
+	app.connect('builder-inited', run_apidoc)
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
