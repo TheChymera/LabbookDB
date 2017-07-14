@@ -1,6 +1,6 @@
 try:
 	from . import selection, formatting
-except SystemError:
+except (SystemError, ValueError):
 	from labbookdb.report import selection, formatting
 from os import path
 from behaviopy import plotting
