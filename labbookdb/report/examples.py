@@ -98,9 +98,9 @@ if __name__ == '__main__':
 	################################################
 	#####Safe for usage with logging_examples#######
 	################################################
-	# treatments(db_path,COHORTS[4:5])
-	# my_sucrose_preference(db_path, "aileen_switching_sides", "treatment")
-	forced_swim(db_path, "tsplot", treatment_start_dates=["2017,1,31,22,0","2016,11,24,21,30"])
+	treatments(db_path,COHORTS[4:5])
+	# forced_swim(db_path, "tsplot", treatment_start_dates=["2017,1,31,22,0","2016,11,24,21,30"])
+	# forced_swim(db_path, "pointplot", treatment_start_dates=["2017,1,31,22,0","2016,11,24,21,30"])
 	# forced_swim(db_path, "tsplot", treatment_start_dates=["2017,1,31,22,0"])
 	# forced_swim(db_path, "pointplot", treatment_start_dates=["2017,1,31,22,0"])
 	# forced_swim(db_path, "tsplot", treatment_start_dates=["2016,11,24,21,30"])
@@ -112,6 +112,7 @@ if __name__ == '__main__':
 	# forced_swim(db_path, "ttest", treatment_start_dates=["2017,1,31,22,0"], columns=["2 to 4"])
 	# forced_swim(db_path, "ttest", treatment_start_dates=["2016,11,24,21,30"], columns=["2 to 4", "2 to 6"])
 	# forced_swim(db_path, "ttest", treatment_start_dates=[i["treatment_start"] for i in COHORTS], columns=["2 to 4", "2 to 6"], save_df="")
+	# my_sucrose_preference(db_path, "aileen_switching_sides", "treatment")
 	# protocolize_dna_extraction(db_path)
 
 	# plt.savefig("fst.pdf")
