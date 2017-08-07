@@ -8,6 +8,7 @@ import numpy
 import pandas as pd
 
 from sqlalchemy import create_engine, literal, update, insert
+from sqlalchemy import inspect
 from os import path
 from sqlalchemy.orm import sessionmaker
 import sqlalchemy
@@ -238,7 +239,12 @@ def add_generic(db_path, parameters, session=None, engine=None):
 	parameters.pop("CATEGORY", None)
 
 	myobject = category_class()
+	columns = inspect(myobject).mapper.column_attrs
+	relationships = inspect(myobject).mapper.relationships
+	all_attributes = [attr.key for attr in columns+relationships]
 	for key, _ in sorted(parameters.items()):
+		if key not in all_attributes:
+			raise ValueError("'"+myobject.__class__.__name__+"' object does not support '"+key+"' attribute. Acceptable attributes are: "+" ,".join(all_attributes)+".")
 		if key[-4:] == "date":
 			parameters[key] = datetime.datetime(*[int(i) for i in parameters[key].split(",")])
 		if key[-3:] == "_id" and not isinstance(parameters[key], int):
