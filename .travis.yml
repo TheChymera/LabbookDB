@@ -12,4 +12,4 @@ install:
   - pip install .
 script: 
   - py.test
-  - cd ../demolog/from_python_code && python generate_db.py
+  - ./test_scripts.sh
