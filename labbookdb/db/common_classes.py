@@ -113,7 +113,7 @@ class ForcedSwimTestMeasurement(Measurement):
 	__mapper_args__ = {'polymorphic_identity': 'forcedswimtest'}
 	id = Column(Integer, ForeignKey('measurements.id'), primary_key=True)
 	temperature = Column(Float) #in degrees Centigrade
-	recording = Column(String) #path to the recording file
+	data_path = Column(String) #path to the recording file
 	evaluations = relationship("Evaluation")
 
 	# Bracket of recording file representing this measurement:
@@ -128,6 +128,7 @@ class OpenFieldTestMeasurement(Measurement):
 	center_luminostiy = Column(Integer) #in lux
 	edge_luminostiy = Column(Integer) #in lux
 	corner_luminostiy = Column(Integer) #in lux (only if `arena_shape == "square"`)
+	data_path = Column(String) #path to the recording file
 
 	arena_id = Column(Integer, ForeignKey('arenas.id'))
 	evaluations = relationship("Evaluation")
@@ -141,6 +142,7 @@ class FMRIMeasurement(Measurement):
 	anesthesia = relationship("AnesthesiaProtocol")
 	scanner_setup_id = Column(Integer, ForeignKey('fmri_scanner_setups.id'))
 	scanner_setup = relationship("FMRIScannerSetup")
+	data_path = Column(String) #path to the recording file
 
 	laser_stimulations = relationship("LaserStimulationProtocol", secondary=laser_stimulations_association)
 
