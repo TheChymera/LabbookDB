@@ -54,7 +54,7 @@ def behaviour(db_path, test_type, animal_ids=[], animals_id_column="id_eth", dat
 		reference_df = reference_df.iloc[np.random.permutation(len(reference_df))]
 
 	for _, measurement_df in reference_df.iterrows():
-		recording_path = measurement_df.loc[measurements_table+"_recording"]
+		recording_path = measurement_df.loc[measurements_table+"_data_path"]
 		if measurements_table+"_recording_bracket" in reference_df.columns:
 			bracket = measurement_df.loc[measurements_table+"_recording_bracket"]
 		else:
