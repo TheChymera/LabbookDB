@@ -1,5 +1,4 @@
 import os
-from behaviopy import plotting
 
 try:
 	from . import selection
@@ -169,6 +168,8 @@ def treatments_plot(db_path,
 	window_end : string
 	A datetime-formatted string (e.g. "2016,12,18") to apply as the timetable end date (overrides autodetected end).
 	"""
+	from behaviopy import plotting
+
 	df = selection.timetable(db_path, filters, default_join, join_types=join_types)
 
 	if save_df:
