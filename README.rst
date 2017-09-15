@@ -22,15 +22,18 @@ In comparison with other electronic formats based on a document concept, a **dat
 * More easily queried
 * More easily integrated into data analysis functions
 
-Video Presentations
-~~~~~~~~~~~~~~~~~~~
+Presentations
+-------------
 
-* `LabbookDB - A Relational Framework for Laboratory Metadata <https://www.youtube.com/watch?v=yDBu_wSyw-g>`_, at SciPy 2017 in Austin (TX,USA)
+Video
+~~~~~
+
+* `LabbookDB - A Relational Framework for Laboratory Metadata <https://www.youtube.com/watch?v=yDBu_wSyw-g>`_, at SciPy 2017 in Austin (TX,USA).
 
 Publications
 ~~~~~~~~~~~~
 
-* `LabbookDB - A Wet-Work-Tracking Database Application Framework <http://conference.scipy.org/proceedings/scipy2017/pdfs/horea-ioan_ioanas.pdf>`_, PROC. OF THE 15th PYTHON IN SCIENCE CONF. (SCIPY 2017)
+* `LabbookDB - A Wet-Work-Tracking Database Application Framework <http://conference.scipy.org/proceedings/scipy2017/pdfs/horea-ioan_ioanas.pdf>`_, in Proceedings of the 15th Python in Science Conference (SciPy 2017).
 
 Installation
 ------------
