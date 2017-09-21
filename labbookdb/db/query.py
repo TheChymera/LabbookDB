@@ -255,7 +255,7 @@ def get_df(db_path,
 		* 2-tuples give the class to be joined on the first element, and the explicit relationship (attribute of another class) on the second element
 		If any of the elements contains a period, the expression will be evaluated as a class (preceeding the period) attribute (after the period)$
 	filters : list
-		A list of lists giving filters for the query. In each sub-list the first and second elements give the class and attribute to be matched. Every following element specifies a possible value for the class attribute (implemented as inclusive disjunction). If the attribute name ends in "date" the function compute datetime objects from the subsequent strings containing numbers separated by commas.
+		A list of lists giving filters for the query. In each sub-list the first and second elements give the class and attribute to be matched. Every following element specifies a possible value for the class attribute (implemented as inclusive disjunction). If the attribute name ends in "date" the function computes datetime objects from the subsequent strings containing numbers separated by commas.
 	!!!incomplete documentation
 
 
