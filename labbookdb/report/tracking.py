@@ -40,9 +40,41 @@ def animals_id(db_path,
 		print(df)
 	return
 
+def make_identifier_short_form(df):
+	"""Convert the long form `AnimalExternalIdentifier_identifier` column of a `pandas.DataFrame` to short-form identifier columns named after the corresponding values on the `AnimalExternalIdentifier_database` column."""
+	df = df.rename(columns={'AnimalExternalIdentifier_animal_id': 'Animal_id'})
+	df = df.set_index(['Animal_id', 'AnimalExternalIdentifier_database'])['AnimalExternalIdentifier_identifier'].unstack(1)
+	return df
+
+def collapse_rename(df, groupby, collapse,
+	rename=False,
+	):
+	"""
+	Collapse long form columns according to a lambda function, so that groupby column values are rendered unique
+
+	Parameters
+	----------
+
+	df : pandas.DataFrame
+		A `pandas.DataFrame` object which you want to collapse.
+	groupby : string
+		The name of a column from `df`, the values of which you want to render unique.
+	collapse : dict
+		A dictionary the keys of which are columns you want to collapse, and the values of which are lambda functions instructing how to collapse (e.g. concatenate) the values.
+	rename : dict, optional
+		A dictionary the keys of which are names of columns from `df`, and the values of which are new names for these columns.
+	"""
+	df = df.groupby(groupby).agg(collapse)
+	if rename:
+		df = df.rename(columns=rename)
+
+	return df
+
 @environment_db_path()
 def animals_info(db_path,
 	save_as=None,
+	functional_scan_responders=True,
+	treatments=True,
 	):
 	"""
 	Extract list of animal (database and external) IDs and their death dates and genotypes, and either print it to screen or save it as an HTML file.
@@ -51,51 +83,73 @@ def animals_info(db_path,
 	----------
 
 	db_path : string
-	Path to the database file to query.
+		Path to the database file to query.
 
 	save_as : string or None, optional
-	Path under which to save the HTML report (".html" is automatically appended to the name, if not already present). If None, the report is printed to the terminal.
+		Path under which to save the HTML report (".html" is automatically appended to the name, if not already present). If None, the report is printed to the terminal.
+
+	functional_scan_responders : bool, optional
+		Whether to create and list a column tracking how many of the scans in which an animal was exposed to stimulation show ICA results in a qualitative analysis.
+
+	treatments : bool, optional
+		Whether to create a and list columns tracking what animal-based and cage-based treatements the animal was subjected to.
 	"""
 
 	df = selection.parameterized(db_path, "animals info")
-	functional_scan_df = selection.parameterized(db_path, "animals measurements")
-	nonresponder_df = selection.parameterized(db_path, "animals measurements irregularities")
 
-	aggregation_dict = {
+	collapse = {
 		'Animal_death_date' : lambda x: ', '.join(set([str(i) for i in x])),
 		'Genotype_code' : lambda x: ', '.join(set(x)),
 		}
-	collapse_stuimulations = {
-		'LaserStimulationProtocol_code' : lambda x: 0 if list(x) == [] else 1,
-		"Animal_id" : lambda x: list(x)[0],
-		}
-	count_scans = {
-		'occurences' : lambda x: sum(x),
-		}
-	collapse_nonresponders = {
-		'Irregularity_description' : lambda x: 1 if "ICA failed to indicate response to stimulus" in list(x) else 0,
-		"Animal_id" : lambda x: list(x)[0],
-		}
+	short_identifiers = make_identifier_short_form(df)
+	df = short_identifiers.join(collapse_rename(df, 'AnimalExternalIdentifier_animal_id', collapse))
+	df.reset_index().set_index('Animal_id', inplace=True)
 
-	functional_scan_df = functional_scan_df.groupby('Measurement_id').agg(collapse_stuimulations)
-	functional_scan_df = functional_scan_df.rename(columns={'LaserStimulationProtocol_code': 'occurences'})
-	functional_scan_df = functional_scan_df.groupby('Animal_id').agg(count_scans)
+	if functional_scan_responders:
+		count_scans = {'occurences' : lambda x: sum(x),}
 
-	nonresponder_df = nonresponder_df.groupby('Measurement_id').agg(collapse_nonresponders)
-	nonresponder_df = nonresponder_df.rename(columns={'Irregularity_description': 'occurences'})
-	nonresponder_df = nonresponder_df.groupby('Animal_id').agg(count_scans)
+		collapse = {
+			'LaserStimulationProtocol_code' : lambda x: 0 if list(x) == [] else 1,
+			"Animal_id" : lambda x: list(x)[0],
+			}
+		rename = {'LaserStimulationProtocol_code': 'occurences'}
+		functional_scan_df = selection.parameterized(db_path, "animals measurements")
+		functional_scan_df = collapse_rename(functional_scan_df, "Measurement_id", collapse, rename)
+		functional_scan_df = collapse_rename(functional_scan_df, 'Animal_id', count_scans)
 
-	df = df.rename(columns={'AnimalExternalIdentifier_animal_id': 'Animal_id'})
-	df = df.set_index(['Animal_id', 'AnimalExternalIdentifier_database'])['AnimalExternalIdentifier_identifier'].unstack(1).join(df.groupby('Animal_id').agg(aggregation_dict)).reset_index()
-	df.set_index('Animal_id', inplace=True)
-	df['nonresponsive'] = nonresponder_df
-	df['functional'] = functional_scan_df
-	df[['nonresponsive', 'functional']] = df[["nonresponsive", 'functional']].fillna(0).astype(int)
-	df["responsive functional scans"] = df['functional'] - df['nonresponsive']
-	df["responsive functional scans"] = df["responsive functional scans"].astype(str) +"/"+ df['functional'].astype(str)
-	df.drop(['nonresponsive', 'functional'], axis = 1, inplace = True, errors = 'ignore')
+		collapse = {
+			'Irregularity_description' : lambda x: 1 if "ICA failed to indicate response to stimulus" in list(x) else 0,
+			"Animal_id" : lambda x: list(x)[0],
+			}
+		rename ={'Irregularity_description': 'occurences'}
+		nonresponder_df = selection.parameterized(db_path, "animals measurements irregularities")
+		nonresponder_df = collapse_rename(nonresponder_df, 'Measurement_id', collapse, rename)
+		nonresponder_df = collapse_rename(nonresponder_df, 'Animal_id', count_scans)
+
+		df['nonresponsive'] = nonresponder_df
+		df['functional'] = functional_scan_df
+		df[['nonresponsive', 'functional']] = df[["nonresponsive", 'functional']].fillna(0).astype(int)
+		df["responsive functional scans"] = df['functional'] - df['nonresponsive']
+		df["responsive functional scans"] = df["responsive functional scans"].astype(str) +"/"+ df['functional'].astype(str)
+		df.drop(['nonresponsive', 'functional'], axis = 1, inplace = True, errors = 'ignore')
+
+	if treatments:
+		treatments_df = selection.animal_treatments(db_path)
+		collapse_treatments = {
+			'TreatmentProtocol_code' : lambda x: ', '.join(set([str(i) for i in x if i])),
+			'Cage_TreatmentProtocol_code' : lambda x: ', '.join(set([i for i in x if i])),
+			}
+		treatments_rename = {
+			'TreatmentProtocol_code': 'animal_treatment',
+			'Cage_TreatmentProtocol_code': 'cage_treatment',
+			}
+		treatments_df = treatments_df.groupby('Animal_id').agg(collapse_treatments)
+		treatments_df = treatments_df.rename(columns=treatments_rename)
+		df['animal_treatment'] = treatments_df["animal_treatment"]
+		df['cage_treatment'] = treatments_df["cage_treatment"]
+
 	df = df.sort_index(ascending=False)
-
+	df = df.fillna('')
 	if save_as:
 		if os.path.splitext(save_as)[1] in [".html",".HTML"]:
 			pass
