@@ -63,7 +63,7 @@ def animals_by_treatment(db_path,
 	end_dates=[],
 	start_dates=[],
 	):
-	"""Select a dataframe of animals and all related tables through to cage treatments based on cage_treatment filters.
+	"""Select a dataframe of animals and all related tables through to treatments based on treatment filters.
 
 	Parameters
 	----------
@@ -176,6 +176,58 @@ def by_animals(db_path, select, animals):
 
 	return df
 
+def animal_treatments(db_path,
+	cage_treatments=[],
+	animal_treatments=[],
+	conjunctive=True,
+	):
+	"""Select a dataframe of animals and all treatments including animal-level or cage-level treatments.
+
+	Parameters
+	----------
+
+	db_path : str
+	Path to a LabbookDB formatted database.
+
+	select : str
+	For which kind of evaluation to select dataframe.
+
+	conjunctive : bool, optional
+	Whether both `cage_treatments` and `animal_treatments` need to be satisfied (statements within each list are always disjunctive).
+
+	Notes
+	-----
+
+	This function does not currently compare the `CageStay.start_date` attribute with e.g. the `Cage.treatment.end_date` attribute in order to determine whether the animal was actually in the cage at the time of the treatment.
+	"""
+
+	col_entries=[
+		("Animal","id"),
+		("Treatment",),
+		("TreatmentProtocol","code"),
+		("CageStay","start_date"),
+		("Cage","id"),
+		("Cage","Treatment",""),
+		("Cage","TreatmentProtocol","code"),
+		]
+	join_entries=[
+		("Animal.treatments",),
+		("Treatment.protocol",),
+		("Animal.cage_stays",),
+		("CageStay.cage",),
+		("Cage_Treatment","Cage.treatments"),
+		("Cage_TreatmentProtocol","Cage_Treatment.protocol"),
+		]
+
+	if cage_treatments:
+		cage_filter = ["Cage_Treatment","protocol"]
+		cage_filter.extend(cage_treatments)
+		df = query.get_df(db_path, col_entries=col_entries, join_entries=join_entries, filters=[cage_filter], join_types=join_types)
+
+	df = query.get_df(db_path, col_entries=col_entries, join_entries=join_entries, default_join="outer")
+
+	return df
+
 def timetable(db_path, filters,
 	default_join="outer",
 	join_types=[],
@@ -260,7 +312,6 @@ def parameterized(db_path, data_type, treatment_start_dates=[]):
 			("Animal","death_date"),
 			("AnimalExternalIdentifier",),
 			("Genotype",),
-			("Cage","id"),
 			]
 		join_entries=[
 			("Animal.external_ids",),
