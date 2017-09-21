@@ -9,7 +9,7 @@ except SystemError:
 	from labbookdb.db import query
 
 
-TABLE_COL_SPACE = 200
+TABLE_COL_SPACE = 150
 
 def animals_id(db_path,
 	save_as=None,
@@ -91,13 +91,13 @@ def animals_info(db_path,
 	df['nonresponsive'] = nonresponder_df
 	df['functional'] = functional_scan_df
 	df[['nonresponsive', 'functional']] = df[["nonresponsive", 'functional']].fillna(0).astype(int)
-	df["responsive functional measurements"] = df['functional'] - df['nonresponsive']
-	df["responsive functional measurements"] = df["responsive functional measurements"].astype(str) +"/"+ df['functional'].astype(str)
+	df["responsive functional scans"] = df['functional'] - df['nonresponsive']
+	df["responsive functional scans"] = df["responsive functional scans"].astype(str) +"/"+ df['functional'].astype(str)
 	df.drop(['nonresponsive', 'functional'], axis = 1, inplace = True, errors = 'ignore')
 	df = df.sort_index(ascending=False)
 
 	if save_as:
-		if os.path.splitext(save_as)[1] in ["html","HTML"]:
+		if os.path.splitext(save_as)[1] in [".html",".HTML"]:
 			pass
 		else:
 			save_as += ".html"

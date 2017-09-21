@@ -260,6 +260,7 @@ def parameterized(db_path, data_type, treatment_start_dates=[]):
 			("Animal","death_date"),
 			("AnimalExternalIdentifier",),
 			("Genotype",),
+			("Cage","id"),
 			]
 		join_entries=[
 			("Animal.external_ids",),
