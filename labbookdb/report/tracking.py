@@ -1,4 +1,5 @@
 import os
+from labbookdb.decorators import environment_db_path
 
 try:
 	from . import selection
@@ -39,6 +40,7 @@ def animals_id(db_path,
 		print(df)
 	return
 
+@environment_db_path()
 def animals_info(db_path,
 	save_as=None,
 	):
@@ -52,7 +54,7 @@ def animals_info(db_path,
 	Path to the database file to query.
 
 	save_as : string or None, optional
-	Path under which to save the HTML report (".html" is automatically appended). If None, the report is printed to the terminal.
+	Path under which to save the HTML report (".html" is automatically appended to the name, if not already present). If None, the report is printed to the terminal.
 	"""
 
 	df = selection.parameterized(db_path, "animals info")
@@ -95,7 +97,11 @@ def animals_info(db_path,
 	df = df.sort_index(ascending=False)
 
 	if save_as:
-		df.to_html(os.path.abspath(os.path.expanduser(save_as+".html")), col_space=TABLE_COL_SPACE)
+		if os.path.splitext(save_as)[1] in ["html","HTML"]:
+			pass
+		else:
+			save_as += ".html"
+		df.to_html(os.path.abspath(os.path.expanduser(save_as)), col_space=TABLE_COL_SPACE)
 	else:
 		print(df)
 	return
