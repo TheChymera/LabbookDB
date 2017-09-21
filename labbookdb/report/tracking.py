@@ -152,10 +152,13 @@ def animals_info(db_path,
 	df = df.fillna('')
 	if save_as:
 		if os.path.splitext(save_as)[1] in [".html",".HTML"]:
-			pass
+			df.to_html(os.path.abspath(os.path.expanduser(save_as)), col_space=TABLE_COL_SPACE)
+		elif os.path.splitext(save_as)[1] in [".tsv",".TSV"]:
+			df.to_csv(save_as, sep='\t', encoding='utf-8')
+		elif os.path.splitext(save_as)[1] in [".csv",".CSV", ""]:
+			df.to_csv(save_as, encoding='utf-8')
 		else:
-			save_as += ".html"
-		df.to_html(os.path.abspath(os.path.expanduser(save_as)), col_space=TABLE_COL_SPACE)
+			print("WARNING: This function currently only supports `.csv`, `.tsv`, or `.html` output. Please append one of the aforementioned extensions to the specified file name (`{}`), or specify no extension - in which case `.csv` will be added and an according output will be created.".format(save_as))
 	else:
 		print(df)
 	return
