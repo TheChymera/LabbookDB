@@ -188,7 +188,7 @@ def treatments_plot(db_path,
 		draw=draw,
 		shade=shade,
 		saturate=saturate,
-		save_plot=save_plot,
+		save_as=save_plot,
 		window_end=window_end,
 		real_dates=real_dates,
 		)
