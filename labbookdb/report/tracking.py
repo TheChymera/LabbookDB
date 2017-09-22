@@ -129,6 +129,22 @@ def animals_info(db_path,
 		print(df)
 	return
 
+def treatment_onsets(db_path, code,
+	level="")
+	"""
+	Return a `pandas.DataFrame` object containing the per animal start dates of a particular treatment code (applied either at the animal or the cage levels).
+
+	Parameters
+	----------
+
+	db_path : string
+		Path to database file to query.
+	code : string
+		Desired treatment code (`Treatment.code` attribute) to filter for.
+	level : {"animal", "cage"}
+		Whether to query animal treatments or cage treatments.
+	"""
+
 def animal_weights(db_path):
 	"""Return a dataframe containing animal weights and dates"""
 	df = selection.parameterized(db_path, "animals weights")
@@ -149,8 +165,9 @@ def further_cages(db_path):
 	"""
 	Returns cage numbers that should be selected for incoming cages.
 
-	Positional arguments:
-	db_path -- path to database file to query (needs to be protocolizer-style)
+	Parameters
+	----------
+		db_path : path to database file to query (needs to be protocolizer-style)
 	"""
 
 	df = selection.parameterized(db_path, "cage list")
