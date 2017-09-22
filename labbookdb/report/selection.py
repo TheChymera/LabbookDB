@@ -282,7 +282,7 @@ def timetable(db_path, filters,
 	return df
 
 
-def parameterized(db_path, data_type, treatment_start_dates=[]):
+def parameterized(db_path, data_type, treatment_start_dates=[],):
 	"""Select dataframe from a LabbookDB style database.
 
 	Parameters
@@ -298,6 +298,18 @@ def parameterized(db_path, data_type, treatment_start_dates=[]):
 	A list containing the treatment start date or dates by which to filter the cages for the sucrose preference measurements.
 	Items should be strings in datetime format, e.g. "2016,4,25,19,30".
 	"""
+
+	default_join = "inner"
+	my_filter = []
+
+	allowed_data_types = [
+			"animals id",
+			"animals info",
+			"animals measurements",
+			"animals measurements irregularities",
+			"cage list",
+			"forced swim",
+			]
 
 	if data_type == "animals id":
 		col_entries=[
@@ -337,6 +349,17 @@ def parameterized(db_path, data_type, treatment_start_dates=[]):
 			("Animal.measurements",),
 			("FMRIMeasurement.irregularities",),
 			]
+	elif data_type == "animals weights":
+		col_entries=[
+			("Animal","id"),
+			("AnimalExternalIdentifier",),
+			("WeightMeasurement",),
+			]
+		join_entries=[
+			("Animal.external_ids",),
+			("WeightMeasurement",),
+			]
+		my_filter = ["Measurement","type","weight"]
 	elif data_type == "cage list":
 		col_entries=[
 			("Animal","id"),
@@ -363,12 +386,12 @@ def parameterized(db_path, data_type, treatment_start_dates=[]):
 			("Cage.treatments",),
 			("Treatment.protocol",),
 			]
+	else:
+		raise ValueError("The `data_type` value needs to be one of: {}. You specified \"{}\"".format(", ".join(allowed_data_types), data_type))
 
 	if treatment_start_dates:
 		my_filter = ["Treatment","start_date"]
 		my_filter.extend(treatment_start_dates)
-	else:
-		my_filter = None
-	df = query.get_df(db_path,col_entries=col_entries, join_entries=join_entries, filters=[my_filter])
+	df = query.get_df(db_path,col_entries=col_entries, join_entries=join_entries, filters=[my_filter], default_join=default_join)
 
 	return df
