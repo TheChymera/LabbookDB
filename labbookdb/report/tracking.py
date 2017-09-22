@@ -131,8 +131,19 @@ def animals_info(db_path,
 
 def animal_weights(db_path):
 	"""Return a dataframe containing animal weights and dates"""
-	df = selection.parameterized(db_path, "animal weights")
+	df = selection.parameterized(db_path, "animals weights")
+	short_identifiers = make_identifier_short_form(df, index_name="WeightMeasurement_id")
+        collapse = {
+		'WeightMeasurement_date' : lambda x: list(set(x))[0] if (len(set(x)) == 1) else "WARNING: different values were present for this entry. Data in this entire DataFrame may not be trustworthy.",
+                'WeightMeasurement_weight' : lambda x: list(set(x))[0] if (len(set(x)) == 1) else "WARNING: different values were present for this entry. Data in this entire DataFrame may not be trustworthy.",
+                }
+	rename = {
+		'WeightMeasurement_date': 'date',
+		'WeightMeasurement_weight': 'weight',
+		}
+	df = short_identifiers.join(collapse_rename(df, 'WeightMeasurement_id', collapse))
 	print(df)
+	return df
 
 def further_cages(db_path):
 	"""
