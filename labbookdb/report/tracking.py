@@ -129,8 +129,9 @@ def animals_info(db_path,
 		print(df)
 	return
 
-def treatment_onsets(db_path, code,
-	level="")
+def treatment_onsets(db_path, animal_treatments,
+	level="",
+	):
 	"""
 	Return a `pandas.DataFrame` object containing the per animal start dates of a particular treatment code (applied either at the animal or the cage levels).
 
@@ -145,20 +146,55 @@ def treatment_onsets(db_path, code,
 		Whether to query animal treatments or cage treatments.
 	"""
 
-def animal_weights(db_path):
-	"""Return a dataframe containing animal weights and dates"""
+	if not level:
+		level = "animal"
+	if level=="animal":
+		df = selection.animal_treatments(db_path, animal_treatments=animal_treatments)
+	elif level=="cage":
+		df = selection.animal_treatments(db_path, cage_treatments=cage_treatments)
+	return df
+
+def animal_weights(db_path,
+	reference={},
+	):
+	"""
+	Return a dataframe containing animal weights and dates
+
+	Parameters
+	----------
+
+	db_path : string
+		Path to database file to query.
+	reference : dict, optional
+		Dictionary based on which to apply a reference date for the dates of each animal. KEys of this dictionary must be "animal" or "cage", and values must be lists of treatment codes.
+	"""
+	import pandas as pd
+
 	df = selection.parameterized(db_path, "animals weights")
 	short_identifiers = make_identifier_short_form(df, index_name="WeightMeasurement_id")
         collapse = {
 		'WeightMeasurement_date' : lambda x: list(set(x))[0] if (len(set(x)) == 1) else "WARNING: different values were present for this entry. Data in this entire DataFrame may not be trustworthy.",
                 'WeightMeasurement_weight' : lambda x: list(set(x))[0] if (len(set(x)) == 1) else "WARNING: different values were present for this entry. Data in this entire DataFrame may not be trustworthy.",
+                'AnimalExternalIdentifier_animal_id' : lambda x: list(set(x))[0] if (len(set(x)) == 1) else "WARNING: different values were present for this entry. Data in this entire DataFrame may not be trustworthy.",
                 }
 	rename = {
 		'WeightMeasurement_date': 'date',
 		'WeightMeasurement_weight': 'weight',
+		'AnimalExternalIdentifier_animal_id': 'Animal_id',
 		}
-	df = short_identifiers.join(collapse_rename(df, 'WeightMeasurement_id', collapse))
+	df = short_identifiers.join(collapse_rename(df, 'WeightMeasurement_id', collapse, rename))
+	onsets = treatment_onsets(db_path, reference.values(), level=reference.keys()[0])
+	for subject in df["Animal_id"]:
+		try:
+			print(df.loc[df["Animal_id"]==subject,"date"])
+			print(onsets.loc[onsets["Animal_id"]==subject,'Treatment_start_date'])
+			print(df.loc[df["Animal_id"]==subject,"date"].values[0])
+			print(df.loc[df["Animal_id"]==subject,"date"].values[0]-onsets.loc[onsets["Animal_id"]==subject,'Treatment_start_date'].values[0])
+		except IndexError:
+			df.drop(df[df["Animal_id"]==subject].index, inplace=True)
+	pd.to_timedelta(df['date'],'d')
 	print(df)
+
 	return df
 
 def further_cages(db_path):
