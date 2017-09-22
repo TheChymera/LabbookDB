@@ -1,7 +1,17 @@
-def make_identifier_short_form(df):
-        """Convert the long form `AnimalExternalIdentifier_identifier` column of a `pandas.DataFrame` to short-form identifier columns named after the corresponding values on the `AnimalExternalIdentifier_database` column."""
+def make_identifier_short_form(df,
+        index_name="Animal_id"):
+        """
+        Convert the long form `AnimalExternalIdentifier_identifier` column of a `pandas.DataFrame` to short-form identifier columns named after the corresponding values on the `AnimalExternalIdentifier_database` column.
+
+        Parameters
+        ----------
+        df : pandas.DataFrame
+                A `pandas.DataFrame` object containing a long-form `AnimalExternalIdentifier_identifier` column and a dedicated `AnimalExternalIdentifier_database` column.
+        index_name : str, optonal
+                The name of a column from `df`, the values of which can be rendered unique. This column will serve as the index o the resulting dataframe.
+        """
         df = df.rename(columns={'AnimalExternalIdentifier_animal_id': 'Animal_id'})
-        df = df.set_index(['Animal_id', 'AnimalExternalIdentifier_database'])['AnimalExternalIdentifier_identifier'].unstack(1)
+        df = df.set_index([index_name, 'AnimalExternalIdentifier_database'])['AnimalExternalIdentifier_identifier'].unstack(1)
         return df
 
 def collapse_rename(df, groupby, collapse,
