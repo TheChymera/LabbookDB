@@ -199,32 +199,46 @@ def animal_treatments(db_path,
 	-----
 
 	This function does not currently compare the `CageStay.start_date` attribute with e.g. the `Cage.treatment.end_date` attribute in order to determine whether the animal was actually in the cage at the time of the treatment.
+	Currently `conjunctive=False` does not work; cage treatment and animal treatment filters are always conjunctive.
 	"""
 
-	col_entries=[
-		("Animal","id"),
-		("Treatment",),
-		("TreatmentProtocol","code"),
-		("CageStay","start_date"),
-		("Cage","id"),
-		("Cage","Treatment",""),
-		("Cage","TreatmentProtocol","code"),
-		]
-	join_entries=[
-		("Animal.treatments",),
-		("Treatment.protocol",),
-		("Animal.cage_stays",),
-		("CageStay.cage",),
-		("Cage_Treatment","Cage.treatments"),
-		("Cage_TreatmentProtocol","Cage_Treatment.protocol"),
-		]
+	filters=[]
+	if animal_treatments:
+		col_entries=[
+			("Animal","id"),
+			("Treatment",),
+			("TreatmentProtocol","code"),
+			]
+		join_entries=[
+			("Animal.treatments",),
+			("Treatment.protocol",),
+			]
+		my_filter = ["TreatmentProtocol","code"]
+		my_filter.extend(animal_treatments)
+		filters.append(my_filter)
+	elif cage_treatments:
+		col_entries=[
+			("Animal","id"),
+			("CageStay","start_date"),
+			("Cage","id"),
+			("Cage","Treatment",""),
+			("Cage","TreatmentProtocol","code"),
+			]
+		join_entries=[
+			("Animal.treatments",),
+			("Treatment.protocol",),
+			("Animal.cage_stays",),
+			("CageStay.cage",),
+			("Cage_Treatment","Cage.treatments"),
+			("Cage_TreatmentProtocol","Cage_Treatment.protocol"),
+			]
+		my_filter = ["TreatmentProtocol","code"]
+		my_filter.extend(cage_treatments)
+		filters.append(my_filter)
+	else:
+		raise ValueError("You must define at least one of the `cage_treatments` and `animal_treatments` parameters.")
 
-	if cage_treatments:
-		cage_filter = ["Cage_Treatment","protocol"]
-		cage_filter.extend(cage_treatments)
-		df = query.get_df(db_path, col_entries=col_entries, join_entries=join_entries, filters=[cage_filter], join_types=join_types)
-
-	df = query.get_df(db_path, col_entries=col_entries, join_entries=join_entries, default_join="outer")
+	df = query.get_df(db_path, col_entries=col_entries, join_entries=join_entries, filters=filters, default_join="outer")
 
 	return df
 
