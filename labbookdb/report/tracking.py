@@ -145,7 +145,6 @@ def treatment_onsets(db_path, animal_treatments,
 	level : {"animal", "cage"}
 		Whether to query animal treatments or cage treatments.
 	"""
-
 	if not level:
 		level = "animal"
 	if level=="animal":
@@ -172,26 +171,36 @@ def animal_weights(db_path,
 
 	df = selection.parameterized(db_path, "animals weights")
 	short_identifiers = make_identifier_short_form(df, index_name="WeightMeasurement_id")
-        collapse = {
+	collapse = {
 		'WeightMeasurement_date' : lambda x: list(set(x))[0] if (len(set(x)) == 1) else "WARNING: different values were present for this entry. Data in this entire DataFrame may not be trustworthy.",
-                'WeightMeasurement_weight' : lambda x: list(set(x))[0] if (len(set(x)) == 1) else "WARNING: different values were present for this entry. Data in this entire DataFrame may not be trustworthy.",
-                'AnimalExternalIdentifier_animal_id' : lambda x: list(set(x))[0] if (len(set(x)) == 1) else "WARNING: different values were present for this entry. Data in this entire DataFrame may not be trustworthy.",
-                }
+		'WeightMeasurement_weight' : lambda x: list(set(x))[0] if (len(set(x)) == 1) else "WARNING: different values were present for this entry. Data in this entire DataFrame may not be trustworthy.",
+		'AnimalExternalIdentifier_animal_id' : lambda x: list(set(x))[0] if (len(set(x)) == 1) else "WARNING: different values were present for this entry. Data in this entire DataFrame may not be trustworthy.",
+		}
 	rename = {
 		'WeightMeasurement_date': 'date',
 		'WeightMeasurement_weight': 'weight',
 		'AnimalExternalIdentifier_animal_id': 'Animal_id',
 		}
 	df = short_identifiers.join(collapse_rename(df, 'WeightMeasurement_id', collapse, rename))
-	onsets = treatment_onsets(db_path, reference.values(), level=reference.keys()[0])
+	onsets = treatment_onsets(db_path, list(reference.values()), level=list(reference.keys())[0])
+	print(onsets)
+	return
 	for subject in df["Animal_id"]:
+		print(subject)
 		try:
-			print(df.loc[df["Animal_id"]==subject,"date"])
-			print(onsets.loc[onsets["Animal_id"]==subject,'Treatment_start_date'])
-			print(df.loc[df["Animal_id"]==subject,"date"].values[0])
-			print(df.loc[df["Animal_id"]==subject,"date"].values[0]-onsets.loc[onsets["Animal_id"]==subject,'Treatment_start_date'].values[0])
+			print('hihi', onsets.loc[onsets["Animal_id"]==subject,'Treatment_start_date'])
+			print('hihi', onsets.loc[onsets["Animal_id"]==subject,'Treatment_start_date'].values[0].dtype)
+			print("lala", df.loc[df["Animal_id"]==subject,"date"].values[0].dtype)
+			#print(df.loc[df["Animal_id"]==subject,"date"]-onsets.loc[onsets["Animal_id"]==subject,'Treatment_start_date'])
 		except IndexError:
+			print('failed')
 			df.drop(df[df["Animal_id"]==subject].index, inplace=True)
+		else:
+			print('_________________PASSED_________________')
+			return
+		#	print(df.loc[df["Animal_id"]==subject,"date"])
+		#	print(onsets.loc[onsets["Animal_id"]==subject,'Treatment_start_date'])
+		#	print(df.loc[df["Animal_id"]==subject,"date"].values[0])
 	pd.to_timedelta(df['date'],'d')
 	print(df)
 
