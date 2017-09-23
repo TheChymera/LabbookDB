@@ -153,6 +153,38 @@ def treatment_onsets(db_path, animal_treatments,
 		df = selection.animal_treatments(db_path, cage_treatments=cage_treatments)
 	return df
 
+def qualitative_dates(df,
+	iterator_column='Animal_id',
+	date_column='relative_date',
+	fuzzy_matching={},
+	):
+	"""
+	Assign qualitative date labels.
+
+	Parameters
+	----------
+
+	df : pandas.DataFrame
+		A `pandas.DataFrame` object containing a date column.
+	fuzzy_assignment : dict, optional
+		A dictionary the keys of which are qualitative date labels to be assigned, and the values of which are lists giving the quantitative date labels in the order of preference based on which to assign the labels.
+	"""
+
+	df['qualitative_date']=""
+	for i in df[iterator_column]:
+                try:
+                        for label, dates in fuzzy_matching.iteritems():
+                                for date in dates:
+                                        if date in df[df[iterator_column]==i][date_column]:
+                                                break
+                except AttributeError:
+                        for label, dates in fuzzy_matching.items():
+                                for date in dates:
+                                        if date in df[df[iterator_column]==i][date_column].values:
+                                                df.loc[(df[iterator_column]==i)&(df[date_column]==date),'qualitative_date']=label
+                                                break
+	return df
+
 def animal_weights(db_path,
 	reference={},
 	rounding="D",
