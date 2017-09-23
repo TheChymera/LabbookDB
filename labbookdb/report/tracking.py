@@ -155,9 +155,10 @@ def treatment_onsets(db_path, animal_treatments,
 
 def animal_weights(db_path,
 	reference={},
+	rounding="D",
 	):
 	"""
-	Return a dataframe containing animal weights and dates
+	Return a dataframe containing animal weights and dates.
 
 	Parameters
 	----------
@@ -165,7 +166,14 @@ def animal_weights(db_path,
 	db_path : string
 		Path to database file to query.
 	reference : dict, optional
-		Dictionary based on which to apply a reference date for the dates of each animal. KEys of this dictionary must be "animal" or "cage", and values must be lists of treatment codes.
+		Dictionary based on which to apply a reference date for the dates of each animal. Keys of this dictionary must be "animal" or "cage", and values must be lists of treatment codes.
+	rounding : string, optional
+		Whether to round dates and timedeltas - use strings as supported by pandas. [1]_
+
+	References
+	----------
+
+	.. [1] http://pandas.pydata.org/pandas-docs/stable/timeseries.html#offset-aliases
 	"""
 	import pandas as pd
 
@@ -182,27 +190,18 @@ def animal_weights(db_path,
 		'AnimalExternalIdentifier_animal_id': 'Animal_id',
 		}
 	df = short_identifiers.join(collapse_rename(df, 'WeightMeasurement_id', collapse, rename))
-	onsets = treatment_onsets(db_path, list(reference.values()), level=list(reference.keys())[0])
-	print(onsets)
-	return
-	for subject in df["Animal_id"]:
-		print(subject)
-		try:
-			print('hihi', onsets.loc[onsets["Animal_id"]==subject,'Treatment_start_date'])
-			print('hihi', onsets.loc[onsets["Animal_id"]==subject,'Treatment_start_date'].values[0].dtype)
-			print("lala", df.loc[df["Animal_id"]==subject,"date"].values[0].dtype)
-			#print(df.loc[df["Animal_id"]==subject,"date"]-onsets.loc[onsets["Animal_id"]==subject,'Treatment_start_date'])
-		except IndexError:
-			print('failed')
-			df.drop(df[df["Animal_id"]==subject].index, inplace=True)
-		else:
-			print('_________________PASSED_________________')
-			return
-		#	print(df.loc[df["Animal_id"]==subject,"date"])
-		#	print(onsets.loc[onsets["Animal_id"]==subject,'Treatment_start_date'])
-		#	print(df.loc[df["Animal_id"]==subject,"date"].values[0])
-	pd.to_timedelta(df['date'],'d')
-	print(df)
+	if reference:
+		onsets = treatment_onsets(db_path, list(reference.values()), level=list(reference.keys())[0])
+		df["relative_date"]=''
+		for subject in df["Animal_id"]:
+			try:
+				df.loc[df["Animal_id"]==subject,"relative_date"] = df.loc[df["Animal_id"]==subject,"date"] - onsets.loc[onsets["Animal_id"]==subject,'Treatment_start_date'].values[0]
+			except IndexError:
+				df.drop(df[df["Animal_id"]==subject].index, inplace=True)
+		if rounding:
+			df['relative_date'] = df['relative_date'].dt.round(rounding)
+	if rounding:
+		df['date'] = df['date'].dt.round(rounding)
 
 	return df
 
