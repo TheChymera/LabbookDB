@@ -191,13 +191,14 @@ def animal_weights(db_path,
 		}
 	df = short_identifiers.join(collapse_rename(df, 'WeightMeasurement_id', collapse, rename))
 	if reference:
-		onsets = treatment_onsets(db_path, list(reference.values()), level=list(reference.keys())[0])
+		onsets = treatment_onsets(db_path, list(reference.values())[0], level=list(reference.keys())[0])
 		df["relative_date"]=''
 		for subject in df["Animal_id"]:
 			try:
 				df.loc[df["Animal_id"]==subject,"relative_date"] = df.loc[df["Animal_id"]==subject,"date"] - onsets.loc[onsets["Animal_id"]==subject,'Treatment_start_date'].values[0]
 			except IndexError:
 				df.drop(df[df["Animal_id"]==subject].index, inplace=True)
+		df = pd.merge(df, onsets, on='Animal_id', how='outer')
 		if rounding:
 			df['relative_date'] = df['relative_date'].dt.round(rounding)
 	if rounding:
