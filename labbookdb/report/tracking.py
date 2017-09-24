@@ -129,7 +129,7 @@ def animals_info(db_path,
 		print(df)
 	return
 
-def treatment_onsets(db_path, animal_treatments,
+def treatment_onsets(db_path, treatments,
 	level="",
 	):
 	"""
@@ -148,9 +148,9 @@ def treatment_onsets(db_path, animal_treatments,
 	if not level:
 		level = "animal"
 	if level=="animal":
-		df = selection.animal_treatments(db_path, animal_treatments=animal_treatments)
+		df = selection.animal_treatments(db_path, animal_treatments=treatments)
 	elif level=="cage":
-		df = selection.animal_treatments(db_path, cage_treatments=cage_treatments)
+		df = selection.animal_treatments(db_path, cage_treatments=treatments)
 	return df
 
 def qualitative_dates(df,
@@ -223,11 +223,16 @@ def animal_weights(db_path,
 		}
 	df = short_identifiers.join(collapse_rename(df, 'WeightMeasurement_id', collapse, rename))
 	if reference:
+		if list(reference.keys())[0] == 'animal':
+			start_date_label = 'Treatment_start_date'
+		elif list(reference.keys())[0] == 'cage':
+			start_date_label = 'Cage_Treatment_start_date'
 		onsets = treatment_onsets(db_path, list(reference.values())[0], level=list(reference.keys())[0])
+		print(onsets)
 		df["relative_date"]=''
 		for subject in df["Animal_id"]:
 			try:
-				df.loc[df["Animal_id"]==subject,"relative_date"] = df.loc[df["Animal_id"]==subject,"date"] - onsets.loc[onsets["Animal_id"]==subject,'Treatment_start_date'].values[0]
+				df.loc[df["Animal_id"]==subject,"relative_date"] = df.loc[df["Animal_id"]==subject,"date"] - onsets.loc[onsets["Animal_id"]==subject, start_date_label].values[0]
 			except IndexError:
 				df.drop(df[df["Animal_id"]==subject].index, inplace=True)
 		df = pd.merge(df, onsets, on='Animal_id', how='outer')
