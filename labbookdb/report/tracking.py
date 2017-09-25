@@ -198,7 +198,7 @@ def treatment_onsets(db_path, treatments,
 				if not stay_start <= treatment_start and not treatment_start >= stay_end:
 					drop_idx.extend(df[(df['Animal_id']==subject)&(df['CageStay_start_date']==stay_start)].index.tolist())
 		df = df.drop(drop_idx)
-
+		df = df.drop_duplicates(subset=['Cage_id','Cage_Treatment_start_date', 'Cage_TreatmentProtocol_code'])
 	return df
 
 def qualitative_dates(df,
@@ -218,12 +218,13 @@ def qualitative_dates(df,
 		A dictionary the keys of which are qualitative date labels to be assigned, and the values of which are lists giving the quantitative date labels in the order of preference based on which to assign the labels.
 	"""
 
-	df['qualitative_date']=""
+	df['qualitative_date']=''
 	for i in df[iterator_column]:
                 try:
                         for label, dates in fuzzy_matching.iteritems():
                                 for date in dates:
-                                        if date in df[df[iterator_column]==i][date_column]:
+                                        if date in df[df[iterator_column]==i][date_column].values:
+                                                df.loc[(df[iterator_column]==i)&(df[date_column]==date),'qualitative_date']=label
                                                 break
                 except AttributeError:
                         for label, dates in fuzzy_matching.items():
@@ -276,10 +277,11 @@ def animal_weights(db_path,
 		elif list(reference.keys())[0] == 'cage':
 			start_date_label = 'Cage_Treatment_start_date'
 		onsets = treatment_onsets(db_path, list(reference.values())[0], level=list(reference.keys())[0])
-		df["relative_date"]=''
+		df['relative_date'] = ''
+		df['relative_date'] = df['relative_date'].astype('timedelta64[ns]')
 		for subject in df["Animal_id"]:
 			try:
-				df.loc[df["Animal_id"]==subject,"relative_date"] = df.loc[df["Animal_id"]==subject,"date"] - onsets.loc[onsets["Animal_id"]==subject, start_date_label].values[0]
+				df.loc[df["Animal_id"]==subject,"relative_date"] = df.loc[df["Animal_id"]==subject,"date"]-onsets.loc[onsets["Animal_id"]==subject, start_date_label].values[0]
 			except IndexError:
 				df.drop(df[df["Animal_id"]==subject].index, inplace=True)
 		df = pd.merge(df, onsets, on='Animal_id', how='outer')
@@ -287,7 +289,6 @@ def animal_weights(db_path,
 			df['relative_date'] = df['relative_date'].dt.round(rounding)
 	if rounding:
 		df['date'] = df['date'].dt.round(rounding)
-
 	return df
 
 def further_cages(db_path):
