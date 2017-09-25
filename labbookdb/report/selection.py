@@ -198,11 +198,11 @@ def animal_treatments(db_path,
 	Notes
 	-----
 
-	This function does not currently compare the `CageStay.start_date` attribute with e.g. the `Cage.treatment.end_date` attribute in order to determine whether the animal was actually in the cage at the time of the treatment.
 	Currently `conjunctive=False` does not work; cage treatment and animal treatment filters are always conjunctive.
 	"""
 
-	filters=[]
+	filters = []
+	join_type = 'outer'
 	if animal_treatments:
 		col_entries=[
 			("Animal","id"),
@@ -232,14 +232,13 @@ def animal_treatments(db_path,
 			("Cage_Treatment","Cage.treatments"),
 			("Cage_TreatmentProtocol","Cage_Treatment.protocol"),
 			]
-		my_filter = ["TreatmentProtocol","code"]
+		my_filter = ["Cage_TreatmentProtocol","code"]
 		my_filter.extend(cage_treatments)
 		filters.append(my_filter)
 	else:
 		raise ValueError("You must define at least one of the `cage_treatments` and `animal_treatments` parameters.")
 
-	df = query.get_df(db_path, col_entries=col_entries, join_entries=join_entries, filters=filters, default_join="outer")
-
+	df = query.get_df(db_path, col_entries=col_entries, join_entries=join_entries, filters=filters, default_join=join_type)
 	return df
 
 def timetable(db_path, filters,
@@ -296,21 +295,24 @@ def timetable(db_path, filters,
 	return df
 
 
-def parameterized(db_path, data_type, treatment_start_dates=[],):
+def parameterized(db_path, data_type,
+	animal_filter=[],
+	treatment_start_dates=[],
+	):
 	"""Select dataframe from a LabbookDB style database.
 
 	Parameters
 	----------
 
 	db_path : string
-	Path to a LabbookDB formatted database.
-
+		Path to a LabbookDB formatted database.
 	data_type : {"animals id", "animals info", "animals measurements", "animals measurements irregularities", "cage list", "forced swim"}
-	What type of data should be selected values can be:
-
+		What type of data should be selected values can be:
+	animal_filter : list, optional
+		A list of animal identifiers (`Animal.id` attributes) for which to limit the query.
 	treatment_start_dates : list, optional
-	A list containing the treatment start date or dates by which to filter the cages for the sucrose preference measurements.
-	Items should be strings in datetime format, e.g. "2016,4,25,19,30".
+		A list containing the treatment start date or dates by which to filter the cages for the sucrose preference measurements.
+		Items should be strings in datetime format, e.g. "2016,4,25,19,30".
 	"""
 
 	default_join = "inner"
@@ -376,13 +378,17 @@ def parameterized(db_path, data_type, treatment_start_dates=[],):
 		my_filter = ["Measurement","type","weight"]
 	elif data_type == "cage list":
 		col_entries=[
-			("Animal","id"),
+			("Animal",),
+			("CageStay",),
 			("Cage","id"),
 			]
 		join_entries=[
 			("Animal.cage_stays",),
 			("CageStay.cage",),
 			]
+		if animal_filter:
+			my_filter = ['Animal','id']
+			my_filter.extend(animal_filter)
 	elif data_type == "forced swim":
 		col_entries=[
 			("Animal","id"),
