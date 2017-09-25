@@ -157,7 +157,7 @@ def cage_periods(db_path,
 			df.loc[(df['Animal_id']==subject)&(df['CageStay_start_date']==start_date),'CageStay_end_date'] = end_date
 	return df
 
-def treatment_onsets(db_path, treatments,
+def treatment_group(db_path, treatments,
 	level="",
 	):
 	"""
@@ -276,7 +276,7 @@ def animal_weights(db_path,
 			start_date_label = 'Treatment_start_date'
 		elif list(reference.keys())[0] == 'cage':
 			start_date_label = 'Cage_Treatment_start_date'
-		onsets = treatment_onsets(db_path, list(reference.values())[0], level=list(reference.keys())[0])
+		onsets = treatment_group(db_path, list(reference.values())[0], level=list(reference.keys())[0])
 		df['relative_date'] = ''
 		df['relative_date'] = df['relative_date'].astype('timedelta64[ns]')
 		for subject in df["Animal_id"]:

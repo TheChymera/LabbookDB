@@ -41,3 +41,24 @@ def animal_weights_():
 	df = df[df['qualitative_date']=='ofMpF']
 	print(df)
 	mpl.show()
+
+def group():
+	from labbookdb.report.tracking import treatment_group
+	from labbookdb.report import selection
+	from labbookdb.report.utilities import make_identifier_short_form, collapse_rename
+
+
+	db_path = '~/syncdata/meta.db'
+
+	df1 = treatment_group(db_path, ['cFluDW','cFluDW_'], 'cage')
+
+        df = selection.parameterized(db_path, "animals info")
+
+        collapse = {
+                'Animal_death_date' : lambda x: ', '.join(set([str(i) for i in x])),
+                }
+        short_identifiers = make_identifier_short_form(df)
+        df = short_identifiers.join(collapse_rename(df, 'AnimalExternalIdentifier_animal_id', collapse))
+        df.reset_index().set_index('Animal_id', inplace=True)
+	print(df)
+	print(df1)
