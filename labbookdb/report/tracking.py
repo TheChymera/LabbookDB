@@ -59,6 +59,7 @@ def animals_info(db_path,
 
 	treatments : bool, optional
 		Whether to create a and list columns tracking what animal-based and cage-based treatements the animal was subjected to.
+
 	"""
 
 	df = selection.parameterized(db_path, "animals info")
@@ -129,6 +130,33 @@ def animals_info(db_path,
 		print(df)
 	return
 
+def cage_periods(db_path,
+	animal_filter=[],
+	):
+	"""
+	Return a `pandas.DataFrame` object containing the periods which animals spent in which cages.
+
+	Parameters
+	----------
+	db_path : string
+		Path to database file to query.
+	animal_filter : list, optional
+		A list of `Animal.id` attribute values for which to specifically filter the query.
+	"""
+	df = selection.parameterized(db_path, animal_filter=animal_filter, data_type='cage list')
+	df['CageStay_end_date'] = ''
+	for subject in df['Animal_id'].unique():
+		for start_date in df[df['Animal_id']==subject]['CageStay_start_date'].tolist():
+			possible_end_dates = df[(df['Animal_id']==subject)&(df['CageStay_start_date']>start_date)]['CageStay_start_date'].tolist()
+			try:
+				end_date = min(possible_end_dates)
+			except ValueError:
+				end_date = None
+			if not end_date:
+				end_date = df[df['Animal_id']==subject]['Animal_death_date'].tolist()[0]
+			df.loc[(df['Animal_id']==subject)&(df['CageStay_start_date']==start_date),'CageStay_end_date'] = end_date
+	return df
+
 def treatment_onsets(db_path, treatments,
 	level="",
 	):
@@ -144,6 +172,13 @@ def treatment_onsets(db_path, treatments,
 		Desired treatment code (`Treatment.code` attribute) to filter for.
 	level : {"animal", "cage"}
 		Whether to query animal treatments or cage treatments.
+
+	Notes
+	-----
+
+	This function checks whether cage-leve treatment onsets indeed happened during the period in which the animal was housed int eh cage.
+	We do not check for the treatment end dates, as an animal which has received a partial treatment has received a treatment.
+	Checks for treatment discontinuation due to e.g. death should be performed elsewhere.
 	"""
 	if not level:
 		level = "animal"
@@ -151,6 +186,19 @@ def treatment_onsets(db_path, treatments,
 		df = selection.animal_treatments(db_path, animal_treatments=treatments)
 	elif level=="cage":
 		df = selection.animal_treatments(db_path, cage_treatments=treatments)
+		animals = list(df["Animal_id"].unique())
+		cage_stays = cage_periods(db_path, animal_filter=animals)
+		drop_idx = []
+		for subject in list(df['Animal_id'].unique())[-1:]:
+			for stay_start in df[df['Animal_id']==subject]['CageStay_start_date'].tolist():
+				stay_end = cage_stays[(cage_stays['Animal_id']==subject)&(cage_stays['CageStay_start_date']==stay_start)]['CageStay_end_date'].tolist()[0]
+				treatment_start = df[(df['Animal_id']==subject)&(df['CageStay_start_date']==stay_start)]['Cage_Treatment_start_date'].tolist()[0]
+				# We do not check for treatment end dates, because often you may want to include recipients of incomplete treatments (e.g. due to death) when filtering based on cagestays.
+				# Filtering based on death should be done elsewhere.
+				if not stay_start <= treatment_start and not treatment_start >= stay_end:
+					drop_idx.extend(df[(df['Animal_id']==subject)&(df['CageStay_start_date']==stay_start)].index.tolist())
+		df = df.drop(drop_idx)
+
 	return df
 
 def qualitative_dates(df,
@@ -228,7 +276,6 @@ def animal_weights(db_path,
 		elif list(reference.keys())[0] == 'cage':
 			start_date_label = 'Cage_Treatment_start_date'
 		onsets = treatment_onsets(db_path, list(reference.values())[0], level=list(reference.keys())[0])
-		print(onsets)
 		df["relative_date"]=''
 		for subject in df["Animal_id"]:
 			try:
