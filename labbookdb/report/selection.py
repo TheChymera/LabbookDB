@@ -388,7 +388,8 @@ def parameterized(db_path, data_type,
 			]
 		if animal_filter:
 			my_filter = ['Animal','id']
-			my_filter.extend(animal_filter)
+			# for some reason this needs to be str
+			my_filter.extend([str(i) for i in animal_filter])
 	elif data_type == "forced swim":
 		col_entries=[
 			("Animal","id"),
@@ -413,5 +414,4 @@ def parameterized(db_path, data_type,
 		my_filter = ["Treatment","start_date"]
 		my_filter.extend(treatment_start_dates)
 	df = query.get_df(db_path,col_entries=col_entries, join_entries=join_entries, filters=[my_filter], default_join=default_join)
-
 	return df
