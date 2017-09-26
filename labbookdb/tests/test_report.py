@@ -1,6 +1,6 @@
 import pytest
 
-def groups():
+def test_groups():
         """Create a `pandas.DataFrame` containing treatment and genotype group assignments"""
         from labbookdb.report.tracking import treatment_group, append_external_identifiers
 
