@@ -11,5 +11,5 @@ install:
   - travis_wait 20 pip install -r requirements.txt
   - pip install .
 script: 
-  - py.test
   - ./test_scripts.sh
+  - py.test
