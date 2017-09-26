@@ -206,6 +206,7 @@ def animal_treatments(db_path,
 	if animal_treatments:
 		col_entries=[
 			("Animal","id"),
+			("Animal","death_date"),
 			("Treatment",),
 			("TreatmentProtocol","code"),
 			]
@@ -219,6 +220,7 @@ def animal_treatments(db_path,
 	elif cage_treatments:
 		col_entries=[
 			("Animal","id"),
+			("Animal","death_date"),
 			("CageStay","start_date"),
 			("Cage","id"),
 			("Cage","Treatment",""),
