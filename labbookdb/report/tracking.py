@@ -1,4 +1,5 @@
 import os
+import pandas as pd
 from labbookdb.decorators import environment_db_path
 from labbookdb.report.utilities import *
 from labbookdb.report import selection
@@ -129,6 +130,37 @@ def animals_info(db_path,
 	else:
 		print(df)
 	return
+
+def append_external_identifiers(db_path, df,
+        concatenate=['Genotype_code'],
+        ):
+        """
+        Append external animal IDs to a dataframe containing an `Animal_id` (`Animal.id`) column.
+
+        Parameters
+        ----------
+
+        db_path : str
+                Path to database fuile to query.
+        df : pandas.DataFrame
+                A `pandas.DataFrame` object containing an `Animal_id` (`Animal.id`) column.
+        concatenate : list, optional
+                A list containing any combination of 'Animal_death_date', 'Genotype_id', 'Genotype_code', 'Genotype_construct'.
+        """
+
+        df_id = selection.parameterized(db_path, "animals info")
+
+        collapse = {}
+        if concatenate:
+                for i in concatenate:
+                        collapse[i] = lambda x: ', '.join(set([str(i) for i in x]))
+        short_identifiers = make_identifier_short_form(df_id)
+        df_id = short_identifiers.join(collapse_rename(df_id, 'AnimalExternalIdentifier_animal_id', collapse))
+        df_id.reset_index(inplace=True)
+        df = pd.merge(df_id, df, on='Animal_id', how='inner')
+
+        return df
+
 
 def cage_periods(db_path,
 	animal_filter=[],
