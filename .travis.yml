@@ -7,7 +7,7 @@ before_install:
   - cd ..
   - git clone https://bitbucket.org/TheChymera/demolog
   - git clone https://github.com/TheChymera/behaviopy.git
-  - (cd behaviopy && python setup.py install)
+  - (cd behaviopy && python setup.py install && travis_wait 20 pip install -r requirements.txt)
   - cd LabbookDB
 install:
   - travis_wait 20 pip install -r requirements.txt
