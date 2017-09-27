@@ -1,3 +1,4 @@
+import pandas as pd
 try:
 	from ..db import query
 except (ValueError, SystemError):
@@ -203,44 +204,85 @@ def animal_treatments(db_path,
 
 	filters = []
 	join_type = 'outer'
+	col_entries=[
+		("Animal","id"),
+		("Animal","death_date"),
+		("Treatment",),
+		("TreatmentProtocol","code"),
+		("CageStay","start_date"),
+		("Cage","id"),
+		("Cage","Treatment",""),
+		("Cage","TreatmentProtocol","code"),
+		]
+	join_entries=[
+		("Animal.treatments",),
+		("Treatment.protocol",),
+		("Animal.cage_stays",),
+		("CageStay.cage",),
+		("Cage_Treatment","Cage.treatments"),
+		("Cage_TreatmentProtocol","Cage_Treatment.protocol"),
+		]
+	my_filter=[]
 	if animal_treatments:
-		col_entries=[
-			("Animal","id"),
-			("Animal","death_date"),
-			("Treatment",),
-			("TreatmentProtocol","code"),
-			]
-		join_entries=[
-			("Animal.treatments",),
-			("Treatment.protocol",),
-			]
 		my_filter = ["TreatmentProtocol","code"]
 		my_filter.extend(animal_treatments)
-		filters.append(my_filter)
-	elif cage_treatments:
-		col_entries=[
-			("Animal","id"),
-			("Animal","death_date"),
-			("CageStay","start_date"),
-			("Cage","id"),
-			("Cage","Treatment",""),
-			("Cage","TreatmentProtocol","code"),
-			]
-		join_entries=[
-			("Animal.treatments",),
-			("Treatment.protocol",),
-			("Animal.cage_stays",),
-			("CageStay.cage",),
-			("Cage_Treatment","Cage.treatments"),
-			("Cage_TreatmentProtocol","Cage_Treatment.protocol"),
-			]
+	if cage_treatments:
 		my_filter = ["Cage_TreatmentProtocol","code"]
 		my_filter.extend(cage_treatments)
-		filters.append(my_filter)
-	else:
-		raise ValueError("You must define at least one of the `cage_treatments` and `animal_treatments` parameters.")
+	filters.append(my_filter)
 
 	df = query.get_df(db_path, col_entries=col_entries, join_entries=join_entries, filters=filters, default_join=join_type)
+
+	# Generally dataframe operations should be performed in `labbookdb.report.tracking`, however, if animals are selected by cage treatment, we need to determine which animals actually received the treatment.
+	# The following is therefore a selection issue.
+	cage_treatment_columns = ['Cage_Treatment_id','Cage_Treatment_end_date','Cage_Treatment_start_date','Cage_TreatmentProtocol_code','Cage_Treatment_protocol_id']
+	animals = list(df["Animal_id"].unique())
+	cage_stays = cage_periods(db_path, animal_filter=animals)
+	for subject in list(df['Animal_id'].unique()):
+		for stay_start in df[df['Animal_id']==subject]['CageStay_start_date'].tolist():
+			stay_end = cage_stays[(cage_stays['Animal_id']==subject)&(cage_stays['CageStay_start_date']==stay_start)]['CageStay_end_date'].tolist()[0]
+			treatment_start = df[(df['Animal_id']==subject)&(df['CageStay_start_date']==stay_start)]['Cage_Treatment_start_date'].tolist()[0]
+			death_date = df[df['Animal_id']==subject]['Animal_death_date'].tolist()[0]
+			# We do not check for treatment end dates, because often you may want to include recipients of incomplete treatments (e.g. due to death) when filtering based on cagestays.
+			# Filtering based on death should be done elsewhere.
+			if not pd.isnull(treatment_start):
+				if not stay_start <= treatment_start and not treatment_start >= stay_end:
+					df.loc[(df['Animal_id']==subject)&(df['CageStay_start_date']==stay_start),cage_treatment_columns] = None
+				elif treatment_start >= death_date:
+					df.loc[(df['Animal_id']==subject)&(df['CageStay_start_date']==stay_start),cage_treatment_columns] = None
+	df = df.drop_duplicates(subset=['Animal_id','Cage_id','Cage_Treatment_start_date', 'Cage_TreatmentProtocol_code', 'TreatmentProtocol_code'])
+
+	return df
+
+def cage_periods(db_path,
+	animal_filter=[],
+	):
+	"""
+	Return a `pandas.DataFrame` object containing the periods which animals spent in which cages.
+
+	Parameters
+	----------
+	db_path : string
+		Path to database file to query.
+	animal_filter : list, optional
+		A list of `Animal.id` attribute values for which to specifically filter the query.
+
+	Notes
+	-----
+	Operations on `pandas.DataFrame` objects should be performed in `labbookdb.report.tracking`, however, the cagestay end date is not explicitly recordes, so to select it or select animals by it, we calculate it here.
+	"""
+	df = parameterized(db_path, animal_filter=animal_filter, data_type='cage list')
+	df['CageStay_end_date'] = ''
+	for subject in df['Animal_id'].unique():
+		for start_date in df[df['Animal_id']==subject]['CageStay_start_date'].tolist():
+			possible_end_dates = df[(df['Animal_id']==subject)&(df['CageStay_start_date']>start_date)]['CageStay_start_date'].tolist()
+			try:
+				end_date = min(possible_end_dates)
+			except ValueError:
+				end_date = None
+			if not end_date:
+				end_date = df[df['Animal_id']==subject]['Animal_death_date'].tolist()[0]
+			df.loc[(df['Animal_id']==subject)&(df['CageStay_start_date']==start_date),'CageStay_end_date'] = end_date
 	return df
 
 def timetable(db_path, filters,
