@@ -1,4 +1,3 @@
-import matplotlib.pyplot as mpl
 from labbookdb.report.tracking import animal_weights, qualitative_dates
 from behaviopy.plotting import weights
 
