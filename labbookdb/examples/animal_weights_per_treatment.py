@@ -9,7 +9,7 @@ fuzzy_matching = {
 		"ofMpF":[45,44,46],
 	}
 
-df = animal_weights('~/syncdata/meta.db', {'cage':['cFluDW','cFluDW_']})
+df = animal_weights('~/.demolog/meta.db', {'cage':['cFluDW','cFluDW_']})
 df['relative_date'] = df['relative_date'].dt.days.astype(int)
 df = df[['Animal_id', 'relative_date', 'weight', 'Cage_TreatmentProtocol_code', 'ETH/AIC']]
 df = qualitative_dates(df, fuzzy_matching=fuzzy_matching)
