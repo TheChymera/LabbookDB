@@ -31,7 +31,7 @@ Thumbs.db
 # Data traces:
 output/*
 input/*
-image*.png
+*.png
 *.backup/
 
 #geany
