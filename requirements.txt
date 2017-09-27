@@ -1,4 +1,5 @@
 argh>=0.26.2
+numpy
 pandas>=0.17
 simplejson>=3.8.0
 sqlalchemy>=1.0.17
