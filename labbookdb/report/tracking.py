@@ -67,7 +67,7 @@ def animals_info(db_path,
 
 	collapse = {
 		'Animal_death_date' : lambda x: ', '.join(set([str(i) for i in x])),
-		'Genotype_code' : lambda x: ', '.join(set(x)),
+		'Genotype_code' : lambda x: ', '.join(set([str(i) for i in x])),
 		}
 	short_identifiers = make_identifier_short_form(df)
 	df = short_identifiers.join(collapse_rename(df, 'AnimalExternalIdentifier_animal_id', collapse))
