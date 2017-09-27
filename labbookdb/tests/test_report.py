@@ -6,7 +6,7 @@ def test_groups():
 	"""Create a `pandas.DataFrame` containing treatment and genotype group assignments"""
 	from labbookdb.report.tracking import treatment_group, append_external_identifiers
 
-	known_sorted_ids = ['5667', '5668', '5673', '5674', '5675', '5689', '5690', '5691', '5692', '5693', '5694', '5694', '5699', '5700', '5704', '5705', '5706', '6254', '6255', '6256', '6262']
+	known_sorted_ids = ['5667', '5668', '5673', '5674', '5675', '5689', '5690', '5691', '5692', '5693', '5694', '5694', '5699', '5700', '5704', '5705', '5706', '6254', '6256', '6262']
 
 	df = treatment_group(DB_PATH, ['cFluDW','cFluDW_'], 'cage')
 	df = append_external_identifiers(DB_PATH, df, ['Genotype_code'])
