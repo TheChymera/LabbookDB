@@ -15,3 +15,4 @@ install:
 script: 
   - ./test_scripts.sh
   - py.test
+  - (cd labbookdb/examples && for f in *.py ; do python "$f" ; done)
