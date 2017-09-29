@@ -129,6 +129,80 @@ def animals_info(db_path,
 			print("WARNING: This function currently only supports `.csv`, `.tsv`, or `.html` output. Please append one of the aforementioned extensions to the specified file name (`{}`), or specify no extension - in which case `.csv` will be added and an according output will be created.".format(save_as))
 	return df
 
+def cage_consumption(db_path, df,
+	treatment_relative_date=True,
+	rounding='D',
+	):
+	"""
+	Return a `pandas.DataFrame` object containing information about the per-animal drinking solution consumption of single cages.
+
+	Parameters
+	----------
+	db_path : string
+		Path to the database file to query.
+	df : pandas.DataFrame
+		A `pandas.DataFrame` object with `DrinkingMeasurement_id`, `DrinkingMeasurement_reference_date`, `DrinkingMeasurement_date`, `DrinkingMeasurement_start_amount`, `DrinkingMeasurement_start_amount` columns.
+		This can be obtained e.g. from `labbookdb.report.selection.cage_drinking_measurements()`.
+	treatment_relative_date : bool, optional
+		Whether to express the dates relative to a treatment onset.
+		It is assumed that only one cage treatment is recorded per cage, if this is not so, this function may not work as expected.
+	rounding : string, optional
+		Whether to round dates and timedeltas - use strings as supported by pandas. [1]_
+
+	Notes
+	-----
+	This function caluclates the per-day consumption based on phase-agnostic and potentially rounded and day values.
+		This is prone to some inaccuracy, as drinking is generally restricted to specific times of the day.
+		Ideally, a `waking_hour_consumption` should be estimated based on exact times of day and day cycle.
+
+	References
+	----------
+
+	.. [1] http://pandas.pydata.org/pandas-docs/stable/timeseries.html#offset-aliases
+	"""
+
+	selected_cages = list(df['Cage_id'].unique())
+        occupancy_df = selection.cage_periods(db_path, cage_filter=selected_cages)
+        df['occupancy']=''
+        for measurement in df['DrinkingMeasurement_id'].tolist():
+                selected = df[df['DrinkingMeasurement_id']==measurement]
+                measurement_start = selected['DrinkingMeasurement_reference_date'].values[0]
+                measurement_end = selected['DrinkingMeasurement_date'].values[0]
+                cage_id = selected['Cage_id'].values[0]
+                occupants = occupancy_df[
+                                (occupancy_df['CageStay_start_date']<=measurement_start)&
+                                (
+                                        (occupancy_df['CageStay_end_date']>=measurement_end)|
+                                        (occupancy_df['CageStay_end_date'].isnull())
+                                )&
+                                (occupancy_df['Cage_id']==cage_id)
+                                ]
+                if True in occupants['Animal_id'].duplicated().tolist():
+                        print(occupants)
+                        raise ValueError('An animal ist listed twice in the occupancy list of a cage (printed above). This biases the occupancy evaluation, and is likely diagnostic of a broader processing error.')
+                occupancy = len(occupants.index)
+                df.loc[(df['DrinkingMeasurement_id']==measurement),'occupancy'] = occupancy
+        df['consumption'] = df['DrinkingMeasurement_start_amount']-df['DrinkingMeasurement_end_amount']
+        if treatment_relative_date:
+                df['relative_start_date'] = ''
+                df['relative_end_date'] = ''
+                df['relative_start_date'] = df['relative_start_date'].astype('timedelta64[ns]')
+                df['relative_end_date'] = df['relative_end_date'].astype('timedelta64[ns]')
+                df["relative_start_date"] = df["DrinkingMeasurement_reference_date"]-df["Treatment_start_date"]
+                df["relative_end_date"] = df["DrinkingMeasurement_date"]-df["Treatment_start_date"]
+		if rounding:
+			df['relative_start_date'] = df['relative_start_date'].dt.round(rounding)
+			df['relative_end_date'] = df['relative_end_date'].dt.round(rounding)
+		df['relative_end_date'] = df['relative_end_date'].dt.days.astype(int)
+		df['relative_start_date'] = df['relative_start_date'].dt.days.astype(int)
+
+		# Here we calculate the day consumption based on phase-agnostic and potentially rounded and day values.
+		# This is prone to some inaccuracy, as drinking is generally restricted to specific times of the day.
+		# Ideally, a `waking_hour_consumption` should be estimated based on exact times of day and day cycle.
+		df['day_consumption'] = df['consumption']/(df['relative_end_date'] - df['relative_start_date'])
+		df['day_animal_consumption']=df['day_consumption']/df['occupancy']
+	return df
+
 def append_external_identifiers(db_path, df,
         concatenate=['Genotype_code'],
         ):
@@ -190,7 +264,7 @@ def treatment_group(db_path, treatments,
 	elif level=="cage":
 		df = selection.animal_treatments(db_path, cage_treatments=treatments)
 		animals = list(df["Animal_id"].unique())
-		cage_stays = cage_periods(db_path, animal_filter=animals)
+		cage_stays = selection.cage_periods(db_path, animal_filter=animals)
 		drop_idx = []
 		for subject in list(df['Animal_id'].unique()):
 			for stay_start in df[df['Animal_id']==subject]['CageStay_start_date'].tolist():
