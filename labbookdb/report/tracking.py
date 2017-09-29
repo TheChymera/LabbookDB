@@ -210,6 +210,7 @@ def treatment_group(db_path, treatments,
 def qualitative_dates(df,
 	iterator_column='Animal_id',
 	date_column='relative_date',
+	label='qualitative_date',
 	fuzzy_matching={},
 	):
 	"""
@@ -220,11 +221,17 @@ def qualitative_dates(df,
 
 	df : pandas.DataFrame
 		A `pandas.DataFrame` object containing a date column.
+	iteraor_column : string, optional
+		The label of the column which identifies the base entities of which each should be assigned a set of qualitatie dates (most commonly this is `Animal_id`, or `Cage_id`).
+	date_column : string, optional
+		The label of the column which serves as the quantitative record which is to be discretized into qualitative dates.
+	label : string, optional
+		The label to assign to the new qualitative date column.
 	fuzzy_assignment : dict, optional
 		A dictionary the keys of which are qualitative date labels to be assigned, and the values of which are lists giving the quantitative date labels in the order of preference based on which to assign the labels.
 	"""
 
-	df['qualitative_date']=''
+	df[label]=''
 	for i in df[iterator_column]:
                 try:
                         for label, dates in fuzzy_matching.iteritems():
