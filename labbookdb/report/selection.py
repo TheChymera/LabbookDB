@@ -111,72 +111,6 @@ def animals_by_treatment(db_path,
 
 	return df
 
-def by_animals(db_path, select, animals):
-	"""Select a dataframe of animals and all related tables through to the "select" table based on animal filters.
-
-	Parameters
-	----------
-
-	db_path : str
-	Path to a LabbookDB formatted database.
-
-	select : str
-	For which kind of evaluation to select dataframe.
-
-	animals : list of str
-	Animal.id values based on which to filter dataframe
-	"""
-
-	accepted_select_values = ["sucrose preference","timetable"]
-
-	if select == "sucrose preference":
-		join_types = ["inner","inner","inner"]
-		col_entries=[
-			("Animal","id"),
-			("Cage","id"),
-			("SucrosePreferenceMeasurement",),
-			]
-		join_entries=[
-			("Animal.cage_stays",),
-			("CageStay.cage",),
-			("SucrosePreferenceMeasurement",),
-			]
-	elif select == "timetable":
-		col_entries=[
-			("Animal","id"),
-			("Treatment",),
-			("FMRIMeasurement","date"),
-			("OpenFieldTestMeasurement","date"),
-			("ForcedSwimTestMeasurement","date"),
-			("TreatmentProtocol","code"),
-			("Cage","id"),
-			("Cage","Treatment",""),
-			("Cage","TreatmentProtocol","code"),
-			("SucrosePreferenceMeasurement","date"),
-			]
-		join_entries=[
-			("Animal.treatments",),
-			("FMRIMeasurement",),
-			("OpenFieldTestMeasurement","Animal.measurements"),
-			("ForcedSwimTestMeasurement","Animal.measurements"),
-			("Treatment.protocol",),
-			("Animal.cage_stays",),
-			("CageStay.cage",),
-			("Cage_Treatment","Cage.treatments"),
-			("Cage_TreatmentProtocol","Cage_Treatment.protocol"),
-			("SucrosePreferenceMeasurement","Cage.measurements"),
-			]
-	else:
-		raise ValueError("The value for select needs to be one of {}".format(accepted_select_values))
-
-	animals = [str(i) for i in animals] #for some reason the Animal.id values need to be string :-/
-	my_filter = ["Animal","id"]
-	my_filter.extend(animals)
-
-	df = query.get_df(db_path, col_entries=col_entries, join_entries=join_entries, filters=[my_filter], join_types=join_types)
-
-	return df
-
 def animal_treatments(db_path,
 	cage_treatments=[],
 	animal_treatments=[],
@@ -254,8 +188,105 @@ def animal_treatments(db_path,
 
 	return df
 
+
+def by_animals(db_path, select, animals):
+	"""Select a dataframe of animals and all related tables through to the "select" table based on animal filters.
+
+	Parameters
+	----------
+
+	db_path : str
+	Path to a LabbookDB formatted database.
+
+	select : str
+	For which kind of evaluation to select dataframe.
+
+	animals : list of str
+	Animal.id values based on which to filter dataframe
+	"""
+
+	accepted_select_values = ["sucrose preference","timetable"]
+
+	if select == "sucrose preference":
+		join_types = ["inner","inner","inner"]
+		col_entries=[
+			("Animal","id"),
+			("Cage","id"),
+			("SucrosePreferenceMeasurement",),
+			]
+		join_entries=[
+			("Animal.cage_stays",),
+			("CageStay.cage",),
+			("SucrosePreferenceMeasurement",),
+			]
+	elif select == "timetable":
+		col_entries=[
+			("Animal","id"),
+			("Treatment",),
+			("FMRIMeasurement","date"),
+			("OpenFieldTestMeasurement","date"),
+			("ForcedSwimTestMeasurement","date"),
+			("TreatmentProtocol","code"),
+			("Cage","id"),
+			("Cage","Treatment",""),
+			("Cage","TreatmentProtocol","code"),
+			("SucrosePreferenceMeasurement","date"),
+			]
+		join_entries=[
+			("Animal.treatments",),
+			("FMRIMeasurement",),
+			("OpenFieldTestMeasurement","Animal.measurements"),
+			("ForcedSwimTestMeasurement","Animal.measurements"),
+			("Treatment.protocol",),
+			("Animal.cage_stays",),
+			("CageStay.cage",),
+			("Cage_Treatment","Cage.treatments"),
+			("Cage_TreatmentProtocol","Cage_Treatment.protocol"),
+			("SucrosePreferenceMeasurement","Cage.measurements"),
+			]
+	else:
+		raise ValueError("The value for select needs to be one of {}".format(accepted_select_values))
+
+	animals = [str(i) for i in animals] #for some reason the Animal.id values need to be string :-/
+	my_filter = ["Animal","id"]
+	my_filter.extend(animals)
+
+	df = query.get_df(db_path, col_entries=col_entries, join_entries=join_entries, filters=[my_filter], join_types=join_types)
+
+	return df
+
+
+def cage_water_consumption_and_occupancy(db_path,
+	treatments=[]
+	):
+	""""""
+	filters = []
+	join_type = 'inner'
+	col_entries=[
+		("Cage","id"),
+		("Treatment",),
+		("TreatmentProtocol",'code'),
+		('DrinkingMeasurement',)
+		]
+	join_entries=[
+		("Cage.treatments",),
+		("Treatment.protocol",),
+		('DrinkingMeasurement',)
+		]
+	my_filter = []
+	if treatments:
+		my_filter = ["TreatmentProtocol","code"]
+		my_filter.extend(treatments)
+	filters.append(my_filter)
+
+	df = query.get_df(db_path, col_entries=col_entries, join_entries=join_entries, filters=filters, default_join=join_type)
+
+	return df
+
+
 def cage_periods(db_path,
 	animal_filter=[],
+	cage_filter=[],
 	):
 	"""
 	Return a `pandas.DataFrame` object containing the periods which animals spent in which cages.
@@ -271,7 +302,7 @@ def cage_periods(db_path,
 	-----
 	Operations on `pandas.DataFrame` objects should be performed in `labbookdb.report.tracking`, however, the cagestay end date is not explicitly recordes, so to select it or select animals by it, we calculate it here.
 	"""
-	df = parameterized(db_path, animal_filter=animal_filter, data_type='cage list')
+	df = parameterized(db_path, animal_filter=animal_filter, cage_filter=cage_filter, data_type='cage list')
 	df['CageStay_end_date'] = ''
 	for subject in df['Animal_id'].unique():
 		for start_date in df[df['Animal_id']==subject]['CageStay_start_date'].tolist():
@@ -341,6 +372,7 @@ def timetable(db_path, filters,
 
 def parameterized(db_path, data_type,
 	animal_filter=[],
+	cage_filter=[],
 	treatment_start_dates=[],
 	):
 	"""Select dataframe from a LabbookDB style database.
@@ -434,6 +466,10 @@ def parameterized(db_path, data_type,
 			my_filter = ['Animal','id']
 			# for some reason this needs to be str
 			my_filter.extend([str(i) for i in animal_filter])
+		if cage_filter:
+			my_filter = ['Cage','id']
+			# for some reason this needs to be str
+			my_filter.extend([str(i) for i in cage_filter])
 	elif data_type == "forced swim":
 		col_entries=[
 			("Animal","id"),
