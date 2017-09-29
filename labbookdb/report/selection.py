@@ -256,7 +256,7 @@ def by_animals(db_path, select, animals):
 	return df
 
 
-def cage_water_consumption_and_occupancy(db_path,
+def cage_drinking_measurements(db_path,
 	treatments=[]
 	):
 	""""""
