@@ -160,33 +160,6 @@ def append_external_identifiers(db_path, df,
         return df
 
 
-def cage_periods(db_path,
-	animal_filter=[],
-	):
-	"""
-	Return a `pandas.DataFrame` object containing the periods which animals spent in which cages.
-
-	Parameters
-	----------
-	db_path : string
-		Path to database file to query.
-	animal_filter : list, optional
-		A list of `Animal.id` attribute values for which to specifically filter the query.
-	"""
-	df = selection.parameterized(db_path, animal_filter=animal_filter, data_type='cage list')
-	df['CageStay_end_date'] = ''
-	for subject in df['Animal_id'].unique():
-		for start_date in df[df['Animal_id']==subject]['CageStay_start_date'].tolist():
-			possible_end_dates = df[(df['Animal_id']==subject)&(df['CageStay_start_date']>start_date)]['CageStay_start_date'].tolist()
-			try:
-				end_date = min(possible_end_dates)
-			except ValueError:
-				end_date = None
-			if not end_date:
-				end_date = df[df['Animal_id']==subject]['Animal_death_date'].tolist()[0]
-			df.loc[(df['Animal_id']==subject)&(df['CageStay_start_date']==start_date),'CageStay_end_date'] = end_date
-	return df
-
 def treatment_group(db_path, treatments,
 	level="",
 	):
