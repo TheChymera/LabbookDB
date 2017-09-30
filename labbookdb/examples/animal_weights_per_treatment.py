@@ -1,5 +1,5 @@
 from labbookdb.report.tracking import animal_weights, qualitative_dates
-from behaviopy.plotting import weights
+from behaviopy.plotting import qualitative_times
 
 fuzzy_matching = {
 		"ofM":[-14,-15,-13,-7,-8,-6],
@@ -14,9 +14,9 @@ df['relative_date'] = df['relative_date'].dt.days.astype(int)
 df = df[['Animal_id', 'relative_date', 'weight', 'Cage_TreatmentProtocol_code', 'ETH/AIC']]
 df = qualitative_dates(df, fuzzy_matching=fuzzy_matching)
 qualitative_times(df,
-	order=['ofM','ofMaF','ofMcF1','ofMcF2','ofMpF'],
+	x='qualitative_date',
 	condition='Cage_TreatmentProtocol_code',
 	err_style="boot_traces",
-	time='qualitative_date',
+	order=['ofM','ofMaF','ofMcF1','ofMcF2','ofMpF'],
 	save_as='animal_weights_per_treatment.png',
 	)
