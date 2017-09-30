@@ -162,34 +162,34 @@ def cage_consumption(db_path, df,
 	"""
 
 	selected_cages = list(df['Cage_id'].unique())
-        occupancy_df = selection.cage_periods(db_path, cage_filter=selected_cages)
-        df['occupancy']=''
-        for measurement in df['DrinkingMeasurement_id'].tolist():
-                selected = df[df['DrinkingMeasurement_id']==measurement]
-                measurement_start = selected['DrinkingMeasurement_reference_date'].values[0]
-                measurement_end = selected['DrinkingMeasurement_date'].values[0]
-                cage_id = selected['Cage_id'].values[0]
-                occupants = occupancy_df[
-                                (occupancy_df['CageStay_start_date']<=measurement_start)&
-                                (
-                                        (occupancy_df['CageStay_end_date']>=measurement_end)|
-                                        (occupancy_df['CageStay_end_date'].isnull())
-                                )&
-                                (occupancy_df['Cage_id']==cage_id)
-                                ]
-                if True in occupants['Animal_id'].duplicated().tolist():
-                        print(occupants)
-                        raise ValueError('An animal ist listed twice in the occupancy list of a cage (printed above). This biases the occupancy evaluation, and is likely diagnostic of a broader processing error.')
-                occupancy = len(occupants.index)
-                df.loc[(df['DrinkingMeasurement_id']==measurement),'occupancy'] = occupancy
-        df['consumption'] = df['DrinkingMeasurement_start_amount']-df['DrinkingMeasurement_end_amount']
-        if treatment_relative_date:
-                df['relative_start_date'] = ''
-                df['relative_end_date'] = ''
-                df['relative_start_date'] = df['relative_start_date'].astype('timedelta64[ns]')
-                df['relative_end_date'] = df['relative_end_date'].astype('timedelta64[ns]')
-                df["relative_start_date"] = df["DrinkingMeasurement_reference_date"]-df["Treatment_start_date"]
-                df["relative_end_date"] = df["DrinkingMeasurement_date"]-df["Treatment_start_date"]
+	occupancy_df = selection.cage_periods(db_path, cage_filter=selected_cages)
+	df['occupancy']=''
+	for measurement in df['DrinkingMeasurement_id'].tolist():
+		selected = df[df['DrinkingMeasurement_id']==measurement]
+		measurement_start = selected['DrinkingMeasurement_reference_date'].values[0]
+		measurement_end = selected['DrinkingMeasurement_date'].values[0]
+		cage_id = selected['Cage_id'].values[0]
+		occupants = occupancy_df[
+				(occupancy_df['CageStay_start_date']<=measurement_start)&
+				(
+					(occupancy_df['CageStay_end_date']>=measurement_end)|
+					(occupancy_df['CageStay_end_date'].isnull())
+				)&
+				(occupancy_df['Cage_id']==cage_id)
+				]
+		if True in occupants['Animal_id'].duplicated().tolist():
+			print(occupants)
+			raise ValueError('An animal ist listed twice in the occupancy list of a cage (printed above). This biases the occupancy evaluation, and is likely diagnostic of a broader processing error.')
+		occupancy = len(occupants.index)
+		df.loc[(df['DrinkingMeasurement_id']==measurement),'occupancy'] = occupancy
+	df['consumption'] = df['DrinkingMeasurement_start_amount']-df['DrinkingMeasurement_end_amount']
+	if treatment_relative_date:
+		df['relative_start_date'] = ''
+		df['relative_end_date'] = ''
+		df['relative_start_date'] = df['relative_start_date'].astype('timedelta64[ns]')
+		df['relative_end_date'] = df['relative_end_date'].astype('timedelta64[ns]')
+		df["relative_start_date"] = df["DrinkingMeasurement_reference_date"]-df["Treatment_start_date"]
+		df["relative_end_date"] = df["DrinkingMeasurement_date"]-df["Treatment_start_date"]
 		if rounding:
 			df['relative_start_date'] = df['relative_start_date'].dt.round(rounding)
 			df['relative_end_date'] = df['relative_end_date'].dt.round(rounding)
@@ -204,34 +204,34 @@ def cage_consumption(db_path, df,
 	return df
 
 def append_external_identifiers(db_path, df,
-        concatenate=['Genotype_code'],
-        ):
-        """
-        Append external animal IDs to a dataframe containing an `Animal_id` (`Animal.id`) column.
+	concatenate=['Genotype_code'],
+	):
+	"""
+	Append external animal IDs to a dataframe containing an `Animal_id` (`Animal.id`) column.
 
-        Parameters
-        ----------
+	Parameters
+	----------
 
-        db_path : str
-                Path to database fuile to query.
-        df : pandas.DataFrame
-                A `pandas.DataFrame` object containing an `Animal_id` (`Animal.id`) column.
-        concatenate : list, optional
-                A list containing any combination of 'Animal_death_date', 'Genotype_id', 'Genotype_code', 'Genotype_construct'.
-        """
+	db_path : str
+		Path to database fuile to query.
+	df : pandas.DataFrame
+		A `pandas.DataFrame` object containing an `Animal_id` (`Animal.id`) column.
+	concatenate : list, optional
+		A list containing any combination of 'Animal_death_date', 'Genotype_id', 'Genotype_code', 'Genotype_construct'.
+	"""
 
-        df_id = selection.parameterized(db_path, "animals info")
+	df_id = selection.parameterized(db_path, "animals info")
 
-        collapse = {}
-        if concatenate:
-                for i in concatenate:
-                        collapse[i] = lambda x: ', '.join(set([str(i) for i in x]))
-        short_identifiers = make_identifier_short_form(df_id)
-        df_id = short_identifiers.join(collapse_rename(df_id, 'AnimalExternalIdentifier_animal_id', collapse))
-        df_id.reset_index(inplace=True)
-        df = pd.merge(df_id, df, on='Animal_id', how='inner')
+	collapse = {}
+	if concatenate:
+		for i in concatenate:
+			collapse[i] = lambda x: ', '.join(set([str(i) for i in x]))
+	short_identifiers = make_identifier_short_form(df_id)
+	df_id = short_identifiers.join(collapse_rename(df_id, 'AnimalExternalIdentifier_animal_id', collapse))
+	df_id.reset_index(inplace=True)
+	df = pd.merge(df_id, df, on='Animal_id', how='inner')
 
-        return df
+	return df
 
 
 def treatment_group(db_path, treatments,
@@ -307,18 +307,18 @@ def qualitative_dates(df,
 
 	df[label]=''
 	for i in df[iterator_column]:
-                try:
-                        for label, dates in fuzzy_matching.iteritems():
-                                for date in dates:
-                                        if date in df[df[iterator_column]==i][date_column].values:
-                                                df.loc[(df[iterator_column]==i)&(df[date_column]==date),'qualitative_date']=label
-                                                break
-                except AttributeError:
-                        for label, dates in fuzzy_matching.items():
-                                for date in dates:
-                                        if date in df[df[iterator_column]==i][date_column].values:
-                                                df.loc[(df[iterator_column]==i)&(df[date_column]==date),'qualitative_date']=label
-                                                break
+		try:
+			for label, dates in fuzzy_matching.iteritems():
+				for date in dates:
+					if date in df[df[iterator_column]==i][date_column].values:
+						df.loc[(df[iterator_column]==i)&(df[date_column]==date),'qualitative_date']=label
+						break
+		except AttributeError:
+			for label, dates in fuzzy_matching.items():
+				for date in dates:
+					if date in df[df[iterator_column]==i][date_column].values:
+						df.loc[(df[iterator_column]==i)&(df[date_column]==date),'qualitative_date']=label
+						break
 	return df
 
 def animal_weights(db_path,
