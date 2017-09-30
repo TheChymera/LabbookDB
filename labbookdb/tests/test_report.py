@@ -25,3 +25,38 @@ def test_animal_cage_treatment_control_in_report():
 		)
 	assert df[df['ETH/AIC']=='6255']['cage_treatment'].values[0] == ""
 	assert df[df['ETH/AIC']=='6255']['animal_treatment'].values[0] == 'aFluIV_'
+
+def test_drinking_by_cage_treatment(
+	treatment_relative_date=True,
+	rounding='D',
+	):
+	from labbookdb.report.tracking import treatment_group, append_external_identifiers, qualitative_dates, cage_consumption
+	from labbookdb.report.selection import cage_periods, cage_drinking_measurements
+
+	known_cage_ids = [25, 38, 41]
+	known_consumption_values = [2.35, 2.51, 2.94, 2.95, 3.16, 3.17, 3.22, 3.23, 3.24, 3.25, 3.49, 3.63, 3.72, 4.04, 4.09, 4.58, 4.98, 5.15, 5.31, 5.39, 5.54, 5.97, 6.73, 6.78]
+
+	df = cage_drinking_measurements(DB_PATH,['cFluDW'])
+	df = cage_consumption(DB_PATH,df)
+
+	fuzzy_matching = {
+		"ofM":[-14,-15,-13,-7,-8,-6],
+		"ofMaF":[0,-1],
+		"ofMcF1":[14,13,15],
+		"ofMcF2":[28,27,29],
+		"ofMpF":[45,44,46,43,47],
+	}
+	df = qualitative_dates(df,
+		iterator_column='Cage_id',
+		date_column='relative_end_date',
+		label='qualitative_date',
+		fuzzy_matching=fuzzy_matching,
+		)
+
+	cage_ids = sorted(df['Cage_id'].unique())
+	assert cage_ids == known_cage_ids
+
+	consumption_values = df['day_animal_consumption'].values
+	consumption_values = [round(i, 2) for i in consumption_values]
+	consumption_values = sorted(list(set(consumption_values)))
+	assert consumption_values == known_consumption_values
