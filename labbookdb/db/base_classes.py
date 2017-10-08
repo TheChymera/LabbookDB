@@ -72,17 +72,20 @@ class FMRIScannerSetup(Base):
 	scanner = Column(String)
 	support = Column(String)
 
-class LaserStimulationProtocol(Base):
-	__tablename__ = "laser_stimulation_protocols"
+class StimulationEvent(Base):
+	__tablename__ = "stimulation_events"
 	id = Column(Integer, primary_key=True)
-	code = Column(String, unique=True)
 	#tme values specified in seconds, frequencies in hertz
-	stimulus_repetitions = Column(Integer)
-	stimulus_duration = Column(Float)
-	inter_stimulus_duration = Column(Float)
-	stimulation_onset = Column(Float)
-	stimulus_frequency = Column(Float)
+	onset = Column(Float)
+	duration = Column(Float)
+	frequency = Column(Float)
 	pulse_width = Column(Float)
+	trial_type = Column(String)
+	target = Column(String)
+	strength = Column(Float)
+	unit_id = Column(Integer, ForeignKey('measurement_units.id'))
+	unit = relationship("MeasurementUnit")
+
 
 #meta classes:
 

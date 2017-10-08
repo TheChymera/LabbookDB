@@ -12,9 +12,13 @@ ingredients_association = Table('ingredients_associations', Base.metadata,
 	Column('solutions_id', Integer, ForeignKey('solutions.id')),
 	Column('ingredients_id', Integer, ForeignKey('ingredients.id'))
 	)
-laser_stimulations_association = Table('laser_stimulations_associations', Base.metadata,
+stimulation_events_association = Table('stimulation_events_associations', Base.metadata,
+	Column('stimulation_events_id', Integer, ForeignKey('stimulation_events.id')),
+	Column('stimulation_protocols_id', Integer, ForeignKey('stimulation_protocols.id'))
+	)
+stimulations_association = Table('stimulations_associations', Base.metadata,
 	Column('fmri_measurements_id', Integer, ForeignKey('fmri_measurements.id')),
-	Column('laser_stimulation_protocols_id', Integer, ForeignKey('laser_stimulation_protocols.id'))
+	Column('stimulation_protocols_id', Integer, ForeignKey('stimulation_protocols.id'))
 	)
 anesthesia_association = Table('anesthesia_associations', Base.metadata,
 	Column('anesthesia_protocols_id', Integer, ForeignKey('anesthesia_protocols.id')),
@@ -56,6 +60,13 @@ class Evaluation(Base):
 	author = relationship("Operator")
 
 	measurement_id = Column(Integer, ForeignKey('measurements.id'))
+
+class StimulationProtocol(Base):
+	__tablename__ = "stimulation_protocols"
+	id = Column(Integer, primary_key=True)
+	code = Column(String, unique=True)
+	#tme values specified in seconds, frequencies in hertz
+	events = relationship("StimulationEvents", secondary=stimulation_events_association)
 
 class Substance(Base):
 	__tablename__ = "substances"
@@ -144,7 +155,7 @@ class FMRIMeasurement(Measurement):
 	scanner_setup = relationship("FMRIScannerSetup")
 	data_path = Column(String) #path to the recording file
 
-	laser_stimulations = relationship("LaserStimulationProtocol", secondary=laser_stimulations_association)
+	stimulations = relationship("StimulationProtocol", secondary=stimulations_association)
 
 	def __str__(self):
 		template = "fMRI({date}"
