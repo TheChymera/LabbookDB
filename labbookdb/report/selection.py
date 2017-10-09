@@ -429,7 +429,7 @@ def parameterized(db_path, data_type,
 			]
 		join_entries=[
 			("Animal.measurements",),
-			("FMRIMeasurement.laser_stimulations",),
+			("FMRIMeasurement.stimulations",),
 			]
 	elif data_type == "animals measurements irregularities":
 		col_entries=[
