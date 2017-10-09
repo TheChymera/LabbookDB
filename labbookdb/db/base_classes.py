@@ -75,17 +75,17 @@ class FMRIScannerSetup(Base):
 class StimulationEvent(Base):
 	__tablename__ = "stimulation_events"
 	id = Column(Integer, primary_key=True)
-	#tme values specified in seconds, frequencies in hertz
+	#tme values specified in seconds, frequencies in hertz, wavelength in nm
 	onset = Column(Float)
 	duration = Column(Float)
 	frequency = Column(Float)
 	pulse_width = Column(Float)
 	trial_type = Column(String)
 	target = Column(String)
+	wavelength = Column(Float)
 	strength = Column(Float)
 	unit_id = Column(Integer, ForeignKey('measurement_units.id'))
 	unit = relationship("MeasurementUnit")
-
 
 #meta classes:
 

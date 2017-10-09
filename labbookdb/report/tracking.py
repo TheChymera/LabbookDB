@@ -77,10 +77,10 @@ def animals_info(db_path,
 		count_scans = {'occurences' : lambda x: sum(x),}
 
 		collapse = {
-			'LaserStimulationProtocol_code' : lambda x: 0 if list(x) == [] else 1,
+			'StimulationProtocol_code' : lambda x: 0 if list(x) == [] else 1,
 			"Animal_id" : lambda x: list(x)[0],
 			}
-		rename = {'LaserStimulationProtocol_code': 'occurences'}
+		rename = {'StimulationProtocol_code': 'occurences'}
 		functional_scan_df = selection.parameterized(db_path, "animals measurements")
 		functional_scan_df = collapse_rename(functional_scan_df, "Measurement_id", collapse, rename)
 		functional_scan_df = collapse_rename(functional_scan_df, 'Animal_id', count_scans)
