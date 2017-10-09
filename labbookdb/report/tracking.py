@@ -412,19 +412,16 @@ def further_cages(db_path):
 	print("Next open cage number: {0}\nSkipped cage numbers: {1}".format(next_cage, ", ".join([str(i) for i in skipped_cages])))
 	return
 
-def treatments_plot(db_path,
+def overview(db_path,
 	default_join=False,
-	draw=[],
 	filters=[],
 	join_types=[],
-	real_dates=True,
-	saturate=[],
-	save_df="",
-	save_plot="",
-	shade=[],
-	window_end="",
+	relative_dates=True,
+	save_as="",
+	rounding='D',
+	rounding_type='round',
 	):
-	"""Plot a timetable of events per animal.
+	"""Returns an overview of events per animal.
 
 	Parameters
 	----------
@@ -446,22 +443,50 @@ def treatments_plot(db_path,
 
 	window_end : string
 	A datetime-formatted string (e.g. "2016,12,18") to apply as the timetable end date (overrides autodetected end).
+
+	rounding_type : {'round','floor','ceil'}, optional
+		Whether to round the dates (splits e.g. days apart at noon, hours at 30 minutes, etc.) or to take the floor or the ceiling.
 	"""
 	from behaviopy import plotting
 
 	df = selection.timetable(db_path, filters, default_join, join_types=join_types)
+	date_columns = ['Treatment_start_date', 'Treatment_end_date', 'FMRIMeasurement_date', 'OpenFieldTestMeasurement_date', 'ForcedSwimTestMeasurement_date', 'Cage_Treatment_start_date', 'Cage_Treatment_end_date',]
 
-	if save_df:
-		df_path = os.path.abspath(os.path.expanduser(save_df))
-		if not(df_path.endswith(".csv") or df_path.endswith(".CSV")):
-			df_path += ".csv"
-		df.to_csv(df_path)
+	if relative_dates:
+		if isinstance(relative_dates, dict):
+			df['reference_date'] = ''
+			df['reference_date'] = df['reference_date'].astype('datetime64[ns]')
+			reference_column = list(relative_dates.keys())[0]
+			matching_column = list(list(relative_dates.values())[0].keys())[0]
+			reference_matching = list(list(relative_dates.values())[0].values())[0]
+			for subject in df['Animal_id'].unique():
+				reference_date = df[(df['Animal_id']==subject)&(df[matching_column]==reference_matching)][reference_column].values[0]
+				df.loc[df['Animal_id']==subject,'reference_date'] = reference_date
+		elif isinstance(relative_dates, bool):
+			df['reference_date'] = df['Cage_Treatment_start_date']
+		elif "," in relative_dates or "-" in relative_dates:
+			print('WARNING: The `relative_dates` value provided could be interpreted as a date. This feature is however not yet supported. Dates will be made relative to "Cage_Treatment_start_date" instead!')
+			df['reference_date'] = df['Cage_Treatment_start_date']
+		else:
+			df['reference_date'] = df[relative_dates]
+		for date_column in date_columns:
+			try:
+				df[date_column] = df[date_column]-df['reference_date']
+			except TypeError:
+				pass
+			else:
+				if rounding:
+					if rounding_type == 'round':
+						df[date_column] = df[date_column].dt.round(rounding)
+					elif rounding_type == 'floor':
+						df[date_column] = df[date_column].dt.floor(rounding)
+					elif rounding_type == 'ceil':
+						df[date_column] = df[date_column].dt.ceil(rounding)
 
-	plotting.timetable(df, "Animal_id",
-		draw=draw,
-		shade=shade,
-		saturate=saturate,
-		save_as=save_plot,
-		window_end=window_end,
-		real_dates=real_dates,
-		)
+	if save_as:
+		save_as = os.path.abspath(os.path.expanduser(save_as))
+		if not(save_as.endswith(".csv") or save_as.endswith(".CSV")):
+			save_as += ".csv"
+		df.to_csv(save_as)
+
+	return df
