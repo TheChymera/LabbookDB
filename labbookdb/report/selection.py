@@ -425,7 +425,7 @@ def parameterized(db_path, data_type,
 		col_entries=[
 			("Animal","id"),
 			("Measurement","id"),
-			("LaserStimulationProtocol","code"),
+			("StimulationProtocol","code"),
 			]
 		join_entries=[
 			("Animal.measurements",),
