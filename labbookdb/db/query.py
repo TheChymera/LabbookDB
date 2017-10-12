@@ -8,7 +8,7 @@ import pandas as pd
 
 import datetime
 from sqlalchemy import create_engine, literal, or_, inspection
-from os import path
+import os
 from sqlalchemy.orm import sessionmaker, aliased, contains_eager
 import sqlalchemy
 
@@ -107,6 +107,9 @@ def animal_info(identifier, database,
 	If specified gives a constraint on the AnimalExternalIdentifier.database column AND truns the identifier attribute into a constraint on the AnimalExternalIdentifier.identifier column. If unspecified, the identfier argument is used as a constraint on the Animal.id column.
 	"""
 
+	if not db_path:
+		db_path = os.environ["LDB_PATH"]
+
 	if database and identifier:
 		session, engine = load_session(db_path)
 		sql_query = session.query(Animal)
@@ -163,7 +166,7 @@ def cage_info(db_path, identifier,
 	engine.dispose()
 
 def load_session(db_path):
-	db_path = "sqlite:///" + path.expanduser(db_path)
+	db_path = "sqlite:///" + os.path.expanduser(db_path)
 	engine = create_engine(db_path, echo=False)
 	Session = sessionmaker(bind=engine)
 	session = Session()
