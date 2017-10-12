@@ -65,6 +65,7 @@ class StimulationProtocol(Base):
 	__tablename__ = "stimulation_protocols"
 	id = Column(Integer, primary_key=True)
 	code = Column(String, unique=True)
+	name = Column(String, unique=True)
 	#tme values specified in seconds, frequencies in hertz
 	events = relationship("StimulationEvent", secondary=stimulation_events_association)
 
