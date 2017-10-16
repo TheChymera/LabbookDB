@@ -2,6 +2,18 @@ import pytest
 from os import path
 
 DB_PATH = '~/.demolog/meta.db'
+DATA_DIR = path.join(path.dirname(path.realpath(__file__)),'../../example_data/')
+
+def test_bids_eventsfile():
+	"""Check if correct BIDS events file can be sourced."""
+	from labbookdb.report.tracking import bids_eventfile
+	import pandas as pd
+
+	df = bids_eventfile(DB_PATH,'chr_longSOA')
+	bids_eventsfile = path.join(DATA_DIR,'bids_eventsfile.csv')
+	df_ = pd.read_csv(bids_eventsfile, index_col=0)
+
+	assert df[['onset','duration']].equals(df_[['onset','duration']])
 
 def test_groups():
 	"""Create a `pandas.DataFrame` containing treatment and genotype group assignments"""

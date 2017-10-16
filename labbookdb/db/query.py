@@ -7,7 +7,6 @@ import sys
 import pandas as pd
 
 import datetime
-from sqlalchemy import create_engine, literal, or_, inspection
 import os
 from sqlalchemy.orm import sessionmaker, aliased, contains_eager
 import sqlalchemy
@@ -167,7 +166,7 @@ def cage_info(db_path, identifier,
 
 def load_session(db_path):
 	db_path = "sqlite:///" + os.path.expanduser(db_path)
-	engine = create_engine(db_path, echo=False)
+	engine = sqlalchemy.create_engine(db_path, echo=False)
 	Session = sessionmaker(bind=engine)
 	session = Session()
 	Base.metadata.create_all(engine)
@@ -186,9 +185,9 @@ def add_all_columns(cols, class_name):
 
 	#we need to catch this esception, because for aliased classes a mapper is not directly returned
 	try:
-		col_name_cols = inspection.inspect(joinclassobject).columns.items()
+		col_name_cols = sqlalchemy.inspection.inspect(joinclassobject).columns.items()
 	except AttributeError:
-		col_name_cols = inspection.inspect(joinclassobject).mapper.columns.items()
+		col_name_cols = sqlalchemy.inspection.inspect(joinclassobject).mapper.columns.items()
 
 	for col_name, col in col_name_cols:
 		column = getattr(joinclassobject, col.key)
@@ -201,24 +200,24 @@ def get_for_protocolize(db_path, class_name, code):
 	cols = []
 	joins = []
 	classobject = ALLOWED_CLASSES[class_name]
-	insp = inspection.inspect(classobject)
+	insp = sqlalchemy.inspection.inspect(classobject)
 	for name, col in insp.columns.items():
 		cols.append(col.label(name))
 	for name, rel in insp.relationships.items():
 		alias = aliased(rel.mapper.class_, name=name)
 		joins.append((alias, rel.class_attribute))
-		for col_name, col in inspection.inspect(rel.mapper).columns.items():
+		for col_name, col in sqlalchemy.inspection.inspect(rel.mapper).columns.items():
 			#the id column causes double entries, as it is mapped once on the parent table (related_table_id) and once on the child table (table_id)
 			if col.key != "id":
 				aliased_col = getattr(alias, col.key)
 				cols.append(aliased_col.label("{}_{}".format(name, col_name)))
 
-		sub_insp = inspection.inspect(rel.mapper.class_)
+		sub_insp = sqlalchemy.inspection.inspect(rel.mapper.class_)
 		for sub_name, sub_rel in sub_insp.relationships.items():
 			if "contains" not in sub_name:
 				sub_alias = aliased(sub_rel.mapper.class_, name=name+"_"+sub_name)
 				joins.append((sub_alias, sub_rel.class_attribute))
-				for sub_col_name, sub_col in inspection.inspect(sub_rel.mapper).columns.items():
+				for sub_col_name, sub_col in sqlalchemy.inspection.inspect(sub_rel.mapper).columns.items():
 					#the id column causes double entries, as it is mapped once on the parent table (related_table_id) and once on the child table (table_id)
 					if sub_col.key != "id":
 						sub_aliased_col = getattr(sub_alias, sub_col.key)
@@ -232,6 +231,8 @@ def get_for_protocolize(db_path, class_name, code):
 	mystring = sql_query.statement
 	mydf = pd.read_sql_query(mystring,engine)
 
+	session.close()
+	engine.dispose()
 	return mydf
 
 def get_df(db_path,
@@ -335,7 +336,7 @@ def get_df(db_path,
 			if len(sub_filter) == 3:
 				sql_query = sql_query.filter(getattr(ALLOWED_CLASSES[sub_filter[0]], sub_filter[1]) == sub_filter[2])
 			else:
-				sql_query = sql_query.filter(or_(getattr(ALLOWED_CLASSES[sub_filter[0]], sub_filter[1]) == v for v in sub_filter[2:]))
+				sql_query = sql_query.filter(sqlalchemy.or_(getattr(ALLOWED_CLASSES[sub_filter[0]], sub_filter[1]) == v for v in sub_filter[2:]))
 
 	mystring = sql_query.statement
 	df = pd.read_sql_query(mystring,engine)
