@@ -1,8 +1,5 @@
 import pandas as pd
-try:
-	from ..db import query
-except (ValueError, SystemError):
-	from labbookdb.db import query
+from labbookdb.db import query
 
 def stimulation_protocol(db_path, code,):
 	"""Select a `pandas.DataFrame`object containing all events and associated measurement units for a specific stimulation protocol.
