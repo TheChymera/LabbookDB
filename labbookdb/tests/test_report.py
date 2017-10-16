@@ -25,7 +25,6 @@ def test_groups():
 	df = append_external_identifiers(DB_PATH, df, ['Genotype_code'])
 	sorted_ids = sorted(df['ETH/AIC'].tolist())
 
-	print(df['ETH/AIC'].tolist(),sorted_ids,known_sorted_ids)
 	assert sorted_ids == known_sorted_ids
 
 def test_animal_cage_treatment_control_in_report():

@@ -8,6 +8,7 @@ import pandas as pd
 
 import datetime
 import os
+from copy import deepcopy
 from sqlalchemy.orm import sessionmaker, aliased, contains_eager
 import sqlalchemy
 
@@ -317,6 +318,8 @@ def get_df(db_path,
 		joins.append(join_parameters)
 
 	sql_query = session.query(*cols)
+	#we need to make sure we don't edit the join_types variable passed to this function
+	join_types = deepcopy(join_types)
 	while len(join_types) < len(joins):
 		if default_join == "outer":
 			join_types.append("outer")
