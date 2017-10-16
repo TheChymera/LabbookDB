@@ -8,6 +8,7 @@ from labbookdb.db import query
 
 TABLE_COL_SPACE = 150
 
+
 def animals_id(db_path,
 	save_as=None,
 	):
@@ -128,6 +129,34 @@ def animals_info(db_path,
 		else:
 			print("WARNING: This function currently only supports `.csv`, `.tsv`, or `.html` output. Please append one of the aforementioned extensions to the specified file name (`{}`), or specify no extension - in which case `.csv` will be added and an according output will be created.".format(save_as))
 	return df
+
+def bids_eventfile(db_path, code):
+	"""
+	Return a BIDS-formatted eventfile for a given code
+
+	Parameters
+	----------
+
+	db_path : string
+		Path to the database file to query.
+
+	code : string
+		Code (valid `StimulationProtocol.code` value) which identifies the stimulation protocol to format.
+	"""
+
+	df = selection.stimulation_protocol(db_path, code)
+	bids_df = pd.DataFrame([])
+	bids_df['onset'] = df['StimulationEvent_onset']
+	bids_df['duration'] = df['StimulationEvent_duration']
+	bids_df['pulse_width'] = df['StimulationEvent_pulse_width']
+	bids_df['frequency'] = df['StimulationEvent_frequency']
+	bids_df['onset'] = df['StimulationEvent_onset']
+	bids_df['trial_type'] = df['StimulationEvent_trial_type']
+	bids_df['wavelength'] = df['StimulationEvent_wavelength']
+	bids_df['strength'] = df['StimulationEvent_strength']
+	bids_df['strength_unit'] = df['MeasurementUnit_code']
+
+	return bids_df
 
 def cage_consumption(db_path, df,
 	treatment_relative_date=True,

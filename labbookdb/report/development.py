@@ -1,3 +1,10 @@
+def bids_sequence():
+	from labbookdb.report.tracking import bids_eventfile
+
+	df = bids_eventfile('~/syncdata/meta.db','chr_longSOA')
+
+	print(df)
+
 def animal_weights_():
 	import matplotlib.pyplot as mpl
 	from labbookdb.report.tracking import animal_weights, qualitative_dates

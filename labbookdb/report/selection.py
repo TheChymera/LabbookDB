@@ -4,6 +4,36 @@ try:
 except (ValueError, SystemError):
 	from labbookdb.db import query
 
+def stimulation_protocol(db_path, code,):
+	"""Select a `pandas.DataFrame`object containing all events and associated measurement units for a specific stimulation protocol.
+
+	Parameters
+	----------
+
+	db_path : string
+		Path to the database file to query.
+
+	code : string
+		Code (valid `StimulationProtocol.code` value) which identifies the stimulation protocol to format.
+	"""
+
+	col_entries=[
+		("StimulationProtocol",),
+		("StimulationEvent",),
+		("MeasurementUnit",),
+		]
+	join_entries=[
+		("StimulationProtocol.events",),
+		("StimulationEvent.unit",),
+		]
+	my_filters=[]
+	my_filter = ["StimulationProtocol","code",code]
+	my_filters.append(my_filter)
+
+	df = query.get_df(db_path,col_entries=col_entries, join_entries=join_entries, filters=my_filters)
+
+	return df
+
 def animals_by_cage_treatment(db_path,
 	codes=[],
 	end_dates=[],
