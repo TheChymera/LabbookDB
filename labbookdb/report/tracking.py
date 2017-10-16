@@ -130,7 +130,7 @@ def animals_info(db_path,
 			print("WARNING: This function currently only supports `.csv`, `.tsv`, or `.html` output. Please append one of the aforementioned extensions to the specified file name (`{}`), or specify no extension - in which case `.csv` will be added and an according output will be created.".format(save_as))
 	return df
 
-def bids_eventfile(db_path, code):
+def bids_eventsfile(db_path, code):
 	"""
 	Return a BIDS-formatted eventfile for a given code
 

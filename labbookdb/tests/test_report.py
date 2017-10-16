@@ -18,10 +18,10 @@ def test_animal_cage_treatment_control_in_report():
 
 def test_bids_eventsfile():
 	"""Check if correct BIDS events file can be sourced."""
-	from labbookdb.report.tracking import bids_eventfile
+	from labbookdb.report.tracking import bids_eventsfile
 	import pandas as pd
 
-	df = bids_eventfile(DB_PATH,'chr_longSOA')
+	df = bids_eventsfile(DB_PATH,'chr_longSOA')
 	bids_eventsfile = path.join(DATA_DIR,'bids_eventsfile.csv')
 	df_ = pd.read_csv(bids_eventsfile, index_col=0)
 
