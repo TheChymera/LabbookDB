@@ -4,29 +4,6 @@ from os import path
 DB_PATH = '~/.demolog/meta.db'
 DATA_DIR = path.join(path.dirname(path.realpath(__file__)),'../../example_data/')
 
-def test_bids_eventsfile():
-	"""Check if correct BIDS events file can be sourced."""
-	from labbookdb.report.tracking import bids_eventfile
-	import pandas as pd
-
-	df = bids_eventfile(DB_PATH,'chr_longSOA')
-	bids_eventsfile = path.join(DATA_DIR,'bids_eventsfile.csv')
-	df_ = pd.read_csv(bids_eventsfile, index_col=0)
-
-	assert df[['onset','duration']].equals(df_[['onset','duration']])
-
-def test_groups():
-	"""Create a `pandas.DataFrame` containing treatment and genotype group assignments"""
-	from labbookdb.report.tracking import treatment_group, append_external_identifiers
-
-	known_sorted_ids = ['5667', '5668', '5673', '5674', '5675', '5689', '5690', '5691', '5692', '5693', '5694', '5694', '5699', '5700', '5704', '5705', '5706', '6254', '6256', '6262']
-
-	df = treatment_group(DB_PATH, ['cFluDW','cFluDW_'], level='cage')
-	df = append_external_identifiers(DB_PATH, df, ['Genotype_code'])
-	sorted_ids = sorted(df['ETH/AIC'].tolist())
-
-	assert sorted_ids == known_sorted_ids
-
 def test_animal_cage_treatment_control_in_report():
 	"""Check if animal which died before the cagetreatment was applied to its last home cage is indeed not showing a cage treatment, but still showing the animal treatment."""
 	from labbookdb.report.tracking import animals_info
@@ -38,6 +15,17 @@ def test_animal_cage_treatment_control_in_report():
 		)
 	assert df[df['ETH/AIC']=='6255']['cage_treatment'].values[0] == ""
 	assert df[df['ETH/AIC']=='6255']['animal_treatment'].values[0] == 'aFluIV_'
+
+def test_bids_eventsfile():
+	"""Check if correct BIDS events file can be sourced."""
+	from labbookdb.report.tracking import bids_eventfile
+	import pandas as pd
+
+	df = bids_eventfile(DB_PATH,'chr_longSOA')
+	bids_eventsfile = path.join(DATA_DIR,'bids_eventsfile.csv')
+	df_ = pd.read_csv(bids_eventsfile, index_col=0)
+
+	assert df[['onset','duration']].equals(df_[['onset','duration']])
 
 def test_drinking_by_cage_treatment(
 	treatment_relative_date=True,
@@ -73,3 +61,15 @@ def test_drinking_by_cage_treatment(
 	consumption_values = [round(i, 2) for i in consumption_values]
 	consumption_values = sorted(list(set(consumption_values)))
 	assert consumption_values == known_consumption_values
+
+def test_groups():
+	"""Create a `pandas.DataFrame` containing treatment and genotype group assignments"""
+	from labbookdb.report.tracking import treatment_group, append_external_identifiers
+
+	known_sorted_ids = ['5667', '5668', '5673', '5674', '5675', '5689', '5690', '5691', '5692', '5693', '5694', '5694', '5699', '5700', '5704', '5705', '5706', '6254', '6256', '6262']
+
+	df = treatment_group(DB_PATH, ['cFluDW','cFluDW_'], level='cage')
+	df = append_external_identifiers(DB_PATH, df, ['Genotype_code'])
+	sorted_ids = sorted(df['ETH/AIC'].tolist())
+
+	assert sorted_ids == known_sorted_ids
