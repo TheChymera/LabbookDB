@@ -1,7 +1,7 @@
 import pandas as pd
 from labbookdb.db import query
 
-def stimulation_protocol(db_path, code,):
+def stimulation_protocol(db_path, code):
 	"""Select a `pandas.DataFrame`object containing all events and associated measurement units for a specific stimulation protocol.
 
 	Parameters
