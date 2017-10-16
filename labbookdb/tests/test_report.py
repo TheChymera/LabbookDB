@@ -1,6 +1,8 @@
 import pytest
+from os import path
 
 DB_PATH = '~/.demolog/meta.db'
+DATA_DIR = path.join(path.dirname(path.realpath(__file__)),'../../example_data/')
 
 def test_bids_eventsfile():
 	"""Check if correct BIDS events file can be sourced."""
@@ -8,7 +10,8 @@ def test_bids_eventsfile():
 	import pandas as pd
 
 	df = bids_eventfile(DB_PATH,'chr_longSOA')
-	df_ = pd.read_csv('../../example_data/bids_eventsfile.csv', index_col=0)
+	bids_eventsfile = path.join(DATA_DIR,'bids_eventsfile.csv')
+	df_ = pd.read_csv(bids_eventsfile, index_col=0)
 	assert df[['onset','duration']].equals(df_[['onset','duration']])
 
 def test_groups():
@@ -21,6 +24,7 @@ def test_groups():
 	df = append_external_identifiers(DB_PATH, df, ['Genotype_code'])
 	sorted_ids = sorted(df['ETH/AIC'].tolist())
 
+	print(df['ETH/AIC'].tolist(),sorted_ids,known_sorted_ids)
 	assert sorted_ids == known_sorted_ids
 
 def test_animal_cage_treatment_control_in_report():
