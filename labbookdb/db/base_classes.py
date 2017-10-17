@@ -151,16 +151,17 @@ class OrthogonalStereotacticTarget(Base):
 	id = Column(Integer, primary_key=True)
 	code = Column(String, unique=True)
 	reference = Column(String)
-	depth_reference = Column(String, default="skull") # set to "dura" if the insertable is lowered to the dura before coordinate setting
 	# coordinates in millimetres
 	posteroanterior = Column(Float)
 	leftright = Column(Float)
 	superoinferior = Column(Float)
-	superoinferior_skull = Column(Float)
 	# angles in degrees
 	angle_posteroanterior = Column(Float)
 	angle_leftright = Column(Float)
 	angle_superoinferior = Column(Float)
+	# depth in millimetres
+	depts = Column(Float)
+	depth_reference = Column(String, default="skull") # set to "dura" if the insertable is lowered to the dura before coordinate setting
 
 	def __str__(self):
 		return "OrthogonalStereotacticTarget({reference}: {pa}(PA), {lr}(LR), {si}(SI))"\
