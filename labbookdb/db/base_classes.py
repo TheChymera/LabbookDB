@@ -156,6 +156,7 @@ class OrthogonalStereotacticTarget(Base):
 	posteroanterior = Column(Float)
 	leftright = Column(Float)
 	superoinferior = Column(Float)
+	superoinferior_skull = Column(Float)
 	# angles in degrees
 	angle_posteroanterior = Column(Float)
 	angle_leftright = Column(Float)
