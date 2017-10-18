@@ -28,7 +28,7 @@ Presentations
 Video
 ~~~~~
 
-* `LabbookDB - A Relational Framework for Laboratory Metadata <https://www.youtube.com/watch?v=yDBu_wSyw-g>`_, at SciPy 2017 in Austin (TX,USA).
+* `LabbookDB - A Relational Framework for Laboratory Metadata <https://www.youtube.com/watch?v=FKWznqP6rcE>`_, at SciPy 2017 in Austin (TX,USA).
 
 Publications
 ~~~~~~~~~~~~
