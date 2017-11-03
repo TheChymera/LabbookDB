@@ -148,8 +148,8 @@ def bids_eventsfile(db_path, code):
 	bids_df = pd.DataFrame([])
 	bids_df['onset'] = df['StimulationEvent_onset']
 	bids_df['duration'] = df['StimulationEvent_duration']
-	bids_df['pulse_width'] = df['StimulationEvent_pulse_width']
 	bids_df['frequency'] = df['StimulationEvent_frequency']
+	bids_df['pulse_width'] = df['StimulationEvent_pulse_width']
 	bids_df['onset'] = df['StimulationEvent_onset']
 	bids_df['trial_type'] = df['StimulationEvent_trial_type']
 	bids_df['wavelength'] = df['StimulationEvent_wavelength']
