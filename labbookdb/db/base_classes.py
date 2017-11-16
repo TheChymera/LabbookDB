@@ -125,10 +125,20 @@ class Virus(Base):
 	__tablename__ = "viruses"
 	id = Column(Integer, primary_key=True)
 	code = Column(String, unique=True)
+	addgene_identifier = Column(String)
+	capsid = Column(String)
+	concentration = Column(Float) # in vg/ml
+	plasmid_summary = Column(String)
+	credit = Column(String)
+	source = Column(String)
 
 	def __str__(self):
-		return "Virus(code: {code})"\
-		.format(code=self.code)
+		if self.addgene_id:
+			return "Virus(code: {code}, Addgene: #{addgene_id})"\
+			.format(code=self.code, addgene_id=self.addgene_id)
+		else:
+			return "Virus(code: {code})"\
+			.format(code=self.code)
 
 class OpticFiberImplant(Base):
 	__tablename__ = "implants"
