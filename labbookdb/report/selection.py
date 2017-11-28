@@ -1,6 +1,45 @@
 import pandas as pd
 from labbookdb.db import query
 
+def animal_id(db_path, database, identifier):
+	"""Return the main LabbookDB animal identifier given an external database identifier.
+
+	Parameters
+	----------
+
+	db_path : string
+		Path to the database file to query.
+	database : string
+		Valid `AnimalExternalIdentifier.database` value.
+	identifier : string
+		Valid `AnimalExternalIdentifier.identifier` value.
+
+	Returns
+	-------
+	int
+		LabbookDB animal identifier.
+	"""
+
+	col_entries=[
+		("Animal","id"),
+		("AnimalExternalIdentifier",),
+		]
+	join_entries=[
+		("Animal.external_ids",),
+		]
+
+	my_filters = []
+	my_filter = ["AnimalExternalIdentifier","identifier",identifier]
+	my_filters.append(my_filter)
+	my_filter = ["AnimalExternalIdentifier","database",database]
+	my_filters.append(my_filter)
+
+	df = query.get_df(db_path,col_entries=col_entries, join_entries=join_entries, filters=my_filters)
+
+	labbookdb_id = df['Animal_id'].item()
+
+	return labbookdb_id
+
 def stimulation_protocol(db_path, code):
 	"""Select a `pandas.DataFrame`object containing all events and associated measurement units for a specific stimulation protocol.
 

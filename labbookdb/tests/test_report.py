@@ -16,6 +16,16 @@ def test_animal_cage_treatment_control_in_report():
 	assert df[df['ETH/AIC']=='6255']['cage_treatment'].values[0] == ""
 	assert df[df['ETH/AIC']=='6255']['animal_treatment'].values[0] == 'aFluIV_'
 
+def test_animal_id():
+	"""Check if LabbookDB animal ID is correctly reported based on external database identifier."""
+	from labbookdb.report.selection import animal_id
+
+	my_id = animal_id(DB_PATH,
+		database='ETH/AIC',
+		identifier='6255'
+		)
+	assert my_id == 41
+
 def test_bids_eventsfile():
 	"""Check if correct BIDS events file can be sourced."""
 	from labbookdb.report.tracking import bids_eventsfile
