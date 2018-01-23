@@ -161,11 +161,17 @@ class FMRIMeasurement(Measurement):
 	def __str__(self):
 		template = "fMRI({date}"
 		if self.temperature:
-			template += ", temp: {temp}"
+			template += ': temp: {temp}'
+		if self.stimulations:
+			template +='; stim: {stimulations}'
 		if any(["failed to indicate response to stimulus" in self.irregularities[i].description for i in range(len(self.irregularities))]):
-			template += ", NONRESPONDENT"
+			template += "; NONRESPONDENT"
 		template += ")"
-		return template.format(date=dt_format(self.date), temp=self.temperature)
+		return template.format(
+			date=dt_format(self.date),
+			temp=self.temperature,
+			stimulations=", ".join([i.code for i in self.stimulations]),
+			)
 
 class AnesthesiaProtocol(Protocol):
 	__tablename__ = 'anesthesia_protocols'
