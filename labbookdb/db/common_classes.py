@@ -164,6 +164,8 @@ class FMRIMeasurement(Measurement):
 			template += ': temp: {temp}'
 		if self.stimulations:
 			template +='; stim: {stimulations}'
+		if any(["measurement aborted" in self.irregularities[i].description for i in range(len(self.irregularities))]):
+			template += "; ABORTED"
 		if any(["failed to indicate response to stimulus" in self.irregularities[i].description for i in range(len(self.irregularities))]):
 			template += "; NONRESPONDENT"
 		template += ")"
