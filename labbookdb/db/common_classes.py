@@ -286,7 +286,7 @@ class SucrosePreferenceMeasurement(Measurement):
 	sucrose_start_amount = Column(Float)
 	sucrose_end_amount = Column(Float)
 	sucrose_bottle_position = Column(String)
-	sucrose_concentration = Column(Float)
+	sucrose_concentration = Column(Float)  # in percent
 	concentration_unit_id = Column(Integer, ForeignKey('measurement_units.id'))
 	concentration_unit = relationship("MeasurementUnit")
 
