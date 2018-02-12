@@ -71,6 +71,7 @@ class FMRIScannerSetup(Base):
 	coil = Column(String)
 	scanner = Column(String)
 	support = Column(String)
+	resonator = Column(String)
 
 class StimulationEvent(Base):
 	__tablename__ = "stimulation_events"
