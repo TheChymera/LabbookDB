@@ -33,7 +33,7 @@ Video
 Publications
 ~~~~~~~~~~~~
 
-* `LabbookDB - A Wet-Work-Tracking Database Application Framework <http://conference.scipy.org/proceedings/scipy2017/pdfs/horea-ioan_ioanas.pdf>`_, in Proceedings of the 15th Python in Science Conference (SciPy 2017).
+* `LabbookDB - A Wet-Work-Tracking Database Application Framework <https://www.researchgate.net/publication/319855508_LabbookDB_A_Wet-Work-Tracking_Database_Application_Framework>`_, in Proceedings of the 15th Python in Science Conference (SciPy 2017).
 
 Installation
 ------------
