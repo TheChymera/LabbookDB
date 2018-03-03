@@ -433,7 +433,7 @@ class BrainBiopsy(Biopsy):
 	id = Column(Integer, ForeignKey('biopsies.id'), primary_key=True)
 	sectioning_protocol_id = Column(Integer, ForeignKey('protocols.id'))
 	sectioning_protocol = relationship("Protocol", foreign_keys=[sectioning_protocol_id])
-
+	data_path = Column(String) # path to corresponding microscopy data
 
 # DNA classes:
 
@@ -497,15 +497,16 @@ class BrainExtractionProtocol(Protocol):
 	perfusion_system = Column(String(50)) #e.g. "pump", "peristaltic pump", "syringe"
 	perfusion_flow = Column(Float) #in ml/min
 	peristaltic_frequency = Column(Float) #in Hz
-	perfusion_solution_id = Column(Integer, ForeignKey("solutions.id"))
-	perfusion_solution = relationship("Solution", foreign_keys=[perfusion_solution_id])
-	perfusion_solution_volume = Column(Float) #in ml
+	flushing_solution_id = Column(Integer, ForeignKey("solutions.id"))
+	flushing_solution = relationship("Solution", foreign_keys=[flushing_solution_id])
+	flushing_solution_volume = Column(Float) #in ml
 	fixation_solution_id = Column(Integer, ForeignKey("solutions.id"))
 	fixation_solution = relationship("Solution", foreign_keys=[fixation_solution_id])
 	fixation_solution_volume = Column(Float) #in ml
 	storage_solution_id = Column(Integer, ForeignKey("solutions.id"))
 	storage_solution = relationship("Solution", foreign_keys=[storage_solution_id])
 	storage_solution_volume = Column(Float) #in ml
+	storage_time = Column(Float) #in days
 	post_extraction_fixation_time = Column(Float) #in hours
 
 class SectioningProtocol(Protocol):
