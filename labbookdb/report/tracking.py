@@ -130,7 +130,8 @@ def animals_info(db_path,
 			print("WARNING: This function currently only supports `.csv`, `.tsv`, or `.html` output. Please append one of the aforementioned extensions to the specified file name (`{}`), or specify no extension - in which case `.csv` will be added and an according output will be created.".format(save_as))
 	return df
 
-def bids_eventsfile(db_path, code):
+def bids_eventsfile(db_path, code,
+	strict=False):
 	"""
 	Return a BIDS-formatted eventfile for a given code
 
@@ -142,6 +143,9 @@ def bids_eventsfile(db_path, code):
 
 	code : string
 		Code (valid `StimulationProtocol.code` value) which identifies the stimulation protocol to format.
+	strict : bool, optional
+		Whether to strict about respecting BIDS specifics.
+		(currently removes coumns with only empty cells)
 	"""
 
 	df = selection.stimulation_protocol(db_path, code)
@@ -155,6 +159,9 @@ def bids_eventsfile(db_path, code):
 	bids_df['wavelength'] = df['StimulationEvent_wavelength']
 	bids_df['strength'] = df['StimulationEvent_strength']
 	bids_df['strength_unit'] = df['MeasurementUnit_code']
+
+	if strict:
+		bids_df = bids_df.dropna(axis=1, how='all')
 
 	return bids_df
 
