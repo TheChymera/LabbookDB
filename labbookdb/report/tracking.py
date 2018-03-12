@@ -289,7 +289,7 @@ def treatment_group(db_path, treatments,
 	Notes
 	-----
 
-	This function checks whether cage-leve treatment onsets indeed happened during the period in which the animal was housed int eh cage.
+	This function checks whether cage-level treatment onsets indeed happened during the period in which the animal was housed in teh cage.
 	We do not check for the treatment end dates, as an animal which has received a partial treatment has received a treatment.
 	Checks for treatment discontinuation due to e.g. death should be performed elsewhere.
 	"""
