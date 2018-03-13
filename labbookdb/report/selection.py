@@ -177,7 +177,69 @@ def animals_by_treatment(db_path,
 
 	return df
 
+def animal_operations(db_path,
+	animal_ids=[],
+	implant_targets=[],
+	virus_targets=[],
+	):
+	"""Select a dataframe of animals having been subjected to operative interventions with the given anatomical targets.
+
+	Parameters
+	----------
+
+	db_path : str
+	Path to a LabbookDB formatted database.
+
+	animal_ids : list, optional
+		A List of LabbookDB `Animal.id` values by which to filter the query.
+		It is faster to filter using this mechanism than to return a dataframe for all animals and then filter that.
+
+	implant_targets : list, optional
+		A List of LabbookDB `OrthogonalStereotacticTarget.code` which should be used to filter the query, while being joined to `Operation` objects via the `OpticFiberImplantProtocol` class.
+		It is faster to filter using this mechanism than to return a dataframe for all animals and then filter that.
+
+	virus_targets : list, optional
+		A List of LabbookDB `OrthogonalStereotacticTarget.code` which should be used to filter the query, while being joined to `Operation` objects via the `VirusInjectionProtocol` class.
+		It is faster to filter using this mechanism than to return a dataframe for all animals and then filter that.
+
+	"""
+
+	filters = []
+	join_type = 'inner'
+	col_entries=[
+		("Animal","id"),
+		("Operation",),
+		("OpticFiberImplantProtocol",),
+		("VirusInjectionProtocol",),
+		("OrthogonalStereotacticTarget",),
+		("Virus","OrthogonalStereotacticTarget",""),
+		]
+	join_entries=[
+		("Animal.operations",),
+		("OpticFiberImplantProtocol","Operation.protocols"),
+		("VirusInjectionProtocol","Operation.protocols"),
+		("OrthogonalStereotacticTarget","OpticFiberImplantProtocol.stereotactic_target"),
+		("Virus_OrthogonalStereotacticTarget","VirusInjectionProtocol.stereotactic_target"),
+		]
+	my_filter=[]
+	if animal_ids:
+		my_filter = ["Animal","id"]
+		my_filter.extend(animal_ids)
+	if implant_targets:
+		my_filter = ["OrthogonalStereotacticTarget","code"]
+		my_filter.extend(implant_targets)
+	if virus_targets:
+		my_filter = ["Virus_OrthogonalStereotacticTarget","code"]
+		my_filter.extend(implant_targets)
+	filters.append(my_filter)
+
+	df = query.get_df(db_path, col_entries=col_entries, join_entries=join_entries, filters=filters, default_join=join_type)
+
+	return df
+
+
 def animal_treatments(db_path,
+	animal_ids=[],
 	cage_treatments=[],
 	animal_treatments=[],
 	conjunctive=True,
@@ -223,6 +285,9 @@ def animal_treatments(db_path,
 		("Cage_TreatmentProtocol","Cage_Treatment.protocol"),
 		]
 	my_filter=[]
+	if animal_ids:
+		my_filter = ["Animal","id"]
+		my_filter.extend(animal_ids)
 	if animal_treatments:
 		my_filter = ["TreatmentProtocol","code"]
 		my_filter.extend(animal_treatments)

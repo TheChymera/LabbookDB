@@ -1,3 +1,10 @@
+def treatments():
+	from labbookdb.report.selection import animal_treatments, animal_operations
+
+	#df = animal_treatments('~/syncdata/meta.db', cage_treatments=['cFluDW','cFluDW_'])
+	df = animal_operations('~/syncdata/meta.db', implant_targets=['dr_impl'])
+	print(df)
+
 def animal_weights_():
 	import matplotlib.pyplot as mpl
 	from labbookdb.report.tracking import animal_weights, qualitative_dates
