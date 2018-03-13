@@ -1,9 +1,9 @@
-def treatments():
+def animal_multiselect():
 	from labbookdb.report.selection import animal_treatments, animal_operations
 
-	#df = animal_treatments('~/syncdata/meta.db', cage_treatments=['cFluDW','cFluDW_'])
-	df = animal_operations('~/syncdata/meta.db', implant_targets=['dr_impl'])
-	print(df)
+	df_treatments = animal_treatments('~/syncdata/meta.db', cage_treatments=['cFluDW','cFluDW_'])
+	#df = animal_operations('~/syncdata/meta.db', implant_targets=['dr_impl'])
+	print(df_treatments)
 
 def animal_weights_():
 	import matplotlib.pyplot as mpl
