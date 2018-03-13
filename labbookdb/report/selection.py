@@ -195,13 +195,12 @@ def animal_operations(db_path,
 		It is faster to filter using this mechanism than to return a dataframe for all animals and then filter that.
 
 	implant_targets : list, optional
-		A List of LabbookDB `OrthogonalStereotacticTarget.code` which should be used to filter the query, while being joined to `Operation` objects via the `OpticFiberImplantProtocol` class.
+		A List of LabbookDB `OrthogonalStereotacticTarget.code` values which should be used to filter the query, while being joined to `Operation` objects via the `OpticFiberImplantProtocol` class.
 		It is faster to filter using this mechanism than to return a dataframe for all animals and then filter that.
 
 	virus_targets : list, optional
-		A List of LabbookDB `OrthogonalStereotacticTarget.code` which should be used to filter the query, while being joined to `Operation` objects via the `VirusInjectionProtocol` class.
+		A List of LabbookDB `OrthogonalStereotacticTarget.code` values which should be used to filter the query, while being joined to `Operation` objects via the `VirusInjectionProtocol` class.
 		It is faster to filter using this mechanism than to return a dataframe for all animals and then filter that.
-
 	"""
 
 	filters = []
@@ -240,8 +239,8 @@ def animal_operations(db_path,
 
 def animal_treatments(db_path,
 	animal_ids=[],
-	cage_treatments=[],
 	animal_treatments=[],
+	cage_treatments=[],
 	conjunctive=True,
 	):
 	"""Select a dataframe of animals and all treatments including animal-level or cage-level treatments.
@@ -250,13 +249,21 @@ def animal_treatments(db_path,
 	----------
 
 	db_path : str
-	Path to a LabbookDB formatted database.
+		Path to a LabbookDB formatted database.
 
-	select : str
-	For which kind of evaluation to select dataframe.
+	animal_ids : list, optional
+		A List of LabbookDB `Animal.id` values by which to filter the query.
+		It is faster to filter using this mechanism than to return a dataframe for all animals and then filter that.
+
+	animal_treatments : list, optional
+		A List of LabbookDB `Treatment.code` values which should be used to filter the query, while being joined to `Animal` objects.
+
+	cage_treatments : list, optional
+		A List of LabbookDB `Treatment.code` values which should be used to filter the query, while being joined to `Cage` objects - and further to `Animal` objects via `CageStay` objects.
+		An onset check is also applied by the function, to ascertain that there is an overlap between the animal's presence in the cage and the cage treatment application.
 
 	conjunctive : bool, optional
-	Whether both `cage_treatments` and `animal_treatments` need to be satisfied (statements within each list are always disjunctive).
+		Whether both `cage_treatments` and `animal_treatments` need to be satisfied (statements within each list are always disjunctive).
 
 	Notes
 	-----
