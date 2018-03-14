@@ -1,7 +1,7 @@
 import pandas as pd
 from labbookdb.db import query
 
-def animal_id(db_path, database, identifier):
+def animal_id(db_path, database, identifier, reverse=False):
 	"""Return the main LabbookDB animal identifier given an external database identifier.
 
 	Parameters
@@ -13,6 +13,9 @@ def animal_id(db_path, database, identifier):
 		Valid `AnimalExternalIdentifier.database` value.
 	identifier : string
 		Valid `AnimalExternalIdentifier.identifier` value.
+	reverse : bool, optional
+		Whether to reverse the query.
+		A reverse query means that a LabbookDB `Animal.id` filter is applied and an `AnimalExternalIdentifier.identifier` value is returned.
 
 	Returns
 	-------
@@ -29,14 +32,20 @@ def animal_id(db_path, database, identifier):
 		]
 
 	my_filters = []
-	my_filter = ["AnimalExternalIdentifier","identifier",identifier]
-	my_filters.append(my_filter)
+	if reverse:
+		my_filter = ["Animal","id",identifier]
+		my_filters.append(my_filter)
+	else:
+		my_filter = ["AnimalExternalIdentifier","identifier",identifier]
+		my_filters.append(my_filter)
 	my_filter = ["AnimalExternalIdentifier","database",database]
 	my_filters.append(my_filter)
 
 	df = query.get_df(db_path,col_entries=col_entries, join_entries=join_entries, filters=my_filters)
-
-	labbookdb_id = df['Animal_id'].item()
+	if reverse:
+		labbookdb_id = df['AnimalExternalIdentifier_identifier'].item()
+	else:
+		labbookdb_id = df['Animal_id'].item()
 
 	return labbookdb_id
 
@@ -201,10 +210,17 @@ def animal_operations(db_path,
 	virus_targets : list, optional
 		A List of LabbookDB `OrthogonalStereotacticTarget.code` values which should be used to filter the query, while being joined to `Operation` objects via the `VirusInjectionProtocol` class.
 		It is faster to filter using this mechanism than to return a dataframe for all animals and then filter that.
+
+	Notes
+	-----
+
+	CAREFUL: Providing both `implant_targets` and `virus_targets` will return entries including only animals which have undergone an operation which has included protocols targeting both areas.
+	If the areas were targeted by protocols included in different operations, the correspondence will not be detected.
+	To obtain such a list please call the function twice and create a new dataframe from the intersection of the inputs on the `Animal_id` column.
 	"""
 
 	filters = []
-	join_type = 'inner'
+	join_type = 'outer'
 	col_entries=[
 		("Animal","id"),
 		("Operation",),
@@ -229,7 +245,7 @@ def animal_operations(db_path,
 		my_filter.extend(implant_targets)
 	if virus_targets:
 		my_filter = ["Virus_OrthogonalStereotacticTarget","code"]
-		my_filter.extend(implant_targets)
+		my_filter.extend(virus_targets)
 	filters.append(my_filter)
 
 	df = query.get_df(db_path, col_entries=col_entries, join_entries=join_entries, filters=filters, default_join=join_type)
