@@ -2,17 +2,14 @@ def animal_multiselect():
 	from labbookdb.report.selection import animal_id, animal_treatments, animal_operations
 
 	db_path='~/syncdata/meta.db'
-	df_treatments = animal_treatments(db_path, cage_treatments=['cFluDW','cFluDW_'])
-	#df_operations = animal_operations(db_path, implant_targets=['dr_impl'])
-	df_operations = animal_operations(db_path, virus_targets=['dr_skull'])
-	#print(df_treatments)
-	print(df_operations)
-	operation_animal_ids = df_operations['Animal_id'].tolist()
-	print(operation_animal_ids)
-	operation_animal_ids = [i for i in operation_animal_ids]
-	print(operation_animal_ids)
-	operation_animal_ids = [animal_id(db_path, 'ETH/AIC', i, reverse=True) for i in operation_animal_ids]
-	print(operation_animal_ids)
+	df_treatments = animal_treatments(db_path, cage_treatments=['cFluDW','cFluDW_'])['Animal_id'].tolist()
+	df_implants = animal_operations(db_path, implant_targets=['dr_impl'])['Animal_id'].tolist()
+	df_virus = animal_operations(db_path, virus_targets=['dr_skull','dr_dura','dr_dura_shallow','dr_skull_perpendicular'])['Animal_id'].tolist()
+	df_treatments = [animal_id(db_path, 'ETH/AIC', i, reverse=True) for i in df_treatments]
+	df_implants = [animal_id(db_path, 'ETH/AIC', i, reverse=True) for i in df_implants]
+	df_virus = [animal_id(db_path, 'ETH/AIC', i, reverse=True) for i in df_virus]
+	d = [df_treatments, df_implants, df_virus]
+	print(set(d[0]).intersection(*d))
 
 def animal_weights_():
 	import matplotlib.pyplot as mpl
