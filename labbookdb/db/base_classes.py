@@ -4,13 +4,7 @@ from sqlalchemy.orm import validates, backref, relationship
 from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
-def dt_format(dt):
-	if not dt:
-		return "NO DATE"
-	elif dt.time()==datetime.time(0,0,0):
-		return str(dt.date())
-	else:
-		return str(dt)
+from utils import *
 
 authors_association = Table('authors_associations', Base.metadata,
 	Column('protocols_id', Integer, ForeignKey('protocols.id')),

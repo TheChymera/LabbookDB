@@ -1,4 +1,5 @@
 from .base_classes import *
+from utils import *
 
 cage_stay_association = Table('cage_stay_associations', Base.metadata,
 	Column('cage_stays_id', Integer, ForeignKey('cage_stays.id')),
@@ -248,6 +249,14 @@ class Observation(Base):
 	unit = relationship("MeasurementUnit")
 	operator_id = Column(Integer, ForeignKey('operators.id'))
 	operator = relationship("Operator")
+	def __str__(self):
+		if self.physiology:
+			out = "{date}: {physiology}"\
+			.format(date=dt_format(self.date), physiology=self.physiology)
+		if self.behaviour:
+			out = "{date}: {behaviour}"\
+			.format(date=dt_format(self.date), behaviour=self.behaviour)
+		return out
 
 class TreatmentProtocol(Protocol):
 	__tablename__ = 'treatment_protocols'
@@ -299,9 +308,13 @@ class Treatment(Base):
 	protocol = relationship('Protocol')
 
 	def __str__(self):
-		return "protocol {protocol_code}, {start_date} - {end_date}"\
-		.format(start_date=dt_format(self.start_date), end_date=dt_format(self.end_date), protocol_code=self.protocol.code)
-
+		if self.end_date:
+			out = "{start_date} - {end_date}: {protocol_name}"\
+			.format(start_date=dt_format(self.start_date), end_date=dt_format(self.end_date), protocol_name=self.protocol.name)
+		else:
+			out = "{start_date}: {protocol_name}"\
+			.format(start_date=dt_format(self.start_date), protocol_name=self.protocol.name)
+		return out
 
 #operation classes:
 
@@ -321,9 +334,9 @@ class Operation(Base):
 	irregularities = relationship("Irregularity", secondary=oprations_irregularities_association)
 
 	def __str__(self):
-		return "Operation({date}: {protocols})"\
-		.format(date=dt_format(self.date), protocols="; ".join([i.type for i in self.protocols]))
-
+		out = "{date}: {protocols}"\
+		.format(date=dt_format(self.date), protocols=", ".join([i.type for i in self.protocols]))
+		return out
 
 #animal classes:
 
@@ -355,13 +368,14 @@ class Animal(Base):
 		return "<Animal(id='%s', genotypes='%s', sex='%s', ear_punches='%s', treatment='%s')>"\
 		% (self.id, [self.genotypes[i].construct+" "+self.genotypes[i].zygosity for i in range(len(self.genotypes))], self.sex, self.ear_punches,[self.treatments[i].protocol.solution for i in range(len(self.treatments))])
 	def __str__(self):
-		return "Animal(id: {id}, sex: {sex}, ear_punches: {ep}):\n"\
+		out = "Animal(id: {id}, sex: {sex}, ear_punches: {ep}):\n"\
 		"\tlicense:\t{license}\n"\
 		"\tbirth:\t{bd}\n"\
 		"\tdeath:\t{dd}\t(death_reason: {dr})\n"\
 		"\texternal_ids:\t{eids}\n"\
 		"\tgenotypes:\t{genotypes}\n"\
 		"\tcage_stays:\t{cage_stays}\n"\
+		"\tobservations:\t{observations}\n"\
 		"\toperations:\t{operations}\n"\
 		"\ttreatments:\t{treatments}\n"\
 		"\tmeasurements:\t{measurements}\n"\
@@ -371,11 +385,13 @@ class Animal(Base):
 		dd=dt_format(self.death_date), dr=self.death_reason,
 		eids=", ".join([self.external_ids[i].identifier+"("+self.external_ids[i].database+")" for i in range(len(self.external_ids))]),
 		genotypes=", ".join([self.genotypes[i].construct+"("+self.genotypes[i].zygosity+")" for i in range(len(self.genotypes))]),
-		operations="\n\t\t\t".join([self.operations[i].__str__() for i in range(len(self.operations))]),
-		treatments="\n\t\t\t".join([self.treatments[i].__str__() for i in range(len(self.treatments))]),
+		operations="\n\t\t\t".join(arange_by_date(self.operations)),
+		observations="\n\t\t\t".join(arange_by_date(self.observations)),
+		treatments="\n\t\t\t".join(arange_by_date(self.treatments)),
 		cage_stays="\n\t\t\t".join([self.cage_stays[i].__str__() for i in range(len(self.cage_stays))]),
-		measurements="\n\t\t\t".join([self.measurements[i].__str__() for i in range(len(self.measurements))]),
+		measurements="\n\t\t\t".join(arange_by_date(self.measurements)),
 		)
+		return out
 
 class CageStay(Base):
 	__tablename__ = "cage_stays"
