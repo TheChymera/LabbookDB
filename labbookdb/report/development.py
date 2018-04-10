@@ -1,9 +1,15 @@
 def animal_multiselect():
-	from labbookdb.report.selection import animal_treatments, animal_operations
+	from labbookdb.report.selection import animal_id, animal_treatments, animal_operations
 
-	df_treatments = animal_treatments('~/syncdata/meta.db', cage_treatments=['cFluDW','cFluDW_'])
-	#df = animal_operations('~/syncdata/meta.db', implant_targets=['dr_impl'])
-	print(df_treatments)
+	db_path='~/syncdata/meta.db'
+	df_treatments = animal_treatments(db_path, cage_treatments=['cFluDW','cFluDW_'])['Animal_id'].tolist()
+	df_implants = animal_operations(db_path, implant_targets=['dr_impl'])['Animal_id'].tolist()
+	df_virus = animal_operations(db_path, virus_targets=['dr_skull','dr_dura','dr_dura_shallow','dr_skull_perpendicular'])['Animal_id'].tolist()
+	df_treatments = [animal_id(db_path, 'ETH/AIC', i, reverse=True) for i in df_treatments]
+	df_implants = [animal_id(db_path, 'ETH/AIC', i, reverse=True) for i in df_implants]
+	df_virus = [animal_id(db_path, 'ETH/AIC', i, reverse=True) for i in df_virus]
+	d = [df_treatments, df_implants, df_virus]
+	print(set(d[0]).intersection(*d))
 
 def animal_weights_():
 	import matplotlib.pyplot as mpl
