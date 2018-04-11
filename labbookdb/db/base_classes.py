@@ -4,7 +4,7 @@ from sqlalchemy.orm import validates, backref, relationship
 from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
-from utils import *
+from .utils import *
 
 authors_association = Table('authors_associations', Base.metadata,
 	Column('protocols_id', Integer, ForeignKey('protocols.id')),

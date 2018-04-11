@@ -1,5 +1,5 @@
 from .base_classes import *
-from utils import *
+from .utils import *
 
 cage_stay_association = Table('cage_stay_associations', Base.metadata,
 	Column('cage_stays_id', Integer, ForeignKey('cage_stays.id')),
