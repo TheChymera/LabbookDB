@@ -161,10 +161,10 @@ class OrthogonalStereotacticTarget(Base):
 	posteroanterior = Column(Float)
 	leftright = Column(Float)
 	superoinferior = Column(Float)
-	# angles in degrees
-	angle_posteroanterior = Column(Float)
-	angle_leftright = Column(Float)
-	angle_superoinferior = Column(Float)
+	# angles in degrees and relative to implant
+	pitch = Column(Float)
+	yaw = Column(Float)
+	roll = Column(Float)
 	# depth in millimetres
 	depth = Column(Float)
 	qualitative_depth_reference = Column(String, default="skull") # set to "dura" if the insertable is lowered to the dura before coordinate setting
