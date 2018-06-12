@@ -9,7 +9,8 @@ def animal_multiselect():
 	df_implants = [animal_id(db_path, 'ETH/AIC', i, reverse=True) for i in df_implants]
 	df_virus = [animal_id(db_path, 'ETH/AIC', i, reverse=True) for i in df_virus]
 	d = [df_treatments, df_implants, df_virus]
-	print(set(d[0]).intersection(*d))
+	selection = list(set(d[0]).intersection(*d))
+	return selection
 
 def animal_weights_():
 	import matplotlib.pyplot as mpl
