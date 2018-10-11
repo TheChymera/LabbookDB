@@ -22,6 +22,7 @@ In comparison with other electronic formats based on a document concept, a **dat
 * More easily queried
 * More easily integrated into data analysis functions
 
+
 Presentations
 -------------
 
@@ -41,7 +42,7 @@ Installation
 Gentoo Linux
 ~~~~~~~~~~~~
 
-LabbookDB is available for Portage (the package manager of Gentoo Linux, derivative distributions, as well as BSD) via the `Chymeric Overlay <https://github.com/TheChymera/overlay>`_.
+LabbookDB is available for Portage (the package manager of Gentoo Linux, derivative distributions, as well as BSD) via the `Gentoo Science Overlay <https://github.com/gentoo/sci/>`_.
 Upon enabling the overlay, the package can be emerged:
 
 .. code-block:: console
