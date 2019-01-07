@@ -4,6 +4,22 @@ from os import path
 DB_PATH = '~/.demolog/meta.db'
 DATA_DIR = path.join(path.dirname(path.realpath(__file__)),'../../example_data/')
 
+def test_implant_angle_filter():
+	from labbookdb.report.selection import animal_id, animal_treatments, animal_operations
+	import numpy as np
+
+	db_path=DB_PATH
+	df = animal_operations(db_path)
+	#validate target by code
+	df = df[~df['OrthogonalStereotacticTarget_code'].isnull()]
+	df = df[df['OrthogonalStereotacticTarget_code'].str.contains('dr')]
+	#check pitch
+	df = df[~df['OrthogonalStereotacticTarget_pitch'].isin([0,np.NaN])]
+	animals = df['Animal_id'].tolist()
+	animals_eth = [animal_id(db_path,'ETH/AIC',i,reverse=True) for i in animals]
+
+	assert animals_eth == ['5684']
+
 def test_animal_cage_treatment_control_in_report():
 	"""Check if animal which died before the cagetreatment was applied to its last home cage is indeed not showing a cage treatment, but still showing the animal treatment."""
 	from labbookdb.report.tracking import animals_info
