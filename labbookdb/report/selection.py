@@ -42,10 +42,14 @@ def animal_id(db_path, database, identifier, reverse=False):
 	my_filters.append(my_filter)
 
 	df = query.get_df(db_path,col_entries=col_entries, join_entries=join_entries, filters=my_filters)
-	if reverse:
-		labbookdb_id = df['AnimalExternalIdentifier_identifier'].item()
-	else:
-		labbookdb_id = df['Animal_id'].item()
+	try:
+		if reverse:
+			labbookdb_id = df['AnimalExternalIdentifier_identifier'].item()
+		else:
+			labbookdb_id = df['Animal_id'].item()
+	except ValueError as e:
+		print('This may be happening because the identifier query value you have provided is of the wrong type (LabbookDB lookups are type-sensitive).')
+		raise
 
 	return labbookdb_id
 
