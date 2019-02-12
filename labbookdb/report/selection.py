@@ -579,6 +579,10 @@ def parameterized(db_path, data_type,
 			("Animal.external_ids",),
 			("Animal.genotypes",),
 			]
+		if animal_filter:
+			my_filter = ['Animal','id']
+			# for some reason this needs to be str
+			my_filter.extend([str(i) for i in animal_filter])
 	elif data_type == "animals measurements":
 		col_entries=[
 			("Animal","id"),
