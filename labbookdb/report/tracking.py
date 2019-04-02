@@ -240,7 +240,7 @@ def cage_consumption(db_path, df,
 	return df
 
 def append_external_identifiers(db_path, df,
-	concatenate=['Genotype_code'],
+	concatenate=[],
 	):
 	"""
 	Append external animal IDs to a dataframe containing an `Animal_id` (`Animal.id`) column.
