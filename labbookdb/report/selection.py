@@ -442,6 +442,38 @@ def cage_drinking_measurements(db_path,
 	return df
 
 
+def animals_by_genotype(db_path, genotypes,
+	attribute='code',
+	):
+	"""Return `pandas.Dataframe` object containing ID and genotype table columns of animals as matched by selected values on a selected Genotype attribute field.
+
+	Parameters
+	----------
+	db_path : string
+		Path to database file to query.
+	genotypes : list
+		List of strings containing values to be matched for the selected Genotype attribute.
+	attribute : str
+		Genotype attribute to match on.
+	"""
+	filters = []
+	join_type = 'inner'
+	col_entries=[
+		("Animal","id"),
+		("Genotype",),
+		]
+	join_entries=[
+		("Animal.genotypes",),
+		]
+	my_filter = ["Genotype", attribute]
+	my_filter.extend(genotypes)
+	filters.append(my_filter)
+
+	df = query.get_df(db_path, col_entries=col_entries, join_entries=join_entries, filters=filters, default_join=join_type)
+
+	return df
+
+
 def cage_periods(db_path,
 	animal_filter=[],
 	cage_filter=[],
