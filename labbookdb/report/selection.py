@@ -47,9 +47,9 @@ def animal_id(db_path, database, identifier, reverse=False):
 			labbookdb_id = df['AnimalExternalIdentifier_identifier'].item()
 		else:
 			labbookdb_id = df['Animal_id'].item()
-	except ValueError as e:
+	except ValueError:
+		labbookdb_id = 'FailedIDQuery'
 		print('This may be happening because the identifier query value you have provided is of the wrong type (LabbookDB lookups are type-sensitive).')
-		raise
 
 	return labbookdb_id
 
