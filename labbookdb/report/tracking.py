@@ -512,6 +512,7 @@ def overview(db_path,
 				pass
 			else:
 				if rounding:
+					df[date_column] = pd.to_datetime(df[date_column], errors='coerce')
 					if rounding_type == 'round':
 						df[date_column] = df[date_column].dt.round(rounding)
 					elif rounding_type == 'floor':
