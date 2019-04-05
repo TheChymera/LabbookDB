@@ -486,7 +486,7 @@ def overview(db_path,
 	from behaviopy import plotting
 
 	df = selection.timetable(db_path, filters, default_join, join_types=join_types)
-	date_columns = ['Treatment_start_date', 'Treatment_end_date', 'FMRIMeasurement_date', 'OpenFieldTestMeasurement_date', 'ForcedSwimTestMeasurement_date', 'Cage_Treatment_start_date', 'Cage_Treatment_end_date',]
+	date_columns = [i for i in df.columns.tolist() if i.endswith('_date')]
 
 	if relative_dates:
 		if isinstance(relative_dates, dict):
