@@ -309,7 +309,7 @@ def treatment_group(db_path, treatments,
 				death_date = df[df['Animal_id']==subject]['Animal_death_date'].tolist()[0]
 				# We do not check for treatment end dates, because often you may want to include recipients of incomplete treatments (e.g. due to death) when filtering based on cagestays.
 				# Filtering based on death should be done elsewhere.
-				if not stay_start <= treatment_start and not treatment_start >= stay_end:
+				if treatment_start <= stay_start or treatment_start >= stay_end:
 					drop_idx.extend(df[(df['Animal_id']==subject)&(df['CageStay_start_date']==stay_start)].index.tolist())
 				elif treatment_start >= death_date:
 					drop_idx.extend(df[(df['Animal_id']==subject)&(df['CageStay_start_date']==stay_start)].index.tolist())
