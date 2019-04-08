@@ -142,6 +142,7 @@ class OpticFiberImplant(Base):
 	long_code = Column(String) #not necessarily uniqu, as we track different transmittances per model
 	angle = Column(Float) # in degrees, relative to an unangled implant axis
 	ferrule_diameter = Column(Float) # in mm
+	cannula_diameter = Column(Float) # in mm
 	length = Column(Float) # in mm
 	manufacturer_code = Column(String)
 	manufacturer = Column(String)
