@@ -1,4 +1,6 @@
-def concurrent_cagetreatment(df, cagestays):
+def concurrent_cagetreatment(df, cagestays,
+	protect_duplicates=['Animal_id','Cage_id','Cage_Treatment_start_date', 'Cage_TreatmentProtocol_code'],
+	):
 	"""
 	Return a `pandas.DataFrame` object containing only `Cage_Treatment*` entries which are concurrent with the animal stay in the cage to which they were administered.
 
@@ -38,7 +40,7 @@ def concurrent_cagetreatment(df, cagestays):
 			elif treatment_start >= death_date:
 				drop_idx.extend(df[(df['Animal_id']==subject)&(df['CageStay_start_date']==stay_start)].index.tolist())
 	df = df.drop(drop_idx)
-	df = df.drop_duplicates(subset=['Animal_id','Cage_id','Cage_Treatment_start_date', 'Cage_TreatmentProtocol_code'])
+	#df = df.drop_duplicates(subset=protect_duplicates)
 	return df
 
 def make_identifier_short_form(df,
