@@ -1,17 +1,23 @@
 
-def animal_multiselect(
-	cage_treatments=['cFluDW','cFluDW_']
+def animal_multiselect(db_path,
+	cage_treatments=['cFluDW','cFluDW_'],
+	implant_targets=['dr_impl'],
+	virus_targets=['dr_skull','dr_dura','dr_dura_shallow','dr_skull_perpendicular'],
+	genotype_targets=['eptg'],
+	external_id='',
 	):
-	from labbookdb.report.selection import animal_id, animal_treatments, animal_operations
+	from labbookdb.report.selection import animals_by_genotype, animal_id, animal_treatments, animal_operations
 
-	db_path='~/syncdata/meta.db'
 	df_treatments = animal_treatments(db_path, cage_treatments=cage_treatments)['Animal_id'].tolist()
-	df_implants = animal_operations(db_path, implant_targets=['dr_impl'])['Animal_id'].tolist()
-	df_virus = animal_operations(db_path, virus_targets=['dr_skull','dr_dura','dr_dura_shallow','dr_skull_perpendicular'])['Animal_id'].tolist()
-	df_treatments = [animal_id(db_path, 'ETH/AIC', i, reverse=True) for i in df_treatments]
-	df_implants = [animal_id(db_path, 'ETH/AIC', i, reverse=True) for i in df_implants]
-	df_virus = [animal_id(db_path, 'ETH/AIC', i, reverse=True) for i in df_virus]
-	d = [df_treatments, df_implants, df_virus]
+	df_implants = animal_operations(db_path, implant_targets=implant_targets)['Animal_id'].tolist()
+	df_virus = animal_operations(db_path, virus_targets=virus_targets)['Animal_id'].tolist()
+	genotype = animals_by_genotype(db_path, genotype_targets)['Animal_id'].tolist()
+	if external_id:
+		df_treatments = [animal_id(db_path, external_id, i, reverse=True) for i in df_treatments]
+		df_implants = [animal_id(db_path, external_id, i, reverse=True) for i in df_implants]
+		df_virus = [animal_id(db_path, external_id, i, reverse=True) for i in df_virus]
+		genotype = [animal_id(db_path, external_id, i, reverse=True) for i in genotype]
+	d = [df_treatments, df_implants, df_virus, genotype]
 	selection = list(set(d[0]).intersection(*d))
 	return selection
 
