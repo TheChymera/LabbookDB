@@ -443,6 +443,7 @@ def overview(db_path,
 	save_as="",
 	rounding='D',
 	rounding_type='round',
+        protect_duplicates=['Animal_id','Cage_id','Cage_Treatment_start_date', 'Cage_TreatmentProtocol_code'],
 	):
 	"""Returns an overview of events per animal.
 
@@ -473,6 +474,10 @@ def overview(db_path,
 	from behaviopy import plotting
 
 	df = selection.timetable(db_path, filters, default_join, join_types=join_types)
+	animals = list(df["Animal_id"].unique())
+	cagestays = selection.cage_periods(db_path, animal_filter=animals)
+	df = concurrent_cagetreatment(df, cagestays, protect_duplicates=protect_duplicates)
+
 	date_columns = [i for i in df.columns.tolist() if i.endswith('_date')]
 
 	if relative_dates:
