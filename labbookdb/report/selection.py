@@ -527,11 +527,13 @@ def timetable(db_path, filters,
 
 	col_entries=[
 		("Animal","id"),
+		("Animal","death_date"),
 		("Treatment",),
 		("FMRIMeasurement","date"),
 		("OpenFieldTestMeasurement","date"),
 		("ForcedSwimTestMeasurement","date"),
 		("TreatmentProtocol","code"),
+		("CageStay","start_date"),
 		("Cage","id"),
 		("Cage","Treatment",""),
 		("Cage","TreatmentProtocol","code"),
@@ -549,10 +551,6 @@ def timetable(db_path, filters,
 		("Cage_TreatmentProtocol","Cage_Treatment.protocol"),
 		("SucrosePreferenceMeasurement","Cage.measurements"),
 		]
-
-	# if treatment_start_dates:
-	# 	my_filter = ["Treatment","start_date"]
-	# 	my_filter.extend(treatment_start_dates)
 
 	# setting outerjoin to true will indirectly include controls
 	df = query.get_df(db_path, col_entries=col_entries, join_entries=join_entries, filters=filters, default_join=default_join, join_types=join_types)
