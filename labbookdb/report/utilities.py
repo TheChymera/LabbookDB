@@ -56,7 +56,8 @@ def make_identifier_short_form(df,
 		The name of a column from `df`, the values of which can be rendered unique. This column will serve as the index o the resulting dataframe.
 	"""
 	df = df.rename(columns={'AnimalExternalIdentifier_animal_id': 'Animal_id'})
-	df = df.set_index([index_name, 'AnimalExternalIdentifier_database'])['AnimalExternalIdentifier_identifier'].unstack(1)
+	df = df.set_index([index_name, 'AnimalExternalIdentifier_database'])['AnimalExternalIdentifier_identifier']
+	df = df.unstack(1)
 	return df
 
 def collapse_rename(df, groupby, collapse,
