@@ -256,7 +256,9 @@ def append_external_identifiers(db_path, df,
 		A list containing any combination of 'Animal_death_date', 'Genotype_id', 'Genotype_code', 'Genotype_construct'.
 	"""
 
-	df_id = selection.parameterized(db_path, "animals info")
+	df_id = selection.parameterized(db_path, "animals info",
+		animal_filter=list(df['Animal_id'].unique()),
+		)
 
 	collapse = {}
 	if concatenate:
