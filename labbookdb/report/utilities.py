@@ -1,3 +1,5 @@
+import pandas as pd
+
 def concurrent_cagetreatment(df, cagestays,
 	protect_duplicates=['Animal_id','Cage_id','Cage_Treatment_start_date', 'Cage_TreatmentProtocol_code'],
 	):
@@ -84,3 +86,40 @@ def collapse_rename(df, groupby, collapse,
 
 	return df
 
+def relativize_dates(df,
+	date_suffix='_date',
+	rounding='D',
+	rounding_type='round',
+	):
+	"""
+	Express dates on each row of a Pandas Dataframe as datetime objects relative to the row value on the 'reference_date' column.
+
+	Parameters
+	----------
+
+	df : pandas.DataFrame
+		Pandas Dataframe, with columns containing 'reference_date' and strings ending in `date_suffix`.
+	date_suffix : str, optional
+		String sufix via which to identify date columns needing manipulation.
+	rounding : str, optional
+		Datetime increment for date rounding.	
+	rounding_type : {'round','floor','ceil'}, optional
+		Whether to round the dates (splits e.g. days apart at noon, hours at 30 minutes, etc.) or to take the floor or the ceiling.
+	"""
+	
+	date_columns = [i for i in df.columns.tolist() if i.endswith(date_suffix)]
+	for date_column in date_columns:
+		try:
+			df[date_column] = df[date_column]-df['reference_date']
+		except TypeError:
+			pass
+		else:
+			if rounding:
+				df[date_column] = pd.to_datetime(df[date_column], errors='coerce')
+				if rounding_type == 'round':
+					df[date_column] = df[date_column].dt.round(rounding)
+				elif rounding_type == 'floor':
+					df[date_column] = df[date_column].dt.floor(rounding)
+				elif rounding_type == 'ceil':
+					df[date_column] = df[date_column].dt.ceil(rounding)
+	return df

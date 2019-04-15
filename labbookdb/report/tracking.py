@@ -480,8 +480,6 @@ def overview(db_path,
 	cagestays = selection.cage_periods(db_path, animal_filter=animals)
 	df = concurrent_cagetreatment(df, cagestays, protect_duplicates=protect_duplicates)
 
-	date_columns = [i for i in df.columns.tolist() if i.endswith('_date')]
-
 	if relative_dates:
 		if isinstance(relative_dates, dict):
 			df['reference_date'] = ''
@@ -499,20 +497,11 @@ def overview(db_path,
 			df['reference_date'] = df['Cage_Treatment_start_date']
 		else:
 			df['reference_date'] = df[relative_dates]
-		for date_column in date_columns:
-			try:
-				df[date_column] = df[date_column]-df['reference_date']
-			except TypeError:
-				pass
-			else:
-				if rounding:
-					df[date_column] = pd.to_datetime(df[date_column], errors='coerce')
-					if rounding_type == 'round':
-						df[date_column] = df[date_column].dt.round(rounding)
-					elif rounding_type == 'floor':
-						df[date_column] = df[date_column].dt.floor(rounding)
-					elif rounding_type == 'ceil':
-						df[date_column] = df[date_column].dt.ceil(rounding)
+		df = relativize_dates(df,
+			rounding=rounding,
+			rounding_type=rounding_type,
+			)
+
 
 	if save_as:
 		save_as = os.path.abspath(os.path.expanduser(save_as))
