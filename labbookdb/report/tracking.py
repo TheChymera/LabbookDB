@@ -500,8 +500,8 @@ def overview(db_path,
 		df = relativize_dates(df,
 			rounding=rounding,
 			rounding_type=rounding_type,
+			reference_date=False,
 			)
-
 
 	if save_as:
 		save_as = os.path.abspath(os.path.expanduser(save_as))
