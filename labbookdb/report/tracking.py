@@ -473,7 +473,6 @@ def overview(db_path,
 	rounding_type : {'round','floor','ceil'}, optional
 		Whether to round the dates (splits e.g. days apart at noon, hours at 30 minutes, etc.) or to take the floor or the ceiling.
 	"""
-	from behaviopy import plotting
 
 	df = selection.timetable(db_path, filters, default_join, join_types=join_types)
 	animals = list(df["Animal_id"].unique())
