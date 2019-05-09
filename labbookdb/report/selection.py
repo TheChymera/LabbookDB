@@ -655,14 +655,6 @@ def parameterized(db_path, data_type,
 			("Animal.cage_stays",),
 			("CageStay.cage",),
 			]
-		if animal_filter:
-			my_filter = ['Animal','id']
-			# for some reason this needs to be str
-			my_filter.extend([str(i) for i in animal_filter])
-		if cage_filter:
-			my_filter = ['Cage','id']
-			# for some reason this needs to be str
-			my_filter.extend([str(i) for i in cage_filter])
 	elif data_type == "forced swim":
 		col_entries=[
 			("Animal","id"),
@@ -683,6 +675,14 @@ def parameterized(db_path, data_type,
 	else:
 		raise ValueError("The `data_type` value needs to be one of: {}. You specified \"{}\"".format(", ".join(allowed_data_types), data_type))
 
+	if animal_filter:
+		my_filter = ['Animal','id']
+		# for some reason this needs to be str
+		my_filter.extend([str(i) for i in animal_filter])
+	if cage_filter:
+		my_filter = ['Cage','id']
+		# for some reason this needs to be str
+		my_filter.extend([str(i) for i in cage_filter])
 	if treatment_start_dates:
 		my_filter = ["Treatment","start_date"]
 		my_filter.extend(treatment_start_dates)
