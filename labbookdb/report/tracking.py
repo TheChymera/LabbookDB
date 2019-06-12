@@ -301,9 +301,9 @@ def treatment_group(db_path, treatments,
 		df = selection.animal_treatments(db_path, animal_treatments=treatments)
 	elif level=="cage":
 		df = selection.animal_treatments(db_path, cage_treatments=treatments)
-		animals = list(df["Animal_id"].unique())
-		cagestays = selection.cage_periods(db_path, animal_filter=animals)
-		df = concurrent_cagetreatment(df, cagestays)
+	animals = list(df["Animal_id"].unique())
+	cagestays = selection.cage_periods(db_path, animal_filter=animals)
+	df = concurrent_cagetreatment(df, cagestays)
 	return df
 
 def qualitative_dates(df,
@@ -473,7 +473,6 @@ def overview(db_path,
 	rounding_type : {'round','floor','ceil'}, optional
 		Whether to round the dates (splits e.g. days apart at noon, hours at 30 minutes, etc.) or to take the floor or the ceiling.
 	"""
-	from behaviopy import plotting
 
 	df = selection.timetable(db_path, filters, default_join, join_types=join_types)
 	animals = list(df["Animal_id"].unique())
