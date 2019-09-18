@@ -613,6 +613,8 @@ def parameterized(db_path, data_type,
 	elif data_type == "animals info":
 		col_entries=[
 			("Animal","death_date"),
+			("Animal","birth_date"),
+			("Animal","sex"),
 			("AnimalExternalIdentifier",),
 			("Genotype",),
 			]
