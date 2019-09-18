@@ -344,6 +344,9 @@ def animal_treatments(db_path,
 					df.loc[(df['Animal_id']==subject)&(df['CageStay_start_date']==stay_start),cage_treatment_columns] = None
 	df = df.drop_duplicates(subset=['Animal_id','Cage_id','Cage_Treatment_start_date', 'Cage_TreatmentProtocol_code', 'TreatmentProtocol_code'])
 
+	# FIXXXXXX
+	#print(df['Animal_id'].tolist())
+	#df.to_csv('lala.csv')
 	return df
 
 
@@ -583,6 +586,7 @@ def parameterized(db_path, data_type,
 	my_filter = []
 
 	allowed_data_types = [
+			"animals base",
 			"animals id",
 			"animals info",
 			"animals measurements",
@@ -591,7 +595,14 @@ def parameterized(db_path, data_type,
 			"forced swim",
 			]
 
-	if data_type == "animals id":
+	if data_type == "animals base":
+		col_entries=[
+			("Animal","id"),
+			("Animal","birth_date"),
+			("Animal","sex"),
+			]
+		join_entries=[]
+	elif data_type == "animals id":
 		col_entries=[
 			("Animal","id"),
 			("AnimalExternalIdentifier",),
