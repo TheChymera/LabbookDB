@@ -40,16 +40,24 @@ def concurrent_cagetreatment(df, cagestays,
 	"""
 	drop_idx = []
 	for subject in list(df['Animal_id'].unique()):
-		for stay_start in df[df['Animal_id']==subject]['CageStay_start_date'].tolist():
+		stay_starts = df[df['Animal_id']==subject]['CageStay_start_date'].tolist()
+		# The per-animal treatment info is recorded in each table row, but if the animal only has one cage stay without a cage treatment, it will be deleted, taking the animal treatment information with it.
+		# We avoid this here:
+		blank_cells_only = False
+		if len(stay_starts) == 1:
+			if df.loc[df['Animal_id']==subject, 'TreatmentProtocol_code'].item() != None:
+				blank_cells_only = True
+		for stay_start in stay_starts:
 			stay_end = cagestays[(cagestays['Animal_id']==subject)&(cagestays['CageStay_start_date']==stay_start)]['CageStay_end_date'].tolist()[0]
 			treatment_start = df[(df['Animal_id']==subject)&(df['CageStay_start_date']==stay_start)]['Cage_Treatment_start_date'].tolist()[0]
 			death_date = df[df['Animal_id']==subject]['Animal_death_date'].tolist()[0]
 			# We do not check for treatment end dates, because often you may want to include recipients of incomplete treatments (e.g. due to death) when filtering based on cagestays.
 			# Filtering based on death should be done elsewhere.
-			if treatment_start <= stay_start or treatment_start >= stay_end:
-				drop_idx.extend(df[(df['Animal_id']==subject)&(df['CageStay_start_date']==stay_start)].index.tolist())
-			elif treatment_start >= death_date:
-				drop_idx.extend(df[(df['Animal_id']==subject)&(df['CageStay_start_date']==stay_start)].index.tolist())
+			if treatment_start <= stay_start or treatment_start >= stay_end or treatment_start >= death_date:
+				if blank_cells_only:
+					df.loc[df['Animal_id']==subject, ['Cage_TreatmentProtocol_code', 'Cage_Treatment_start_date', 'Cage_Treatment_end_date', 'Cage_Treatment_protocol_id']] = None
+				else:
+					drop_idx.extend(df[(df['Animal_id']==subject)&(df['CageStay_start_date']==stay_start)].index.tolist())
 	df = df.drop(drop_idx)
 	#df = df.drop_duplicates(subset=protect_duplicates)
 	return df
