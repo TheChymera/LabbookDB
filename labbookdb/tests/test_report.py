@@ -114,11 +114,7 @@ def test_groups():
 		]
 
 	df = treatment_group(DB_PATH, ['cFluDW','cFluDW_'], level='cage')
-	print(df.columns)
-	print(df['Animal_id'].tolist())
 	df = append_external_identifiers(DB_PATH, df, ['Genotype_code'])
 	sorted_ids = sorted(df['ETH/AIC'].tolist())
 
-	print(sorted_ids)
-	print(known_sorted_ids)
 	assert sorted_ids == known_sorted_ids
