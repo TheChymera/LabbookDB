@@ -1,7 +1,16 @@
 import pandas as pd
 
 def concurrent_cagetreatment(df, cagestays,
-	protect_duplicates=['Animal_id','Cage_id','Cage_Treatment_start_date', 'Cage_TreatmentProtocol_code'],
+	protect_duplicates=[
+		'Animal_id',
+		'Cage_id',
+		'Cage_Treatment_start_date',
+		'Cage_Treatment_end_date',
+		'Cage_TreatmentProtocol_code',
+		'Treatment_end_date',
+		'Treatment_end_date',
+		'TreatmentProtocol_code',
+		],
 	):
 	"""
 	Return a `pandas.DataFrame` object containing only `Cage_Treatment*` entries which are concurrent with the animal stay in the cage to which they were administered.
