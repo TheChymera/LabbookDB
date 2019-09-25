@@ -301,9 +301,6 @@ def treatment_group(db_path, treatments,
 		df = selection.animal_treatments(db_path, animal_treatments=treatments)
 	elif level=="cage":
 		df = selection.animal_treatments(db_path, cage_treatments=treatments)
-	animals = list(df["Animal_id"].unique())
-	cagestays = selection.cage_periods(db_path, animal_filter=animals)
-	df = concurrent_cagetreatment(df, cagestays)
 	return df
 
 def qualitative_dates(df,

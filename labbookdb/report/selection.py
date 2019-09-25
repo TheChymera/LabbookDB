@@ -1,5 +1,6 @@
 import pandas as pd
 from labbookdb.db import query
+from labbookdb.report.utilities import concurrent_cagetreatment
 
 def animal_id(db_path, database, identifier, reverse=False):
 	"""Return the main LabbookDB animal identifier given an external database identifier.
@@ -330,23 +331,8 @@ def animal_treatments(db_path,
 	cage_treatment_columns = ['Cage_Treatment_id','Cage_Treatment_end_date','Cage_Treatment_start_date','Cage_TreatmentProtocol_code','Cage_Treatment_protocol_id']
 	animals = list(df["Animal_id"].unique())
 	cage_stays = cage_periods(db_path, animal_filter=animals)
-	for subject in list(df['Animal_id'].unique()):
-		for stay_start in df[df['Animal_id']==subject]['CageStay_start_date'].tolist():
-			stay_end = cage_stays[(cage_stays['Animal_id']==subject)&(cage_stays['CageStay_start_date']==stay_start)]['CageStay_end_date'].tolist()[0]
-			treatment_start = df[(df['Animal_id']==subject)&(df['CageStay_start_date']==stay_start)]['Cage_Treatment_start_date'].tolist()[0]
-			death_date = df[df['Animal_id']==subject]['Animal_death_date'].tolist()[0]
-			# We do not check for treatment end dates, because often you may want to include recipients of incomplete treatments (e.g. due to death) when filtering based on cagestays.
-			# Filtering based on death should be done elsewhere.
-			if not pd.isnull(treatment_start):
-				if not stay_start <= treatment_start and not treatment_start >= stay_end:
-					df.loc[(df['Animal_id']==subject)&(df['CageStay_start_date']==stay_start),cage_treatment_columns] = None
-				elif treatment_start >= death_date:
-					df.loc[(df['Animal_id']==subject)&(df['CageStay_start_date']==stay_start),cage_treatment_columns] = None
-	df = df.drop_duplicates(subset=['Animal_id','Cage_id','Cage_Treatment_start_date', 'Cage_TreatmentProtocol_code', 'TreatmentProtocol_code'])
+	df = concurrent_cagetreatment(df, cage_stays)
 
-	# FIXXXXXX
-	#print(df['Animal_id'].tolist())
-	#df.to_csv('lala.csv')
 	return df
 
 
