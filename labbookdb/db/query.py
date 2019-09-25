@@ -321,10 +321,7 @@ def get_df(db_path,
 	#we need to make sure we don't edit the join_types variable passed to this function
 	join_types = deepcopy(join_types)
 	while len(join_types) < len(joins):
-		if default_join == "outer":
-			join_types.append("outer")
-		elif default_join == "inner":
-			join_types.append("inner")
+		join_types.append(default_join)
 	for ix, join in enumerate(joins):
 		if join_types[ix] == "inner":
 			sql_query = sql_query.join(*join)
