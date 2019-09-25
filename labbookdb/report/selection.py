@@ -333,6 +333,12 @@ def animal_treatments(db_path,
 	cage_stays = cage_periods(db_path, animal_filter=animals)
 	df = concurrent_cagetreatment(df, cage_stays)
 
+	# The concurrent cage treatment function cannot delete the entire entry for animals which have only one entry in the dataframe.
+	# This is because the row may still contain unique animal treatment information, which would otherwise be lost.
+	# As the `concurrent_cagetreatment()` function is unaware of this context, we perform this filtering here.
+	if cage_treatments:
+		df = df.loc[df['Cage_TreatmentProtocol_code'].isin(cage_treatments)]
+
 	return df
 
 
