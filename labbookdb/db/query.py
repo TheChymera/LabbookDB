@@ -286,7 +286,7 @@ def get_df(db_path,
 			("Cage_TreatmentProtocol","Cage_Treatment.protocol")
 			]
 	>>> filters = [["Cage_Treatment","start_date","2016,4,25,19,30"]]
-	>>> reference_df = get_df("~/syncdata/meta.db",col_entries=col_entries, join_entries=join_entries, filters=filters)
+	>>> reference_df = get_df("~/syncdata/meta.db", col_entries=col_entries, join_entries=join_entries, filters=filters)
 
 	"""
 
