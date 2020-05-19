@@ -137,7 +137,8 @@ def relativize_dates(df,
 			pass
 		else:
 			if rounding:
-				df[date_column] = pd.to_datetime(df[date_column], errors='coerce')
+				start = pd.to_datetime('1970-01-01')
+				df[date_column] = df[date_column] + start
 				if rounding_type == 'round':
 					df[date_column] = df[date_column].dt.round(rounding)
 				elif rounding_type == 'floor':
